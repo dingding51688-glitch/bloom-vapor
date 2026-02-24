@@ -10,6 +10,7 @@ collections:
     label: "Landing Page"
     files:
       - file: "index.html"
+        name: "homepage"
         label: "Homepage"
         fields:
           - label: "Hero Title"
