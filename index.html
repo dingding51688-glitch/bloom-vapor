@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bloom Vapor - 精品电子烟系列</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2atLYB+g6JV+0ZKXHXTULyYM54PsTcZTa0m0kJ0=" crossorigin="" />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7k3P5LhY5QZnIcqoNCmieYw7YI6wrEn7k55m9A=" crossorigin=""></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+    :root {
+      color-scheme: light dark;
+      --bg: #0d1117;
+      --mid: #161b22;
+      --accent: #7c3aed;
+      --text: #f7f6ff;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top, #1f2430, #08090d 60%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      padding: 40px 0 30px;
+    }
+    header h1 {
+      font-size: clamp(2.2rem, 4vw, 3rem);
+      margin-bottom: 12px;
+    }
+    header p {
+      font-size: 1.1rem;
+      color: #cfd3ff;
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(16, 185, 129, 0.25));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      animation: fade-slide 0.8s ease both;
+    }
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    .hero::before {
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.35), transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(124, 58, 237, 0.4), transparent 55%);
+      animation: particle-shift 12s ease-in-out infinite alternate;
+    }
+    .hero::after {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: particle-drift 16s linear infinite;
+      opacity: 0.3;
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .hero-text {
+      flex: 1 1 320px;
+    }
+    .hero-text h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+    .flow-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
+      color: #cfd3ff;
+    }
+    .hero-text p {
+      color: #e0e4ff;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-cta button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hero-cta button:hover {
+      transform: translateY(-4px) scale(1.02);
+      opacity: 0.95;
+      box-shadow: 0 14px 26px rgba(124, 58, 237, 0.35);
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin: 40px 0 20px;
+      letter-spacing: 0.04em;
+    }
+    .category-grid, .product-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .category-grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .product-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .category-grid img {
+      width: 100%;
+      border-radius: 14px;
+      height: 170px;
+      object-fit: cover;
+      margin-bottom: 12px;
+      filter: brightness(0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .product-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .card, .product-card {
+      animation: fade-slide 0.9s ease both;
+    }
+    .product-card img {
+      width: 100%;
+      border-radius: 16px;
+      height: 190px;
+      object-fit: cover;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      filter: saturate(1.05);
+    }
+    .product-card p {
+      color: #d7d7ff;
+    }
+    .stardawg-title {
+      font-family: 'Russo One', 'Bebas Neue', 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #e7f1ff;
+      text-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+    }
+    .stardawg-title .inline-flag {
+      width: 30px;
+      height: 20px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      object-fit: cover;
+    }
+    .variant-table {
+      width: 100%;
+      margin-top: 16px;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      background: rgba(10, 12, 20, 0.55);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .variant-table th,
+    .variant-table td {
+      padding: 10px 14px;
+      text-align: left;
+    }
+    .variant-table thead {
+      background: rgba(124, 58, 237, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      color: #cdd4ff;
+    }
+    .variant-table tbody tr {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .variant-table tbody tr:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .variant-table tbody tr:hover,
+    .variant-table tbody tr:focus {
+      background: rgba(124, 58, 237, 0.18);
+    }
+    .variant-table .price-cell {
+      font-weight: 600;
+      color: #f8f4ff;
+    }
+    .product-flag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.85rem;
+      color: #f5f5ff;
+      margin-bottom: 10px;
+    }
+    .hub-panel {
+      margin: 18px 0 10px;
+      display: none;
+    }
+    .hub-panel.active {
+      display: block;
+    }
+    .hub-card {
+      background: rgba(15, 17, 25, 0.9);
+      border-radius: 18px;
+      padding: 18px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.6s ease;
+    }
+    .hub-panel.active .hub-card {
+      animation: float 6s ease-in-out infinite;
+    }
+    .order-section {
+      margin-top: 56px;
+      padding: 32px;
+      border-radius: 22px;
+      background: rgba(12, 14, 22, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.45);
+    }
+    .order-section .section-title {
+      margin-top: 0;
+    }
+    .order-desc,
+    .order-hint {
+      color: #cfd3ff;
+      margin-bottom: 18px;
+    }
+    .order-hint {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    .order-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+    .order-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #e4e6ff;
+    }
+    .order-form .full-width {
+      grid-column: 1 / -1;
+    }
+    .order-form input,
+    .order-form textarea {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(17, 19, 28, 0.85);
+      color: #fff;
+      font-size: 1rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .order-form input:focus,
+    .order-form textarea:focus {
+      border-color: var(--accent);
+      outline: none;
+      transform: translateY(-2px);
+    }
+    .order-form textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    .submit-order {
+      grid-column: 1 / -1;
+      border: none;
+      border-radius: 18px;
+      padding: 14px 20px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: linear-gradient(120deg, var(--accent), #a855f7);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 15px 30px rgba(124, 58, 237, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .submit-order:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 35px rgba(124, 58, 237, 0.45);
+    }
+    .hub-map {
+      margin-top: 16px;
+      height: 290px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: none;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      transform: translateY(12px);
+      opacity: 0;
+    }
+    .hub-map.visible {
+      display: block;
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .hub-map.visible {
+      display: block;
+    }
+    .stations-section {
+      margin-top: 40px;
+    }
+    .station-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .station-controls input {
+      flex: 1;
+      min-width: 240px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text);
+    }
+    .station-count {
+      font-size: 0.9rem;
+      color: #9ba3d8;
+    }
+    .station-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .station-list .station-card {
+      background: rgba(15, 17, 25, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: fade-slide 0.4s ease both;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .station-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(124, 58, 237, 0.45);
+    }
+    .station-card small {
+      color: #8de1ff;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .station-card p {
+      color: #d7ddff;
+      font-size: 0.95rem;
+    }
+    .station-card span {
+      color: #9ba3d8;
+      font-size: 0.85rem;
+    }
+    .skeleton-line {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.3s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes particle-shift {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(20px, -10px, 0); }
+    }
+    @keyframes particle-drift {
+      0% { background-position: 0 0; }
+      100% { background-position: 200px 200px; }
+    }
+    .hub-card ul {
+      list-style: none;
+      margin: 12px 0;
+      padding-left: 0;
+      color: #ced4ff;
+    }
+    .hub-card li {
+      margin-bottom: 6px;
+    }
+    .hub-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 6px 0;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .hub-result:hover {
+      color: #ffffff;
+    }
+    .select-chip {
+      font-size: 0.85rem;
+      color: #82f5b2;
+      border: 1px solid rgba(130, 245, 178, 0.4);
+      border-radius: 999px;
+      padding: 2px 10px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .hub-result:hover .select-chip {
+      background: rgba(130, 245, 178, 0.15);
+      color: #e7fff3;
+    }
+    .highlight-pulse {
+      animation: glow 2s ease-out 1;
+    }
+    @keyframes glow {
+      0% { box-shadow: 0 0 0 rgba(124, 58, 237, 0.6); }
+      50% { box-shadow: 0 0 40px rgba(130, 245, 178, 0.7); }
+      100% { box-shadow: 0 0 0 rgba(124, 58, 237, 0); }
+    }
+        .hub-form {
+      margin-bottom: 14px;
+    }
+    .hub-form label {
+      display: block;
+      font-size: 0.9rem;
+      color: #9ba3d8;
+      margin-bottom: 6px;
+    }
+    .hub-form-row {
+      display: flex;
+      gap: 8px;
+    }
+    .hub-form-row input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      color: #f4f5ff;
+    }
+    .hub-form-row button {
+      border: none;
+      background: var(--accent);
+      color: white;
+      padding: 0 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hub-note {
+      color: #9ba3d8;
+      font-size: 0.9rem;
+    }
+    .distance {
+      color: #8de1ff;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .card {
+      background: rgba(15, 17, 25, 0.9);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chip {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      background: rgba(124, 58, 237, 0.15);
+      color: #c4b5fd;
+    }
+    .price {
+      font-size: 1.7rem;
+      font-weight: 600;
+    }
+    .buy-btn {
+      margin-top: auto;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 14px;
+      padding: 10px 0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.35);
+    }
+    .buy-btn:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 14px 30px rgba(124, 58, 237, 0.45);
+    }
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #9aa1c8;
+    }
+    footer a {
+      color: #c4b5fd;
+      text-decoration: none;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(8, 9, 13, 0.75);
+    }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.9), rgba(16, 185, 129, 0.7));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+    .logo-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+    .logo-part { color: #d5ddff; font-weight: 600; }
+    .logo-part.mid { color: #82f5b2; }
+    .logo-num { color: var(--accent); font-weight: 700; }
+    .logo-dot { color: #ffcc5c; font-weight: 700; }
+    .nav-menu {
+      display: flex;
+      gap: 26px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      position: relative;
+    }
+    .nav-indicator {
+      position: absolute;
+      bottom: -6px;
+      height: 2px;
+      width: 32px;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: transform 0.3s ease, width 0.3s ease;
+    }
+    .nav-menu a {
+      text-decoration: none;
+      color: #dfe2ff;
+      padding-bottom: 6px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    @keyframes fade-slide {
+      0% {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @media (max-width: 640px) {
+      .hero {
+        padding: 24px;
+      }
+      .hero-cta {
+        width: 100%;
+      }
+      .hero-cta button {
+        flex: 1;
+        justify-content: center;
+      }
+      .station-list {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="top">
+    <nav>
+      <div class="logo-mark">
+        <span class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="presentation">
+            <rect x="7" y="11" width="22" height="18" rx="4" ry="4" fill="rgba(8,9,13,0.5)" stroke="#d4f8ff" stroke-width="1.4" />
+            <rect x="21" y="11" width="8" height="18" rx="3" ry="3" fill="rgba(255,255,255,0.15)" />
+            <circle cx="25" cy="20" r="2.4" fill="#82f5b2" />
+            <path d="M17 25c-2.6-2.3-4.4-5.8-1.7-8.1c1.5-1.3 3-0.4 3.4 0.1c0.4-0.8 1.8-1.6 3.2-0.2c2.5 2.4-0.3 5.4-2.2 8z" fill="#b0ffb3" stroke="#0f4d3d" stroke-width="0.6" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="logo-part">SUP</span>
+        <span class="logo-part mid">PLY</span>
+        <span class="logo-dot">•</span>
+        <span class="logo-num">24</span>
+      </div>
+      <div class="nav-menu" id="nav-menu">
+        <span class="nav-indicator" id="nav-indicator"></span>
+        <a href="#top" class="active">首页</a>
+        <a href="#hubs">站点</a>
+        <a href="#products">产品</a>
+        <a href="#stations">全部站点</a>
+        <a href="#contact">在线客服</a>
+      </div>
+    </nav>
+
+    <header>
+      <h1>Supply 24</h1>
+      <p>Get What You Need in 1 Hour — Safe & Secure</p>
+    </header>
+
+    <section class="hero parallax" id="gallery" data-depth="0.2">
+      <div class="hero-text">
+        <div class="flow-step">STEP 1</div>
+        <h2>先选择最近的 24/7 站点</h2>
+        <p>Across Northern Ireland · Fully self-service · Pick up from a nearby hub within 1 hour.</p>
+      </div>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="toggleHubPanel()">立即匹配取货站点</button>
+      </div>
+    </section>
+
+
+    <div class="hub-panel" id="hub-panel">
+      <div class="hub-card">
+        <div class="hub-form">
+          <label for="postcode">邮编 Postcode</label>
+          <div class="hub-form-row">
+            <input type="text" id="postcode" placeholder="例如 BT9 5AD" />
+            <button type="button" onclick="matchHub()">匹配站点</button>
+          </div>
+        </div>
+        <ul id="hub-list">
+          <li>输入邮编，立即推荐最近的 24/7 站点。</li>
+        </ul>
+        <div id="hub-map" class="hub-map" role="presentation" aria-hidden="true"></div>
+        <p class="hub-note">当前显示的是所有已激活的 24/7 取货站点示例。输入邮编即可返回最近的站点链接。</p>
+      </div>
+    </div>
+
+
+    <div class="flow-step" style="margin-top:40px;">STEP 2</div>
+    <h3 class="section-title" id="products">选择心仪产品</h3>
+    <div class="product-showcase">
+      <div class="card product-card">
+        <img src="https://flagcdn.com/w640/gb.png" alt="United Kingdom Flag" loading="lazy" />
+        <div class="product-flag" aria-label="英国">🇬🇧 英国</div>
+        <h4 class="stardawg-title">
+          <span>Stardawg</span>
+          <img class="inline-flag" src="https://flagcdn.com/w640/gb.png" alt="UK Flag" />
+        </h4>
+        <table class="variant-table" aria-label="Stardawg 规格价格">
+          <thead>
+            <tr>
+              <th>规格</th>
+              <th>示例售价</th>
+              <th>单克价</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="variant-row" data-product="Stardawg" data-variant="28g · £160 · £5.71/g">
+              <td>28g</td>
+              <td class="price-cell">£160</td>
+              <td>£5.71/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Stardawg" data-variant="62.5g · £325 · £5.20/g">
+              <td>62.5g</td>
+              <td class="price-cell">£325</td>
+              <td>£5.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Stardawg" data-variant="125g · £575 · £4.60/g">
+              <td>125g</td>
+              <td class="price-cell">£575</td>
+              <td>£4.60/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Stardawg" data-variant="250g · £1,050 · £4.20/g">
+              <td>250g</td>
+              <td class="price-cell">£1,050</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Stardawg" data-variant="500g · £2,100 · £4.20/g">
+              <td>500g</td>
+              <td class="price-cell">£2,100</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Stardawg" data-variant="1000g · £4,000 · £4.00/g">
+              <td>1000g</td>
+              <td class="price-cell">£4,000</td>
+              <td>£4.00/g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card product-card">
+        <img src="https://flagcdn.com/w640/ca.png" alt="Canada Flag" loading="lazy" />
+        <div class="product-flag" aria-label="加拿大">🇨🇦 加拿大</div>
+        <h4>Nova Edge Pro</h4>
+        <table class="variant-table" aria-label="Nova Edge Pro 规格价格">
+          <thead>
+            <tr>
+              <th>规格</th>
+              <th>示例售价</th>
+              <th>单克价</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="28g · £160 · £5.71/g">
+              <td>28g</td>
+              <td class="price-cell">£160</td>
+              <td>£5.71/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="62.5g · £325 · £5.20/g">
+              <td>62.5g</td>
+              <td class="price-cell">£325</td>
+              <td>£5.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="125g · £575 · £4.60/g">
+              <td>125g</td>
+              <td class="price-cell">£575</td>
+              <td>£4.60/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="250g · £1,050 · £4.20/g">
+              <td>250g</td>
+              <td class="price-cell">£1,050</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="500g · £2,100 · £4.20/g">
+              <td>500g</td>
+              <td class="price-cell">£2,100</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="1000g · £4,000 · £4.00/g">
+              <td>1000g</td>
+              <td class="price-cell">£4,000</td>
+              <td>£4.00/g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card product-card">
+        <img src="https://flagcdn.com/w640/us.png" alt="United States Flag" loading="lazy" />
+        <div class="product-flag" aria-label="美国">🇺🇸 美国</div>
+        <h4>Air Wave 一次性</h4>
+        <table class="variant-table" aria-label="Air Wave 一次性 规格价格">
+          <thead>
+            <tr>
+              <th>规格</th>
+              <th>示例售价</th>
+              <th>单克价</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="28g · £160 · £5.71/g">
+              <td>28g</td>
+              <td class="price-cell">£160</td>
+              <td>£5.71/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="62.5g · £325 · £5.20/g">
+              <td>62.5g</td>
+              <td class="price-cell">£325</td>
+              <td>£5.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="125g · £575 · £4.60/g">
+              <td>125g</td>
+              <td class="price-cell">£575</td>
+              <td>£4.60/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="250g · £1,050 · £4.20/g">
+              <td>250g</td>
+              <td class="price-cell">£1,050</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="500g · £2,100 · £4.20/g">
+              <td>500g</td>
+              <td class="price-cell">£2,100</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="1000g · £4,000 · £4.00/g">
+              <td>1000g</td>
+              <td class="price-cell">£4,000</td>
+              <td>£4.00/g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card product-card">
+        <img src="https://flagcdn.com/w640/th.png" alt="Thailand Flag" loading="lazy" />
+        <div class="product-flag" aria-label="泰国">🇹🇭 泰国</div>
+        <h4>Carbon Pods 口味包</h4>
+        <table class="variant-table" aria-label="Carbon Pods 口味包 规格价格">
+          <thead>
+            <tr>
+              <th>规格</th>
+              <th>示例售价</th>
+              <th>单克价</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="28g · £160 · £5.71/g">
+              <td>28g</td>
+              <td class="price-cell">£160</td>
+              <td>£5.71/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="62.5g · £325 · £5.20/g">
+              <td>62.5g</td>
+              <td class="price-cell">£325</td>
+              <td>£5.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="125g · £575 · £4.60/g">
+              <td>125g</td>
+              <td class="price-cell">£575</td>
+              <td>£4.60/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="250g · £1,050 · £4.20/g">
+              <td>250g</td>
+              <td class="price-cell">£1,050</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="500g · £2,100 · £4.20/g">
+              <td>500g</td>
+              <td class="price-cell">£2,100</td>
+              <td>£4.20/g</td>
+            </tr>
+            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="1000g · £4,000 · £4.00/g">
+              <td>1000g</td>
+              <td class="price-cell">£4,000</td>
+              <td>£4.00/g</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <section class="order-section" id="order-form">
+      <div class="flow-step">STEP 3</div>
+      <h3 class="section-title">填写订购信息</h3>
+      <p class="order-desc">请留下详尽的联系与配送信息，专属客服将在 10-15 分钟内确认库存并回电协助完成下单。</p>
+      <form name="order-info" class="order-form" data-netlify="true">
+        <input type="hidden" name="form-name" value="order-info" />
+        <label class="full-width">
+          选购产品
+          <input type="text" name="product" id="order-product" placeholder="例如 Stardawg" required />
+        </label>
+        <label>
+          联系人姓名
+          <input type="text" name="name" placeholder="您的姓名" required />
+        </label>
+        <label>
+          联系电话
+          <input type="tel" name="phone" placeholder="+44 7xxx xxx xxx" required />
+        </label>
+        <label>
+          电子邮箱
+          <input type="email" name="email" placeholder="用于接收确认邮件" />
+        </label>
+        <label class="full-width">
+          已选择的站点信息
+          <input type="text" name="address" id="order-station" placeholder="系统会自动填入您刚选择的站点，可修改" required />
+        </label>
+        <label class="full-width">
+          备注需求
+          <textarea name="notes" rows="4" placeholder="口味、数量或其他要求"></textarea>
+        </label>
+        <button type="submit" class="submit-order">提交下单信息</button>
+      </form>
+      <p class="order-hint">提交后将由人工审核订单信息，若需加急可直接通过页面底部的在线客服联系我们。</p>
+    </section>
+
+    <section class="stations-section" id="stations">
+      <h3 class="section-title">全部 24/7 站点</h3>
+      <div class="station-controls">
+        <input id="station-search" type="text" placeholder="输入城市 / 地址 / 邮编关键字" />
+        <span class="station-count" id="station-count" aria-live="polite">加载中…</span>
+      </div>
+      <div class="station-list" id="station-list" aria-live="polite"></div>
+    </section>
+
+    <footer id="contact">
+      © 2026 Bloom Vapor · 仅面向 18+ 用户 | <a href="#">隐私政策</a> | <a href="#">联系我们</a>
+    </footer>
+  </div>
+  <script>
+    const HUBS_ENDPOINT = '/.netlify/functions/stations';
+    const STATIONS_SOURCE = 'data/hubs-ni.json';
+    let hubMap = null;
+    let hubMarkers = [];
+    let userMarker = null;
+    let leafletReadyPromise = null;
+    let allStations = [];
+    let stationListReady = false;
+    let stationSearchValue = '';
+
+    function goToOrderForm(productName, variantText) {
+      const formSection = document.getElementById('order-form');
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      const productInput = document.getElementById('order-product');
+      if (productInput && productName) {
+        productInput.value = variantText ? `${productName} · ${variantText}` : productName;
+        productInput.focus();
+      }
+    }
+
+    function initVariantRowClicks() {
+      document.addEventListener('click', (event) => {
+        const row = event.target.closest('.variant-row');
+        if (!row) return;
+        const product = row.dataset.product;
+        const variant = row.dataset.variant;
+        goToOrderForm(product, variant);
+      });
+    }
+
+    function applyStationSelection(stationName, stationAddress, stationPostcode) {
+      const formSection = document.getElementById('order-form');
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      const stationInput = document.getElementById('order-station');
+      if (stationInput) {
+        const summary = [stationName, stationAddress, stationPostcode].filter(Boolean).join(' · ');
+        stationInput.value = summary;
+        stationInput.focus({ preventScroll: true });
+      }
+    }
+
+    function toggleHubPanel() {
+      const panel = document.getElementById('hub-panel');
+      if (!panel) return;
+      panel.classList.toggle('active');
+    }
+
+    /* ------------------- 导航高亮 ------------------- */
+    function initNavIndicator() {
+      const menu = document.getElementById('nav-menu');
+      const indicator = document.getElementById('nav-indicator');
+      if (!menu || !indicator) return;
+      const links = Array.from(menu.querySelectorAll('a'));
+
+      function moveIndicator(target) {
+        if (!target) return;
+        const { offsetLeft, offsetWidth } = target;
+        indicator.style.transform = `translateX(${offsetLeft}px)`;
+        indicator.style.width = `${offsetWidth}px`;
+      }
+
+      moveIndicator(menu.querySelector('a.active'));
+
+      links.forEach((link) => {
+        link.addEventListener('click', () => {
+          links.forEach((l) => l.classList.remove('active'));
+          link.classList.add('active');
+          moveIndicator(link);
+        });
+      });
+
+      const sectionMap = links
+        .map((link) => {
+          const id = link.getAttribute('href').replace('#', '');
+          return { link, section: document.getElementById(id) };
+        })
+        .filter((item) => item.section);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const match = sectionMap.find((item) => item.section === entry.target);
+              if (match) {
+                links.forEach((l) => l.classList.remove('active'));
+                match.link.classList.add('active');
+                moveIndicator(match.link);
+              }
+            }
+          });
+        },
+        { threshold: 0.4 }
+      );
+
+      sectionMap.forEach((item) => observer.observe(item.section));
+    }
+
+    /* ------------------- 站点总览列表 ------------------- */
+    function cleanStationName(name = '') {
+      return name.replace(/^OOHPod\s*/i, '').trim() || 'Supply 24 Hub';
+    }
+
+    function renderStationSkeleton(count = 6) {
+      const list = document.getElementById('station-list');
+      if (!list) return;
+      const skeletonCard = `
+        <div class="station-card">
+          <div class="skeleton-line" style="width:55%"></div>
+          <div class="skeleton-line" style="width:90%"></div>
+          <div class="skeleton-line" style="width:72%"></div>
+        </div>`;
+      list.innerHTML = new Array(count).fill(skeletonCard).join('');
+      const countEl = document.getElementById('station-count');
+      if (countEl) countEl.textContent = '加载中…';
+    }
+
+    function renderStationCards(items) {
+      const list = document.getElementById('station-list');
+      const countEl = document.getElementById('station-count');
+      if (!list) return;
+      if (!items.length) {
+        list.innerHTML = '<p class="hub-note">暂无匹配的站点，请修改关键词。</p>';
+      } else {
+        list.innerHTML = items
+          .map(
+            (station, index) => `
+            <div class="station-card" style="animation-delay:${index * 40}ms">
+              <small>${cleanStationName(station.name)}</small>
+              <p>${station.address}</p>
+              <span>${station.postcode}</span>
+            </div>`
+          )
+          .join('');
+      }
+      if (countEl) {
+        countEl.textContent = `${items.length} / ${allStations.length} 站点`;
+      }
+    }
+
+    function filterStations(query) {
+      const normalized = query.trim().toLowerCase();
+      if (!normalized) return allStations;
+      return allStations.filter((station) => {
+        const target = `${station.name} ${station.address} ${station.postcode}`.toLowerCase();
+        return target.includes(normalized);
+      });
+    }
+
+    async function loadStationList() {
+      if (stationListReady) return;
+      renderStationSkeleton();
+      try {
+        const response = await fetch(STATIONS_SOURCE);
+        if (!response.ok) throw new Error('无法加载站点数据');
+        allStations = await response.json();
+        stationListReady = true;
+        renderStationCards(filterStations(stationSearchValue));
+      } catch (error) {
+        console.error('station list load error', error);
+        const list = document.getElementById('station-list');
+        if (list) {
+          list.innerHTML = '<p class="hub-note">站点列表暂不可用，请稍后刷新。</p>';
+        }
+        const countEl = document.getElementById('station-count');
+        if (countEl) countEl.textContent = '加载失败';
+      }
+    }
+
+    function initStationSearch() {
+      const searchInput = document.getElementById('station-search');
+      if (!searchInput) return;
+      searchInput.addEventListener('input', () => {
+        stationSearchValue = searchInput.value;
+        renderStationCards(filterStations(stationSearchValue));
+      });
+    }
+
+    function waitForLeaflet() {
+      if (window.L) return Promise.resolve(window.L);
+      if (!leafletReadyPromise) {
+        leafletReadyPromise = new Promise((resolve, reject) => {
+          const deadline = setTimeout(() => reject(new Error('Leaflet failed to load')), 8000);
+          const check = () => {
+            if (window.L) {
+              clearTimeout(deadline);
+              resolve(window.L);
+            } else {
+              requestAnimationFrame(check);
+            }
+          };
+          check();
+        });
+      }
+      return leafletReadyPromise;
+    }
+
+    function clearDynamicNotes(card) {
+      card.querySelectorAll('.hub-note.dynamic').forEach((note) => note.remove());
+    }
+
+    function updateDynamicNote(card, text) {
+      if (!text) return;
+      const note = document.createElement('p');
+      note.className = 'hub-note dynamic';
+      note.textContent = text;
+      card.appendChild(note);
+    }
+
+    async function renderHubMap(user, stations) {
+      const mapContainer = document.getElementById('hub-map');
+      if (!mapContainer || !stations.length || !user) {
+        if (mapContainer) mapContainer.classList.remove('visible');
+        return;
+      }
+
+      const validStations = stations.filter(
+        (station) => Number.isFinite(station.latitude) && Number.isFinite(station.longitude)
+      );
+      if (!validStations.length) {
+        mapContainer.classList.remove('visible');
+        return;
+      }
+
+      const L = await waitForLeaflet();
+      mapContainer.classList.add('visible');
+
+      if (!hubMap) {
+        hubMap = L.map('hub-map', {
+          zoomControl: false
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(hubMap);
+      }
+
+      hubMarkers.forEach((marker) => hubMap.removeLayer(marker));
+      hubMarkers = [];
+      if (userMarker) {
+        hubMap.removeLayer(userMarker);
+        userMarker = null;
+      }
+
+      const bounds = [];
+      const hasUser = Number.isFinite(user.latitude) && Number.isFinite(user.longitude);
+
+      if (hasUser) {
+        const userIcon = L.divIcon({
+          html: '<div style="width:14px;height:14px;border-radius:50%;background:#7c3aed;border:2px solid white"></div>',
+          className: 'user-pin'
+        });
+        userMarker = L.marker([user.latitude, user.longitude], { icon: userIcon }).addTo(hubMap);
+        userMarker.bindPopup(`你的位置: ${user.postcode}`);
+        bounds.push([user.latitude, user.longitude]);
+      }
+
+      validStations.forEach((station, index) => {
+        const cleanName = station.name.replace(/^OOHPod\s*/i, '').trim();
+        const marker = L.marker([station.latitude, station.longitude]).addTo(hubMap);
+        marker.bindPopup(`<strong>${cleanName}</strong><br>${station.address}<br>${station.postcode}`);
+        hubMarkers.push(marker);
+        bounds.push([station.latitude, station.longitude]);
+      });
+
+      if (bounds.length > 1) {
+        hubMap.fitBounds(bounds, { padding: [20, 20] });
+      } else if (bounds.length === 1) {
+        hubMap.setView(bounds[0], 13);
+      }
+    }
+
+    async function matchHub() {
+      const input = document.getElementById('postcode');
+      const list = document.getElementById('hub-list');
+      const card = document.querySelector('.hub-card');
+
+      if (!input || !list || !card) return;
+
+      const value = input.value.trim().toUpperCase();
+      if (!value) {
+        alert('请输入邮编 (e.g. BT9 5AD)');
+        input.focus();
+        return;
+      }
+
+      const postcodePattern = /^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})$/;
+      if (!postcodePattern.test(value)) {
+        alert('邮编格式不正确，请输入英国/北爱尔兰格式 (如 BT9 5AD)。');
+        input.focus();
+        return;
+      }
+
+      list.innerHTML = '<li>查询中...</li>';
+      clearDynamicNotes(card);
+
+      try {
+        const response = await fetch(`${HUBS_ENDPOINT}?postcode=${encodeURIComponent(value)}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || 'Network error');
+        }
+
+        const stations = (data.stations || []).map((station) => ({
+          ...station,
+          distanceMiles: station.distanceKm ? station.distanceKm * 0.621371 : null
+        }));
+
+        if (!stations.length) {
+          list.innerHTML = '<li>未找到匹配站点，请检查邮编或稍后再试。</li>';
+          await renderHubMap(null, []);
+          return;
+        }
+
+        list.innerHTML = stations
+          .map((station) => {
+            const distance = station.distanceMiles
+              ? `<span class="distance">${station.distanceMiles.toFixed(1)} mi</span>`
+              : '';
+            const cleanName = station.name.replace(/^OOHPod\s*/i, '').trim();
+            const safeName = cleanName.replace(/"/g, '&quot;');
+            const safePostcode = station.postcode.replace(/"/g, '&quot;');
+            const safeAddress = station.address.replace(/"/g, '&quot;');
+            return `
+              <li class="hub-result" data-station-name="${safeName}" data-station-postcode="${safePostcode}" data-station-address="${safeAddress}">
+                <div>
+                  <strong>${cleanName}</strong> — ${station.address} · <span class="distance">${station.postcode}</span> ${distance}
+                </div>
+                <span class="select-chip">选择此站点领取</span>
+              </li>`;
+          })
+          .join('');
+
+        updateDynamicNote(
+          card,
+          `根据 ${data.user?.postcode || value} 推荐最近的 ${stations.length} 个站点。`
+        );
+
+        renderHubMap(data.user, stations).catch((err) => {
+          console.warn('map render failed', err);
+        });
+      } catch (error) {
+        console.error('matchHub error', error);
+        list.innerHTML = '<li>服务暂不可用，请稍后重试。</li>';
+        await renderHubMap(null, []);
+      }
+    }
+
+    function initParallax() {
+      const elements = document.querySelectorAll('.parallax');
+      if (!elements.length) return;
+      const handleScroll = () => {
+        const scrollY = window.scrollY || window.pageYOffset;
+        elements.forEach((el) => {
+          const depth = Number(el.dataset.depth || 0.15);
+          const offset = scrollY * depth * -0.1;
+          el.style.transform = `translate3d(0, ${offset}px, 0)`;
+        });
+      };
+      handleScroll();
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    function focusProducts(stationName, stationPostcode) {
+      const productsSection = document.getElementById('products');
+      if (!productsSection) return;
+      productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      productsSection.classList.remove('highlight-pulse');
+      void productsSection.offsetWidth;
+      productsSection.classList.add('highlight-pulse');
+
+      const header = productsSection.querySelector('h3');
+      if (header) {
+        header.setAttribute('data-selected-station', `${stationName} · ${stationPostcode}`);
+      }
+    }
+
+    function scrollToProducts() {
+      const productsWrapper = document.querySelector('.product-showcase');
+      if (productsWrapper) {
+        productsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function initHubResultClicks() {
+      const list = document.getElementById('hub-list');
+      if (!list) return;
+      list.addEventListener('click', (event) => {
+        const item = event.target.closest('.hub-result');
+        if (!item) return;
+        const name = item.dataset.stationName || '';
+        const postcode = item.dataset.stationPostcode || '';
+        const address = item.dataset.stationAddress || '';
+        focusProducts(name, postcode);
+        applyStationSelection(name, address, postcode);
+        scrollToProducts();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavIndicator();
+      initStationSearch();
+      loadStationList();
+      initParallax();
+      initHubResultClicks();
+      initVariantRowClicks();
+    });
+  </script>
+</body>
+</html>
