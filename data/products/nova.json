@@ -1,37 +1,37 @@
 {
   "active": true,
-  "name": "Nova Edge Pro",
+  "name": "Forbidden Runtz",
   "flag": "https://flagcdn.com/w640/ca.png",
   "sort_order": 2,
   "variants": [
     {
       "label": "28g",
-      "price_gbp": 160,
+      "price_gbp": 200,
       "grams": 28
     },
     {
       "label": "62.5g",
-      "price_gbp": 325,
+      "price_gbp": 410,
       "grams": 62.5
     },
     {
       "label": "125g",
-      "price_gbp": 575,
+      "price_gbp": 760,
       "grams": 125
     },
     {
       "label": "250g",
-      "price_gbp": 1050,
+      "price_gbp": 1400,
       "grams": 250
     },
     {
       "label": "500g",
-      "price_gbp": 2100,
+      "price_gbp": 2550,
       "grams": 500
     },
     {
       "label": "1000g",
-      "price_gbp": 4000,
+      "price_gbp": 4700,
       "grams": 1000
     }
   ],
@@ -39,6 +39,6 @@
   "images": [
     "/uploads/图片_20260226102859_24_9.jpg"
   ],
-  "id": "nova",
+  "id": "Forbidden Runtz",
   "description": ""
 }
