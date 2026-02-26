@@ -1,0 +1,8 @@
+{
+  "name": "greenhub-site",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-products.js"
+  }
+}

@@ -43,6 +43,7 @@
     .container {
       max-width: 1100px;
       margin: 0 auto;
+      padding-top: env(safe-area-inset-top, 0px);
     }
     .pay-grid {
       display:flex;
@@ -395,6 +396,52 @@
     }
     .variant-table td small { color: #9ba3d8; font-size: 0.86rem; }
     .variant-table .per-gram { color: #9aa7d6; font-size: 0.88rem; }
+
+    .variant-cards {
+      display: none;
+      gap: 12px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x mandatory;
+    }
+    .variant-card {
+      min-width: 150px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(145deg, rgba(21,23,31,0.95), rgba(10,12,18,0.9));
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      scroll-snap-align: start;
+    }
+    .variant-card-label {
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 0.92rem;
+      color: #f5f6ff;
+    }
+    .variant-card-price {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .variant-card-per {
+      font-size: 0.9rem;
+      color: #9db0ff;
+    }
+    .variant-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124,58,237,0.5);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.45);
+    }
+    .variant-card.active {
+      border-color: rgba(130,245,178,0.8);
+      box-shadow: 0 0 20px rgba(130,245,178,0.35);
+    }
     .product-flag {
       display: inline-flex;
       align-items: center;
@@ -741,10 +788,10 @@
       padding-bottom: 18px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       position: sticky;
-      top: 0;
+      top: env(safe-area-inset-top, 0px);
       z-index: 10;
       backdrop-filter: blur(14px);
-      background: rgba(8, 9, 13, 0.75);
+      background: rgba(8, 9, 13, 0.85);
     }
     .logo-mark {
       display: inline-flex;
@@ -776,8 +823,37 @@
     .logo-icon img, .logo-img { width: 350px; height: 70px; object-fit: contain; border-radius: 8px; display:block; }
     /* Responsive: scale down logo on small screens */
     @media (max-width: 720px) {
-      .logo-icon img, .logo-img { width: 140px; height: auto; }
-      nav { padding: 8px 6px; }
+      nav {
+        padding: 6px 12px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        position: static;
+        top: auto;
+      }
+      #stations { display: none; }
+      .logo-link {
+        width: 100%;
+        justify-content: center;
+      }
+      .logo-icon {
+        width: auto;
+        height: auto;
+        padding: 6px 14px;
+        border-radius: 14px;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.55);
+      }
+      .logo-icon img, .logo-img { width: min(220px, 70vw); height: auto; }
+      .nav-menu {
+        width: 100%;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .nav-indicator { display: none; }
+      nav { padding-bottom: 12px; }
+      .variant-table { display: none; }
+      .variant-cards { display: flex; }
     }
     nav { display:flex; align-items:center; justify-content:space-between; padding:6px 0; }
     .logo-link { display:flex; align-items:center; gap:12px; }
@@ -797,13 +873,7 @@
       position: relative;
     }
     .nav-indicator {
-      position: absolute;
-      bottom: -6px;
-      height: 2px;
-      width: 32px;
-      background: var(--accent);
-      border-radius: 999px;
-      transition: transform 0.3s ease, width 0.3s ease;
+      display: none;
     }
     .nav-menu a {
       text-decoration: none;
@@ -886,6 +956,65 @@
       #floating-contact{ right: 12px; bottom: 12px; }
       .fc-button{ width:44px;height:44px }
       .fc-icon{ width:18px;height:18px }
+    }
+
+    /* Product image modal */
+    .img-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1600;
+    }
+    .img-modal.show { display: flex; }
+    .img-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(5,7,12,0.85);
+      backdrop-filter: blur(4px);
+    }
+    .img-modal-content {
+      position: relative;
+      max-width: min(90vw, 720px);
+      max-height: min(90vh, 720px);
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(11,14,20,0.95);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2;
+    }
+    .img-modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+    .img-modal-caption {
+      color: #e4e8ff;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .img-modal-close {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      border: none;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -1126,6 +1255,17 @@
       </a>
     </div>
   </div>
+
+  <!-- Product image modal -->
+  <div id="image-modal" class="img-modal" aria-hidden="true">
+    <div class="img-modal-backdrop" data-close-img></div>
+    <figure class="img-modal-content" role="dialog" aria-modal="true" aria-label="Product image preview">
+      <button class="img-modal-close" type="button" aria-label="Close" data-close-img>&times;</button>
+      <img id="img-modal-image" src="" alt="Product image preview" loading="lazy" />
+      <figcaption id="img-modal-caption" class="img-modal-caption"></figcaption>
+    </figure>
+  </div>
+
   <script>
     const HUBS_ENDPOINT = '/.netlify/functions/stations';
     const STATIONS_SOURCE = 'data/hubs-ni.json';
@@ -1149,13 +1289,17 @@
       }
     }
 
-    function initVariantRowClicks() {
+    function initVariantSelectionClicks() {
       document.addEventListener('click', (event) => {
-        const row = event.target.closest('.variant-row');
-        if (!row) return;
-        const product = row.dataset.product;
-        const variant = row.dataset.variant;
+        const target = event.target.closest('.variant-row, .variant-card');
+        if (!target) return;
+        const product = target.dataset.product;
+        const variant = target.dataset.variant;
         goToOrderForm(product, variant);
+        if (target.classList.contains('variant-card')) {
+          document.querySelectorAll('.variant-card.active').forEach((card) => card.classList.remove('active'));
+          target.classList.add('active');
+        }
       });
     }
 
@@ -1718,6 +1862,50 @@
     }
     loadChatLinks();
 
+    function initProductImagePreview() {
+      const container = document.getElementById('product-showcase');
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('img-modal-image');
+      const modalCaption = document.getElementById('img-modal-caption');
+      if (!container || !modal || !modalImg) return;
+
+      function closeModal() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        modalImg.src = '';
+        modalCaption && (modalCaption.textContent = '');
+        document.body.style.overflow = '';
+      }
+
+      function openModal(src, caption) {
+        modalImg.src = src;
+        modalImg.alt = caption || 'Product image';
+        if (modalCaption) modalCaption.textContent = caption || '';
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      container.addEventListener('click', (event) => {
+        const img = event.target.closest('.product-card img');
+        if (!img) return;
+        const title = img.closest('.product-card')?.querySelector('.stardawg-title')?.textContent?.trim() || img.alt || 'Product image';
+        openModal(img.src, title);
+      });
+
+      modal.addEventListener('click', (event) => {
+        if (event.target.dataset.closeImg !== undefined || event.target === modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('show')) {
+          closeModal();
+        }
+      });
+    }
+
     function bindOrderForm() {
       const form = document.querySelector('form[name="order-info"]');
       if (!form) return;
@@ -1873,6 +2061,8 @@
       }
       // Load products from data file and render
       try { loadAndRenderProducts(); } catch (err) { console.warn('load products failed', err); }
+      // Enable product image zoom
+      try { initProductImagePreview(); } catch (err) { console.warn('initProductImagePreview failed', err); }
       // Admin tools bindings
       try { initAdminTools(); } catch (e) { console.warn('initAdminTools failed', e); }
     });
@@ -1981,11 +2171,14 @@
     }
 
     function renderProductCard(p) {
-      const image = p.image || p.flag || '';
+      const gallery = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+      if ((!gallery || !gallery.length) && p.image) gallery.push(p.image);
+      if ((!gallery || !gallery.length) && p.flag) gallery.push(p.flag);
+      const primaryImage = gallery.length ? gallery[0] : '';
       const imgAlt = p.image_alt || `${p.name || ''} image`;
       const countryFlag = p.flag ? `<img class="inline-flag" src="${p.flag}" alt="flag"/>` : '';
       const header = `<h4 class="stardawg-title">${escapeHtml(p.name || '')} ${countryFlag}</h4>`;
-      const imgTag = image ? `<img src="${image}" alt="${escapeHtml(imgAlt)}" loading="lazy" />` : '';
+      const imgTag = primaryImage ? `<img src="${primaryImage}" alt="${escapeHtml(imgAlt)}" loading="lazy" />` : '';
       const variants = Array.isArray(p.variants) ? p.variants : [];
 
       function formatGbpDecimals(val, digits = 2) {
@@ -1993,8 +2186,7 @@
         return n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: digits, maximumFractionDigits: digits });
       }
 
-      const rows = variants.map(v => {
-        // Price compatibility: accept numeric `price_gbp`, string `price`, or legacy `price` with currency symbol
+      const variantViews = variants.map(v => {
         function parsePriceField(x) {
           if (x == null) return 0;
           if (typeof x === 'number') return x;
@@ -2006,7 +2198,6 @@
         const price = parsePriceField(v.price_gbp ?? v.price ?? v.priceGbp ?? v.price_gbp);
         const priceFmt = safeFormatGbp(price);
 
-        // Weight compatibility: prefer explicit `grams` field, else parse from label, else fallback to unit
         let gramsValue = null;
         if (v.grams != null && !Number.isNaN(Number(v.grams))) gramsValue = Number(v.grams);
         const labelText = String(v.label || '').trim();
@@ -2020,19 +2211,27 @@
           const perGramValue = price / gramsValue;
           perGramText = `${formatGbpDecimals(perGramValue, 2)}/g`;
         }
-        // Fallback to explicit unit field if present
         if (!perGramText && v.unit) {
           perGramText = escapeHtml(String(v.unit));
         }
 
         const variantLabel = escapeHtml(labelText || '');
         const dataVariant = `${variantLabel} · ${priceFmt} · ${perGramText}`;
-        return `<tr class="variant-row" data-product="${escapeHtml(p.name)}" data-variant="${escapeHtml(dataVariant)}">
+        const row = `<tr class="variant-row" data-product="${escapeHtml(p.name)}" data-variant="${escapeHtml(dataVariant)}">
                   <td>${variantLabel}</td>
                   <td class="price-cell">${priceFmt}</td>
                   <td class="per-gram">${escapeHtml(perGramText)}</td>
                 </tr>`;
-      }).join('');
+        const card = `<button type="button" class="variant-card" data-product="${escapeHtml(p.name)}" data-variant="${escapeHtml(dataVariant)}">
+            <span class="variant-card-label">${variantLabel}</span>
+            <span class="variant-card-price">${priceFmt}</span>
+            <span class="variant-card-per">${escapeHtml(perGramText)}</span>
+          </button>`;
+        return { row, card };
+      });
+
+      const rows = variantViews.map((view) => view.row).join('');
+      const cards = variantViews.map((view) => view.card).join('');
 
       return `
         <div class="card product-card">
@@ -2047,6 +2246,9 @@
               ${rows}
             </tbody>
           </table>
+          <div class="variant-cards" aria-label="${escapeHtml(p.name)} mobile variants">
+            ${cards}
+          </div>
         </div>`;
     }
 
@@ -2138,12 +2340,10 @@
       loadStationList();
       initParallax();
       initHubResultClicks();
-      initVariantRowClicks();
+      initVariantSelectionClicks();
     });
   </script>
-</body>
-</html>
-
+<style>
     @media (min-width: 768px) {
       header {
         position: sticky;
@@ -2166,3 +2366,6 @@
       .nav-indicator { display: none; }
       .pay-option { flex: 1 1 100%; }
     }
+</style>
+</body>
+</html>
