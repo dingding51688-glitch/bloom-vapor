@@ -1,10 +1,8 @@
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { sendTelegram } from './_telegram.js';
 
-const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
+const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
 
 function sanitizeString(v) {
   return typeof v === 'string' ? v.trim() : '';
@@ -74,7 +72,7 @@ export async function handler(event) {
 
     let bankDetails = null;
     try {
-      const bankPath = path.resolve(FN_DIR, '../../data/bank.json');
+      const bankPath = path.resolve(__dirname, '../../data/bank.json');
       const bankRaw = await readFile(bankPath, 'utf8');
       bankDetails = JSON.parse(bankRaw);
     } catch (err) {

@@ -4,10 +4,8 @@ async function getFetch() {
   try { const mod = await import('node-fetch'); return mod.default || mod; } catch (e) { console.warn('[admin-update-order] node-fetch not available'); return null; }
 }
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
+const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
 
 async function sendEmailViaSendGrid(to, subject, html) {
   const key = process.env.SENDGRID_API_KEY;
