@@ -1750,6 +1750,16 @@
           pickupSurcharge: pickupSurcharge
         };
 
+        if (!payload.hubId) {
+          alert('Please select a pickup hub before submitting your order.');
+          const changeBtn = document.getElementById('order-station-change-btn');
+          try { if (changeBtn) changeBtn.click(); } catch (e) {}
+          const stationSearchBtn = document.getElementById('order-station-search-btn');
+          try { (stationSearchBtn || document.getElementById('order-postcode')).scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+          try { (stationSearchBtn || document.getElementById('order-postcode')).focus(); } catch (e) {}
+          return;
+        }
+
         const submitBtn = form.querySelector('.submit-order');
         submitBtn && (submitBtn.disabled = true);
         submitBtn && (submitBtn.textContent = 'Creating order...');
