@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { sendTelegram } from './_telegram.js';
 import { createOrderRecord, serializePaymentPayload } from './_airtable.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BANK_PATH = path.resolve(__dirname, '../../data/bank.json');
+const CURRENT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const BANK_PATH = path.resolve(CURRENT_DIR, '../../data/bank.json');
 
 function sanitizeString(v) {
   return typeof v === 'string' ? v.trim() : '';
