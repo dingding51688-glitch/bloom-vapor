@@ -3,11 +3,24 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sendTelegram } from './_telegram.js';
 import { createOrderRecord, serializePaymentPayload } from './_airtable.js';
+import { sendTemplatedEmail } from './_email.js';
 
 const CURRENT_DIR = typeof __dirname !== 'undefined'
   ? __dirname
   : path.dirname(fileURLToPath(import.meta.url));
 const BANK_PATH = path.resolve(CURRENT_DIR, '../../data/bank.json');
+const FALLBACK_SITE_URL = 'https://marvelous-pothos-05456a.netlify.app';
+
+function resolveSiteUrl(event) {
+  const envUrl = process.env.SITE_URL || process.env.URL;
+  const headerUrl = event?.headers?.origin || event?.headers?.referer;
+  const url = envUrl || headerUrl || FALLBACK_SITE_URL;
+  return url.replace(/\/$/, '');
+}
+
+function resolveLogoUrl(siteUrl) {
+  return (process.env.EMAIL_LOGO_URL || `${siteUrl}/uploads/logo.png`).replace(/\/$/, '');
+}
 
 function sanitizeString(v) {
   return typeof v === 'string' ? v.trim() : '';
@@ -110,6 +123,27 @@ export async function handler(event) {
     } catch (err) {
       console.error('[create-order] telegram send error', err);
       telegramSent = false;
+    }
+
+    const siteUrl = resolveSiteUrl(event);
+    const logoUrl = resolveLogoUrl(siteUrl);
+    const paymentUrl = `${siteUrl}/payment.html?orderId=${orderId}`;
+    if (order.customerEmail) {
+      await sendTemplatedEmail({
+        to: order.customerEmail,
+        subject: `Your Green Hub order ${orderId} is awaiting payment`,
+        template: 'order-awaiting-payment.html',
+        vars: {
+          customerName: order.customerName || 'there',
+          orderId,
+          productName: order.productName,
+          priceAmount: order.priceGbp,
+          pickupOption: order.pickupOption || 'Standard (3-5 days)',
+          paymentUrl,
+          logoUrl,
+          year: new Date().getFullYear()
+        }
+      });
     }
 
     const responseBody = { orderId, status: 'pending', telegramSent };

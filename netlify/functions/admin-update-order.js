@@ -1,43 +1,9 @@
 import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord } from './_airtable.js';
-async function getFetch() {
-  if (typeof globalThis.fetch === 'function') return globalThis.fetch.bind(globalThis);
-  try { const mod = await import('node-fetch'); return mod.default || mod; } catch (e) { console.warn('[admin-update-order] node-fetch not available'); return null; }
-}
+import { sendTemplatedEmail } from './_email.js';
 
-async function sendEmailViaSendGrid(to, subject, html) {
-  const key = process.env.SENDGRID_API_KEY;
-  const from = process.env.SENDGRID_FROM || `no-reply@${process.env.SITE_HOST || 'example.com'}`;
-  if (!key) {
-    console.warn('[admin-update-order] SENDGRID_API_KEY not configured');
-    return false;
-  }
-  try {
-    const fetchFn = await getFetch();
-    if (!fetchFn) { console.warn('[admin-update-order] no fetch available'); return false; }
-    const res = await fetchFn('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: to }] }],
-        from: { email: from },
-        subject,
-        content: [{ type: 'text/html', value: html }]
-      })
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      console.warn('[admin-update-order] sendgrid failed', res.status, txt);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error('[admin-update-order] sendgrid error', err);
-    return false;
-  }
-}
+const FALLBACK_SITE_URL = 'https://marvelous-pothos-05456a.netlify.app';
+const SITE_URL = (process.env.SITE_URL || process.env.URL || FALLBACK_SITE_URL).replace(/\/$/, '');
+const LOGO_URL = (process.env.EMAIL_LOGO_URL || `${SITE_URL}/uploads/logo.png`).replace(/\/$/, '');
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') {
@@ -68,16 +34,22 @@ export async function handler(event) {
 
     let emailSent = false;
     if (sendEmail && order.customerEmail) {
-      const subject = `Your GreenHub order ${orderId}`;
-      const html = `
-        <p>Hi ${order.customerName || 'Customer'},</p>
-        <p>Your order <strong>${orderId}</strong> has been updated.</p>
-        <p><strong>Tracking number:</strong> ${order.trackingNumber || 'N/A'}</p>
-        <p><strong>Password / collection code:</strong> ${order.password || 'N/A'}</p>
-        <p>Please retain this information for collection.</p>
-        <p>Thanks — GreenHub</p>
-      `;
-      emailSent = await sendEmailViaSendGrid(order.customerEmail, subject, html);
+      emailSent = await sendTemplatedEmail({
+        to: order.customerEmail,
+        subject: `Your Green Hub order ${orderId} is ready for pickup`,
+        template: 'order-ready-for-collection.html',
+        vars: {
+          customerName: order.customerName || 'Customer',
+          orderId,
+          pickupWindow: order.pickupOption || 'Standard (3-5 days)',
+          trackingNumber: order.trackingNumber || 'Not provided',
+          collectionCode: order.password || 'Provided at pickup',
+          hubAddress: [order.hubName, order.hubPostcode].filter(Boolean).join(' · '),
+          hubName: order.hubName || 'Green Hub Locker',
+          logoUrl: LOGO_URL,
+          year: new Date().getFullYear()
+        }
+      });
     }
 
     return {
