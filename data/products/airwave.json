@@ -6,32 +6,32 @@
   "variants": [
     {
       "label": "28g",
-      "price_gbp": 200,
+      "price_gbp": 220,
       "grams": 28
     },
     {
       "label": "62.5g",
-      "price_gbp": 400,
+      "price_gbp": 444,
       "grams": 62.5
     },
     {
       "label": "125g",
-      "price_gbp": 750,
+      "price_gbp": 810,
       "grams": 125
     },
     {
       "label": "250g",
-      "price_gbp": 1350,
+      "price_gbp": 1475,
       "grams": 250
     },
     {
       "label": "500g",
-      "price_gbp": 2400,
+      "price_gbp": 2700,
       "grams": 500
     },
     {
       "label": "1000g",
-      "price_gbp": 4700,
+      "price_gbp": 5000,
       "grams": 1000
     }
   ],
