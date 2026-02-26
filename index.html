@@ -2307,11 +2307,13 @@
           ${gallery.length ? `
             <div class="product-gallery" data-product="${escapeHtml(p.id || p.name || '')}">
               <img src="${escapeHtml(gallery[0])}" alt="${escapeHtml(imgAlt)}" loading="lazy" />
-              <div class="product-gallery-thumbs">
-                ${gallery.map((src, idx) => `<button type="button" class="product-gallery-thumb${idx === 0 ? ' active' : ''}" data-src="${escapeHtml(src)}">
-                    <img src="${escapeHtml(src)}" alt="${escapeHtml(p.name || '')} ${idx + 1}" loading="lazy" />
-                  </button>`).join('')}
-              </div>
+              ${gallery.length > 1 ? `
+                <div class="product-gallery-thumbs">
+                  ${gallery.map((src, idx) => `<button type="button" class="product-gallery-thumb${idx === 0 ? ' active' : ''}" data-src="${escapeHtml(src)}">
+                      <img src="${escapeHtml(src)}" alt="${escapeHtml(p.name || '')} ${idx + 1}" loading="lazy" />
+                    </button>`).join('')}
+                </div>
+              ` : ''}
             </div>
           ` : imgTag}
           <div class="product-flag">${p.country ? escapeHtml(p.country) : ''}</div>
