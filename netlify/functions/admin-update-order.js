@@ -1,11 +1,8 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord } from './_airtable.js';
 async function getFetch() {
   if (typeof globalThis.fetch === 'function') return globalThis.fetch.bind(globalThis);
   try { const mod = await import('node-fetch'); return mod.default || mod; } catch (e) { console.warn('[admin-update-order] node-fetch not available'); return null; }
 }
-import path from 'node:path';
-
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
 
 async function sendEmailViaSendGrid(to, subject, html) {
   const key = process.env.SENDGRID_API_KEY;
@@ -55,18 +52,19 @@ export async function handler(event) {
   const { orderId, trackingNumber, password, sendEmail } = payload || {};
   if (!orderId) return { statusCode: 400, body: JSON.stringify({ error: 'Missing orderId' }) };
 
-  const filePath = path.join(ORDERS_DIR, `${orderId}.json`);
   try {
-    const raw = await readFile(filePath, 'utf8');
-    const order = JSON.parse(raw);
+    const record = await findOrderByOrderId(orderId);
+    if (!record) {
+      return { statusCode: 404, body: JSON.stringify({ error: 'Order not found' }) };
+    }
 
-    if (trackingNumber !== undefined) order.trackingNumber = String(trackingNumber).trim();
-    if (password !== undefined) order.password = String(password).trim();
-    order.updatedAt = new Date().toISOString();
-    if (!order.history) order.history = [];
-    order.history.push({ at: order.updatedAt, note: 'Admin updated tracking/password' });
+    const updates = { updatedAt: new Date().toISOString() };
+    if (trackingNumber !== undefined) updates.trackingNumber = String(trackingNumber).trim();
+    if (password !== undefined) updates.password = String(password).trim();
 
-    await writeFile(filePath, JSON.stringify(order, null, 2), 'utf8');
+    await updateOrderRecord(record.id, updates);
+
+    const order = airtableRecordToOrder({ id: record.id, fields: { ...record.fields, ...updates } });
 
     let emailSent = false;
     if (sendEmail && order.customerEmail) {

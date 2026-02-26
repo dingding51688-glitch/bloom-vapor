@@ -1,8 +1,6 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { sendTelegram } from './_telegram.js';
+import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord, serializePaymentPayload } from './_airtable.js';
 
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
 const NOWPAYMENTS_API_KEY = process.env.NOWPAYMENTS_API_KEY || '';
 
 async function getFetch() {
@@ -85,13 +83,13 @@ export async function handler(event) {
   }
 
   try {
-    const filePath = path.join(ORDERS_DIR, `${orderId}.json`);
-    const raw = await readFile(filePath, 'utf8');
-    const order = JSON.parse(raw);
-
-    if (!order || !order.orderId) {
+    const record = await findOrderByOrderId(orderId);
+    if (!record) {
       return { statusCode: 404, body: JSON.stringify({ error: 'Order not found' }) };
     }
+
+    const order = airtableRecordToOrder(record);
+
     if (order.status === 'paid') {
       return { statusCode: 400, body: JSON.stringify({ error: 'Order already paid' }) };
     }
@@ -102,7 +100,7 @@ export async function handler(event) {
     const baseUrl = resolveBaseUrl(event);
     const invoice = await createNowPaymentsInvoice(order, network, baseUrl);
 
-    order.payment = {
+    const payment = {
       provider: 'nowpayments',
       network,
       invoiceId: invoice.id,
@@ -117,17 +115,17 @@ export async function handler(event) {
       cancelUrl: invoice.cancel_url
     };
 
-    if (order.bankDetails) {
-      order.bankDetails = {
-        accountName: order.bankDetails.accountName,
-        sortCode: order.bankDetails.sortCode,
-        accountNumber: order.bankDetails.accountNumber
-      };
-    }
+    await updateOrderRecord(record.id, {
+      paymentPayload: serializePaymentPayload(payment),
+      paymentInvoiceId: payment.invoiceId || '',
+      paymentPaymentId: payment.paymentId || '',
+      paymentNetwork: network,
+      updatedAt: new Date().toISOString()
+    });
 
-    await writeFile(filePath, JSON.stringify(order, null, 2), 'utf8');
-
-    const pickupInfo = order.pickupOption ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}` : '';
+    const pickupInfo = order.pickupOption
+      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
+      : '';
     const text = `💳 Invoice created for <b>${orderId}</b>\nNetwork: ${network}\nAmount: £${order.priceGbp}${pickupInfo}\nLink: ${invoice.invoice_url}`;
     sendTelegram(text).catch(() => {});
 

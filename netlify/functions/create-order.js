@@ -1,11 +1,21 @@
-import { writeFile, mkdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { sendTelegram } from './_telegram.js';
+import { createOrderRecord, serializePaymentPayload } from './_airtable.js';
 
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BANK_PATH = path.resolve(__dirname, '../../data/bank.json');
 
 function sanitizeString(v) {
   return typeof v === 'string' ? v.trim() : '';
+}
+
+function parsePrice(value) {
+  if (value === null || value === undefined) return 0;
+  const cleaned = String(value).replace(/[^0-9.]/g, '');
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
 }
 
 function generateOrderId() {
@@ -17,9 +27,18 @@ function generateOrderId() {
   return `ORD-${yyyy}${mm}${dd}-${suffix}`;
 }
 
+async function getBankDetails() {
+  try {
+    const raw = await readFile(BANK_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    return null;
+  }
+}
+
 export async function handler(event) {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   let payload;
@@ -31,31 +50,25 @@ export async function handler(event) {
 
   const required = ['productId', 'productName', 'priceGbp', 'hubId', 'hubName', 'customerName', 'customerPhone'];
   for (const key of required) {
-    if (payload[key] === undefined || payload[key] === null || String(payload[key]).trim() === '') {
+    const value = payload[key];
+    if (value === undefined || value === null || String(value).trim() === '') {
       return { statusCode: 400, body: JSON.stringify({ error: `Missing field: ${key}` }) };
     }
   }
 
   const orderId = generateOrderId();
   const now = new Date().toISOString();
-
-  function parsePrice(value) {
-    if (value === null || value === undefined) return 0;
-    const raw = String(value).replace(/[^0-9.]/g, '');
-    const num = Number(raw);
-    return Number.isFinite(num) ? num : 0;
-  }
+  const basePrice = parsePrice(payload.basePriceGbp);
+  const totalPrice = parsePrice(payload.priceGbp);
+  const surcharge = parsePrice(payload.pickupSurcharge);
 
   const order = {
     orderId,
-    createdAt: now,
     status: 'pending',
     productId: sanitizeString(payload.productId),
     productName: sanitizeString(payload.productName),
-    basePriceGbp: parsePrice(payload.basePriceGbp),
-    pickupOption: sanitizeString(payload.pickupOption || ''),
-    pickupSurchargeGbp: parsePrice(payload.pickupSurcharge),
-    priceGbp: parsePrice(payload.priceGbp),
+    basePriceGbp: basePrice,
+    priceGbp: totalPrice,
     hubId: sanitizeString(payload.hubId),
     hubName: sanitizeString(payload.hubName),
     hubPostcode: sanitizeString(payload.hubPostcode || ''),
@@ -63,31 +76,30 @@ export async function handler(event) {
     customerPhone: sanitizeString(payload.customerPhone),
     customerEmail: sanitizeString(payload.customerEmail || ''),
     notes: sanitizeString(payload.notes || ''),
-    payment: null
+    pickupOption: sanitizeString(payload.pickupOption || ''),
+    pickupSurchargeGbp: surcharge,
+    trackingNumber: '',
+    password: '',
+    payment: null,
+    createdAt: now,
+    updatedAt: now
   };
 
   try {
-    await mkdir(ORDERS_DIR, { recursive: true });
-    const filePath = path.join(ORDERS_DIR, `${orderId}.json`);
+    await createOrderRecord({
+      ...order,
+      paymentPayload: serializePaymentPayload(null),
+      paymentInvoiceId: '',
+      paymentPaymentId: ''
+    });
 
-    let bankDetails = null;
-    try {
-      const bankPath = path.resolve(__dirname, '../../data/bank.json');
-      const bankRaw = await readFile(bankPath, 'utf8');
-      bankDetails = JSON.parse(bankRaw);
-    } catch (err) {
-      console.warn('[create-order] bank details not found', err.message);
-    }
-    if (bankDetails) {
-      order.bankDetails = bankDetails;
-    }
+    const bankDetails = await getBankDetails();
 
-    await writeFile(filePath, JSON.stringify(order, null, 2), 'utf8');
-
-    // send telegram (await result so caller can see status)
-    const statusLabel = order.status === 'paid' ? '已付款' : '等待付款';
+    const statusLabel = '等待付款';
+    const pickupLine = order.pickupOption
+      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
+      : '';
     const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const pickupLine = order.pickupOption ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}` : '';
     const text = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nBase price: £${order.basePriceGbp || order.priceGbp}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
     let telegramSent = false;
     try {
@@ -98,10 +110,13 @@ export async function handler(event) {
       telegramSent = false;
     }
 
+    const responseBody = { orderId, status: 'pending', telegramSent };
+    if (bankDetails) responseBody.bankDetails = bankDetails;
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId, status: 'pending', telegramSent })
+      body: JSON.stringify(responseBody)
     };
   } catch (err) {
     console.error('[create-order] error', err);

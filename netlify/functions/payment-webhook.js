@@ -1,14 +1,19 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { sendTelegram, sendPaymentTelegram } from './_telegram.js';
+import {
+  airtableRecordToOrder,
+  findOrderByInvoiceId,
+  findOrderByOrderId,
+  findOrderByPaymentId,
+  serializePaymentPayload,
+  updateOrderRecord
+} from './_airtable.js';
 
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
 const WEBHOOK_SECRET = process.env.PAYMENT_WEBHOOK_SECRET || '';
 const NOWPAYMENTS_IPN_SECRET = process.env.NOWPAYMENTS_IPN_SECRET || '';
 
 function verifyLegacySignature(rawBody, signatureHeader) {
-  if (!WEBHOOK_SECRET) return true; // no secret configured, skip verification
+  if (!WEBHOOK_SECRET) return true;
   if (!signatureHeader) return false;
   try {
     const expected = crypto.createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex');
@@ -22,7 +27,9 @@ function verifyNowPaymentsSignature(rawBody, signatureHeader) {
   if (!NOWPAYMENTS_IPN_SECRET) return true;
   if (!signatureHeader) return false;
   try {
-    const expected = crypto.createHmac('sha512', NOWPAYMENTS_IPN_SECRET).update(rawBody).digest('hex');
+    const expected = crypto.createHmac('sha512', NOWPAYMENTS_IPN_SECRET)
+      .update(rawBody)
+      .digest('hex');
     return expected === signatureHeader;
   } catch (err) {
     console.warn('[payment-webhook] failed to verify NOWPayments signature', err);
@@ -41,57 +48,34 @@ function normalizePayload(payload) {
   return null;
 }
 
-async function loadOrder(orderId) {
-  if (!orderId) return null;
-  const filePath = path.join(ORDERS_DIR, `${orderId}.json`);
-  const raw = await readFile(filePath, 'utf8');
-  return { filePath, order: JSON.parse(raw) };
-}
-
-async function findOrderByInvoiceId(invoiceId) {
-  if (!invoiceId) return null;
-  const fs = await import('node:fs');
-  const files = fs.readdirSync(ORDERS_DIR).filter((f) => f.endsWith('.json'));
-  for (const f of files) {
-    const p = path.join(ORDERS_DIR, f);
-    try {
-      const rawFile = await readFile(p, 'utf8');
-      const o = JSON.parse(rawFile);
-      if (o.payment && (o.payment.invoiceId === invoiceId || o.payment.paymentId === invoiceId)) {
-        return { filePath: p, order: o };
-      }
-    } catch (err) {
-      // ignore bad files
-    }
-  }
-  return null;
+async function findOrderContext({ orderId, invoiceId, paymentId }) {
+  let record = null;
+  if (orderId) record = await findOrderByOrderId(orderId).catch(() => null);
+  if (!record && invoiceId) record = await findOrderByInvoiceId(invoiceId).catch(() => null);
+  if (!record && paymentId) record = await findOrderByPaymentId(paymentId).catch(() => null);
+  return record ? { record, order: airtableRecordToOrder(record) } : null;
 }
 
 async function handleLegacy(payload) {
   const { invoiceId, orderId, status } = payload;
-  let context = null;
-
-  if (orderId) context = await loadOrder(orderId).catch(() => null);
-  if (!context && invoiceId) context = await findOrderByInvoiceId(invoiceId);
+  const context = await findOrderContext({ orderId, invoiceId, paymentId: null });
   if (!context) {
     console.warn('[payment-webhook] order not found (legacy)');
     return { statusCode: 404, body: JSON.stringify({ error: 'Order not found' }) };
   }
 
-  const { filePath, order } = context;
-
+  const { record, order } = context;
   if (order.status === 'paid') {
     return { statusCode: 200, body: JSON.stringify({ ok: true, message: 'Already paid' }) };
   }
 
-  if (String(status).toLowerCase() === 'paid' || String(status).toLowerCase() === 'confirmed') {
-    order.status = 'paid';
-    order.paidAt = new Date().toISOString();
-    await writeFile(filePath, JSON.stringify(order, null, 2), 'utf8');
+  const success = String(status || '').toLowerCase();
+  if (success === 'paid' || success === 'confirmed') {
+    const now = new Date().toISOString();
+    await updateOrderRecord(record.id, { status: 'paid', paidAt: now, updatedAt: now });
 
     const text = `✅ Order <b>${order.orderId}</b>\nStatus: 已付款\nProduct: ${order.productName}\nAmount: £${order.priceGbp}`;
     sendTelegram(text).catch(() => {});
-
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   }
 
@@ -99,41 +83,51 @@ async function handleLegacy(payload) {
 }
 
 async function handleNowPayments(payload) {
-  const orderId = payload.order_id;
-  let context = null;
+  const context = await findOrderContext({
+    orderId: payload.order_id,
+    invoiceId: payload.invoice_id,
+    paymentId: payload.payment_id
+  });
 
-  if (orderId) context = await loadOrder(orderId).catch(() => null);
-  if (!context && payload.invoice_id) context = await findOrderByInvoiceId(payload.invoice_id);
-  if (!context && payload.payment_id) context = await findOrderByInvoiceId(payload.payment_id);
   if (!context) {
     console.warn('[payment-webhook] order not found for NOWPayments');
     return { statusCode: 404, body: JSON.stringify({ error: 'Order not found' }) };
   }
 
-  const { filePath, order } = context;
-  order.payment = {
+  const { record, order } = context;
+  const payment = {
     ...(order.payment || {}),
     provider: 'nowpayments',
-    paymentId: payload.payment_id,
-    invoiceId: payload.invoice_id || order.payment?.invoiceId,
+    paymentId: payload.payment_id || order.payment?.paymentId || '',
+    invoiceId: payload.invoice_id || order.payment?.invoiceId || '',
     payCurrency: payload.pay_currency,
     payAmount: payload.pay_amount,
     actuallyPaid: payload.actually_paid,
-    txId: payload.payment_status === 'finished' ? payload.txid || payload.transaction_hash : order.payment?.txId,
+    txId:
+      String(payload.payment_status || '').toLowerCase() === 'finished'
+        ? payload.txid || payload.transaction_hash || order.payment?.txId
+        : order.payment?.txId,
     status: payload.payment_status,
     updatedAt: new Date().toISOString()
   };
 
   const successStatuses = new Set(['finished', 'confirmed', 'paid', 'completed']);
+  const updates = {
+    paymentPayload: serializePaymentPayload(payment),
+    paymentInvoiceId: payment.invoiceId || '',
+    paymentPaymentId: payment.paymentId || '',
+    paymentNetwork: payload.pay_currency || order.payment?.network || '',
+    updatedAt: new Date().toISOString()
+  };
 
   if (successStatuses.has(String(payload.payment_status || '').toLowerCase())) {
-    order.status = 'paid';
-    order.paidAt = new Date().toISOString();
+    updates.status = 'paid';
+    updates.paidAt = new Date().toISOString();
   }
 
-  await writeFile(filePath, JSON.stringify(order, null, 2), 'utf8');
+  await updateOrderRecord(record.id, updates);
 
-  if (order.status === 'paid') {
+  if (updates.status === 'paid') {
     const text = `✅ Order <b>${order.orderId}</b>\nStatus: 已付款\nProduct: ${order.productName}\nAmount: £${order.priceGbp}\nPay: ${payload.pay_amount} ${payload.pay_currency}`;
     sendTelegram(text).catch(() => {});
     const fullInfo = `${text}\nEmail: ${order.customerEmail || 'N/A'}\nPhone: ${order.customerPhone || 'N/A'}`;

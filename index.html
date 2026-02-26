@@ -91,11 +91,7 @@
     header {
       text-align: center;
       padding: 12px 0 8px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
       background: radial-gradient(circle at top, #14171d, #06070a 60%);
-      padding-bottom: 18px;
     }
     header .site-subtitle {
       display: block;
@@ -2137,3 +2133,26 @@
   </script>
 </body>
 </html>
+
+    @media (min-width: 768px) {
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding-bottom: 18px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 10px 8px 28px; }
+      header h1 { font-size: 1.7rem; }
+      header .site-subtitle { font-size: 0.72rem; letter-spacing: 0.08em; }
+      .hero { padding: 18px; margin: 18px auto 22px; gap: 16px; }
+      .hero-text h2 { font-size: 1.4rem; }
+      .hero-cta { width: 100%; justify-content: center; }
+      .hero-cta button { flex: 1 1 150px; text-align: center; }
+      .nav-menu { flex-wrap: wrap; gap: 12px; font-size: 0.85rem; justify-content: center; }
+      .nav-menu a { padding: 6px 10px; }
+      .nav-indicator { display: none; }
+      .pay-option { flex: 1 1 100%; }
+    }
