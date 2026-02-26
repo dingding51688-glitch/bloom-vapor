@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = path.resolve(__dirname, '../../data/hubs-ni.json');
+const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
+const DATA_PATH = path.resolve(FN_DIR, '../../data/hubs-ni.json');
 const POSTCODES_IO_BASE = 'https://api.postcodes.io';
 const MAX_RESULTS = 67;
 

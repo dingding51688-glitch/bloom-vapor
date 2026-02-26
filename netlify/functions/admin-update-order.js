@@ -6,8 +6,8 @@ async function getFetch() {
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
+const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
 
 async function sendEmailViaSendGrid(to, subject, html) {
   const key = process.env.SENDGRID_API_KEY;

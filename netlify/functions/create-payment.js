@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sendTelegram } from './_telegram.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
+const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
 const NOWPAYMENTS_API_KEY = process.env.NOWPAYMENTS_API_KEY || '';
 
 async function getFetch() {

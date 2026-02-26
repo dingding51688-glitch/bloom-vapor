@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
+const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
 
 export async function handler(event) {
   try {

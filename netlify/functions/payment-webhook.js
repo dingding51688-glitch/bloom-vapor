@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import { sendTelegram, sendPaymentTelegram } from './_telegram.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ORDERS_DIR = path.resolve(__dirname, '../../data/orders');
+const FN_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ORDERS_DIR = path.resolve(FN_DIR, '../../data/orders');
 const WEBHOOK_SECRET = process.env.PAYMENT_WEBHOOK_SECRET || '';
 const NOWPAYMENTS_IPN_SECRET = process.env.NOWPAYMENTS_IPN_SECRET || '';
 
