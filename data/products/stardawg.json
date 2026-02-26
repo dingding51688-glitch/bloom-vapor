@@ -1,20 +1,44 @@
 {
-  "id": "stardawg",
-  "name": "Stardawg",
-  "country": "United Kingdom",
-  "flag": "https://flagcdn.com/w640/gb.png",
-  "images": [
-    "https://flagcdn.com/w640/gb.png"
-  ],
-  "description": "",
-  "sort_order": 1,
   "active": true,
+  "name": "Stardawg",
+  "flag": "https://flagcdn.com/w640/gb.png",
+  "sort_order": 1,
   "variants": [
-    { "label": "28g", "price_gbp": 160, "grams": 28 },
-    { "label": "62.5g", "price_gbp": 325, "grams": 62.5 },
-    { "label": "125g", "price_gbp": 575, "grams": 125 },
-    { "label": "250g", "price_gbp": 1050, "grams": 250 },
-    { "label": "500g", "price_gbp": 2100, "grams": 500 },
-    { "label": "1000g", "price_gbp": 4000, "grams": 1000 }
-  ]
+    {
+      "label": "28g",
+      "price_gbp": 160,
+      "grams": 28
+    },
+    {
+      "label": "62.5g",
+      "price_gbp": 325,
+      "grams": 62.5
+    },
+    {
+      "label": "125g",
+      "price_gbp": 575,
+      "grams": 125
+    },
+    {
+      "label": "250g",
+      "price_gbp": 1050,
+      "grams": 250
+    },
+    {
+      "label": "500g",
+      "price_gbp": 2100,
+      "grams": 500
+    },
+    {
+      "label": "1000g",
+      "price_gbp": 4000,
+      "grams": 1000
+    }
+  ],
+  "country": "United Kingdom",
+  "images": [
+    "/uploads/86f3db85-f121-407e-964c-9222b2fd4e83.png"
+  ],
+  "id": "stardawg",
+  "description": ""
 }
