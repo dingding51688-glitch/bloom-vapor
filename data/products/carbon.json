@@ -1,20 +1,44 @@
 {
-  "id": "carbon",
-  "name": "Carbon Pods — Flavour Pack",
-  "country": "Thailand",
-  "flag": "https://flagcdn.com/w640/th.png",
-  "images": [
-    "https://flagcdn.com/w640/th.png"
-  ],
-  "description": "",
-  "sort_order": 4,
   "active": true,
+  "name": "Carbon Pods — Flavour Pack",
+  "flag": "https://flagcdn.com/w640/th.png",
+  "sort_order": 4,
   "variants": [
-    { "label": "28g", "price_gbp": 160, "grams": 28 },
-    { "label": "62.5g", "price_gbp": 325, "grams": 62.5 },
-    { "label": "125g", "price_gbp": 575, "grams": 125 },
-    { "label": "250g", "price_gbp": 1050, "grams": 250 },
-    { "label": "500g", "price_gbp": 2100, "grams": 500 },
-    { "label": "1000g", "price_gbp": 4000, "grams": 1000 }
-  ]
+    {
+      "label": "28g",
+      "price_gbp": 160,
+      "grams": 28
+    },
+    {
+      "label": "62.5g",
+      "price_gbp": 325,
+      "grams": 62.5
+    },
+    {
+      "label": "125g",
+      "price_gbp": 575,
+      "grams": 125
+    },
+    {
+      "label": "250g",
+      "price_gbp": 1050,
+      "grams": 250
+    },
+    {
+      "label": "500g",
+      "price_gbp": 2100,
+      "grams": 500
+    },
+    {
+      "label": "1000g",
+      "price_gbp": 4000,
+      "grams": 1000
+    }
+  ],
+  "country": "Thailand",
+  "images": [
+    "/uploads/图片_20260226102107_18_9.jpg"
+  ],
+  "id": "carbon",
+  "description": ""
 }
