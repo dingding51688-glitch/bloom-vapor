@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Receive pickup code">
+  <rect x="30" y="14" width="180" height="212" rx="18" fill="#1b1f23" stroke="#dbeff0" stroke-opacity="0.06"/>
+  <rect x="48" y="28" width="144" height="156" rx="10" fill="#0f1720"/>
+  <g transform="translate(56,46)">
+    <rect x="8" y="12" width="120" height="72" rx="8" fill="#061217" stroke="#61c46a" stroke-width="2"/>
+    <path d="M22 36h72v6H22z" fill="#9ef0a3"/>
+    <circle cx="100" cy="22" r="10" fill="#7ce06a" stroke="#fff" stroke-width="2"/>
+    <text x="96" y="26" font-size="12" font-family="Arial, sans-serif" fill="#06331a" font-weight="700">1</text>
+  </g>
+</svg>

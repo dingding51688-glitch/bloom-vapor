@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Payment — Green Hub NI</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#1f2430,#08090d 60%);color:#eef0ff;margin:0;padding:28px}
+    .container{max-width:900px;margin:0 auto;padding-top:12px}
+    .card{background:linear-gradient(180deg,rgba(17,20,26,0.96),rgba(12,14,18,0.98));padding:24px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 40px rgba(0,0,0,0.6);position:sticky;top:18px}
+    h1{margin:0 0 8px;font-size:1.4rem}
+    p.lead{color:#cfd3ff;margin:6px 0 16px}
+    .options{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .option{flex:1;min-width:220px;padding:18px;border-radius:12px;background:linear-gradient(180deg,#0f1116,#0b0c10);border:1px solid rgba(255,255,255,0.04);text-align:center}
+    .option h3{margin:0 0 8px;font-size:1rem}
+    .btn{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;text-decoration:none;font-weight:600}
+    .muted{color:#9aa3c8;font-size:0.95rem}
+    .pay-token{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+    .pay-token .icon{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem;font-weight:700}
+    .icon.tron{background:linear-gradient(145deg,#ff4d4f,#b41523)}
+    .icon.eth{background:linear-gradient(145deg,#37b6ff,#1f81ff)}
+    .total-amount{font-size:1.5rem;color:#ffffff;font-weight:800;text-align:center;margin-top:10px;letter-spacing:0.02em}
+    .total-amount strong{font-weight:900}
+    .note{margin-top:14px;color:#9ba3d8}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Complete your payment</h1>
+      <p class="lead">Choose a payment method to complete your order. After selecting USDT we will generate a NowPayments invoice for you.</p>
+      <p class="muted" id="order-id">Order: —</p>
+
+      <div class="options">
+        <div class="option">
+          <h3>Bank transfer</h3>
+          <div id="bank-info" style="text-align:left;color:#e6f1ff;line-height:1.5">
+            <div><strong>Account Name：</strong> <span id="bank-account-name">—</span></div>
+            <div><strong>Sort Code：</strong> <span id="bank-sort-code">—</span></div>
+            <div><strong>Account Number：</strong> <span id="bank-account-number">—</span></div>
+            <p style="margin-top:8px;color:#cfe1ff;">Reference: <span id="bank-ref">W0XPSN</span></p>
+          </div>
+        </div>
+        <div class="option">
+          <h3>USDT (TRC20)</h3>
+          <p class="muted">Lower fee network — recommended.</p>
+          <a class="btn" id="usdt-trc" href="#">
+            <span class="pay-token">
+              <span class="icon tron">T</span>
+              <span>Pay TRC20</span>
+            </span>
+          </a>
+        </div>
+        <div class="option">
+          <h3>USDT (ERC20)</h3>
+          <p class="muted">Ethereum network (higher gas cost).</p>
+          <a class="btn" id="usdt-erc" href="#">
+            <span class="pay-token">
+              <span class="icon eth">T</span>
+              <span>Pay ERC20</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <p class="note">After payment, your order status will update automatically. If you need help, contact Live chat in the site corner.</p>
+    </div>
+  </div>
+
+  <script>
+    // Read orderId from query and show it (display only the suffix)
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId') || '';
+    if (orderId) {
+      const parts = String(orderId).split('-');
+      const suffix = parts[parts.length - 1] || orderId;
+      document.getElementById('order-id').textContent = 'Order: ' + suffix;
+      // Try to fetch order details to display amount (price includes pickup surcharge)
+      (async function(){
+        try {
+          const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
+          if (!resp.ok) return;
+          const order = await resp.json();
+          if (order && (order.priceGbp != null)) {
+            const amt = Number(order.priceGbp) || 0;
+            const el = document.createElement('p');
+            el.className = 'total-amount';
+            el.innerHTML = 'Total: <strong>' + amt.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }) + '</strong>';
+            const ref = document.getElementById('bank-ref');
+            if (ref && order.orderId) {
+              const p = String(order.orderId).split('-');
+              ref.textContent = p[p.length - 1] || order.orderId;
+            }
+            document.getElementById('order-id').after(el);
+            if (order.bankDetails) {
+              document.getElementById('bank-account-name').textContent = order.bankDetails.accountName || '—';
+              document.getElementById('bank-sort-code').textContent = order.bankDetails.sortCode || '—';
+              document.getElementById('bank-account-number').textContent = order.bankDetails.accountNumber || '—';
+            }
+          }
+        } catch (e) { console.warn('could not load order details', e); }
+      })();
+      const refEl = document.getElementById('bank-ref');
+      if (refEl) {
+        const parts2 = String(orderId).split('-');
+        refEl.textContent = parts2[parts2.length - 1] || orderId;
+      }
+    }
+
+    async function loadBankDetails() {
+      try {
+        const resp = await fetch('/data/bank.json');
+        if (!resp.ok) return;
+        const bank = await resp.json();
+        document.getElementById('bank-account-name').textContent = bank.accountName || '—';
+        document.getElementById('bank-sort-code').textContent = bank.sortCode || '—';
+        document.getElementById('bank-account-number').textContent = bank.accountNumber || '—';
+      } catch (err) {
+        console.warn('bank info load failed', err);
+      }
+    }
+    loadBankDetails();
+
+    async function handlePayClick(e, network) {
+      e.preventDefault();
+      if (!orderId) return alert('Missing orderId');
+      const btn = e.currentTarget;
+      const label = btn.textContent;
+      btn.textContent = 'Creating invoice...';
+      btn.style.opacity = '0.8';
+      btn.classList.add('disabled');
+      try {
+        const resp = await fetch('/.netlify/functions/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, network })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed to create invoice');
+        if (data.payUrl) {
+          window.location.href = data.payUrl;
+        } else {
+          alert('Invoice created but no payment link returned. Please contact support.');
+        }
+      } catch (err) {
+        console.error('create payment error', err);
+        alert('Could not create payment: ' + (err.message || err));
+      } finally {
+        btn.textContent = label;
+        btn.style.opacity = '';
+        btn.classList.remove('disabled');
+      }
+    }
+
+    document.getElementById('usdt-trc').addEventListener('click', (e) => handlePayClick(e, 'TRC20'));
+    document.getElementById('usdt-erc').addEventListener('click', (e) => handlePayClick(e, 'ERC20'));
+  </script>
+</body>
+</html>

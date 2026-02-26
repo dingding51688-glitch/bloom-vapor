@@ -1,0 +1,12 @@
+{
+  "title": "填写订购信息",
+  "description": "请留下详尽的联系与配送信息，专属客服将在 10-15 分钟内确认库存并回电协助完成下单。",
+  "productLabel": "选购产品",
+  "nameLabel": "联系人姓名",
+  "phoneLabel": "联系电话",
+  "emailLabel": "电子邮箱",
+  "stationLabel": "已选择的站点信息",
+  "notesLabel": "备注需求",
+  "submitText": "提交下单信息",
+  "hint": "提交后将由人工审核订单信息，若需加急可直接通过页面底部的在线客服联系我们。"
+}

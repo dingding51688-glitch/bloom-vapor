@@ -1,19 +1,29 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bloom Vapor - 精品电子烟系列</title>
+  <title>Green Hub NI — Premium Products & 24/7 Pickup Lockers (UK)</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2atLYB+g6JV+0ZKXHXTULyYM54PsTcZTa0m0kJ0=" crossorigin="" />
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7k3P5LhY5QZnIcqoNCmieYw7YI6wrEn7k55m9A=" crossorigin=""></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
     :root {
       color-scheme: light dark;
-      --bg: #0d1117;
-      --mid: #161b22;
-      --accent: #7c3aed;
-      --text: #f7f6ff;
+      /* Core backgrounds and surfaces */
+      --bg: #0b0f14;
+      --mid: #0f1418;
+      --card-bg: rgba(18,22,26,0.72);
+      --glass: rgba(255,255,255,0.04);
+      /* Text */
+      --text: #eef0ff;
+      --muted: #aeb3d9;
+      /* Brand accents */
+      --accent-purple: #7c3aed;
+      --accent-green: #10b981;
+      --accent: var(--accent-purple);
+      --accent-gradient: linear-gradient(120deg,var(--accent-purple),var(--accent-green));
+      --shadow-accent: rgba(124,58,237,0.18);
     }
     * {
       box-sizing: border-box;
@@ -22,37 +32,99 @@
       font-family: "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
     body {
-      background: radial-gradient(circle at top, #1f2430, #08090d 60%);
+      background: radial-gradient(circle at top, #14171d, #06070a 60%);
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
-      padding: 32px 16px 64px;
+      padding: 16px 12px 48px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
     .container {
       max-width: 1100px;
       margin: 0 auto;
     }
+    .pay-grid {
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+    .pay-option {
+      flex:1 1 220px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:linear-gradient(145deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.06);
+      text-align:left;
+    }
+    .pay-option strong {
+      display:block;
+      font-size:1rem;
+    }
+    .pay-option small {
+      font-size:0.85rem;
+      color:var(--muted);
+    }
+    .token-icon {
+      width:38px;
+      height:38px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:#fff;
+      font-size:1rem;
+    }
+    .token-icon.tron { background:linear-gradient(145deg,#ff4d4f,#b41523); }
+    .token-icon.eth { background:linear-gradient(145deg,#37b6ff,#1f81ff); }
+    .token-icon.bank { background:linear-gradient(145deg,#fcd34d,#f59e0b); color:#101014; }
+    .token-copy {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
     header {
       text-align: center;
-      padding: 40px 0 30px;
+      padding: 12px 0 8px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: radial-gradient(circle at top, #14171d, #06070a 60%);
+      padding-bottom: 18px;
+    }
+    header .site-subtitle {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.95rem;
+      color: #9ff3b3;
+      opacity: 0.95;
+      letter-spacing: 0.02em;
+      font-weight: 600;
     }
     header h1 {
       font-size: clamp(2.2rem, 4vw, 3rem);
       margin-bottom: 12px;
     }
     header p {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: #cfd3ff;
     }
     .hero {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(16, 185, 129, 0.25));
+      background: var(--card-bg);
+      background-image: radial-gradient(circle at 10% 20%, rgba(124,58,237,0.12), transparent 18%), radial-gradient(circle at 85% 10%, rgba(16,185,129,0.08), transparent 22%);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
       padding: 32px;
-      margin-bottom: 36px;
+      margin: 32px auto 36px;
       display: flex;
+      justify-content: center;
       flex-wrap: wrap;
       gap: 24px;
       align-items: center;
@@ -67,9 +139,9 @@
       opacity: 0.4;
     }
     .hero::before {
-      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45), transparent 45%),
-        radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.35), transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(124, 58, 237, 0.4), transparent 55%);
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.12), transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(124, 58, 237, 0.14), transparent 55%);
       animation: particle-shift 12s ease-in-out infinite alternate;
     }
     .hero::after {
@@ -84,6 +156,8 @@
     }
     .hero-text {
       flex: 1 1 320px;
+      max-width: 880px;
+      text-align: center;
     }
     .hero-text h2 {
       font-size: 1.8rem;
@@ -102,6 +176,75 @@
       margin-bottom: 12px;
       color: #cfd3ff;
     }
+    .step-action {
+      margin-left: 12px;
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 28px var(--shadow-accent);
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+    .step-action:hover { transform: translateY(-3px); opacity:0.98; }
+    .hub-result.nearest {
+      background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(16,185,129,0.03));
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+    }
+    /* Modal styles for hub picker */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      padding: 24px;
+    }
+    .modal.show { display: flex; }
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(2,6,23,0.6);
+      backdrop-filter: blur(2px);
+    }
+    .modal-content {
+      position: relative;
+      width: min(1100px, 96%);
+      max-height: 80vh;
+      overflow: auto;
+      background: linear-gradient(180deg, rgba(12,14,18,0.9), rgba(16,18,22,0.95));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Ensure hub-panel is visible when placed inside modal */
+    #modal-hub-container > .hub-panel {
+      display: block !important;
+    }
+    /* Make hub-card stretch to modal width for a pleasant dialog */
+    #modal-hub-container .hub-card {
+      width: 100%;
+      box-sizing: border-box;
+    }
     .hero-text p {
       color: #e0e4ff;
     }
@@ -109,6 +252,7 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      margin-left: auto;
     }
     .hero-cta button {
       border: none;
@@ -117,11 +261,12 @@
       font-weight: 600;
       cursor: pointer;
       transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+      box-shadow: 0 12px 32px rgba(16,185,129,0.06);
     }
     .btn-primary {
-      background: var(--accent);
+      background: var(--accent-gradient);
       color: white;
+      box-shadow: 0 10px 26px var(--shadow-accent);
     }
     .btn-outline {
       background: transparent;
@@ -161,78 +306,99 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 18px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
     }
     .card, .product-card {
       animation: fade-slide 0.9s ease both;
     }
+    /* Product card — premium styling */
+    .product-card {
+      padding: 24px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(22,24,34,0.96), rgba(10,12,18,0.98));
+      border: 1px solid rgba(124, 58, 237, 0.08);
+      box-shadow: 0 20px 45px rgba(2,6,12,0.65), 0 6px 20px rgba(124,58,237,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      height: 100%;
+      min-height: 520px;
+    }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 30px 70px rgba(3,6,12,0.75), 0 18px 40px rgba(124,58,237,0.12); }
     .product-card img {
       width: 100%;
-      border-radius: 16px;
-      height: 190px;
+      border-radius: 14px;
+      height: 170px;
       object-fit: cover;
-      margin-bottom: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      filter: saturate(1.05);
+      margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 8px 24px rgba(2,6,12,0.6);
+      transform-origin: center;
+      transition: transform 0.32s ease, box-shadow 0.32s ease;
     }
-    .product-card p {
-      color: #d7d7ff;
-    }
-    .stardawg-title {
+    .product-card:hover img { transform: scale(1.03); box-shadow: 0 18px 40px rgba(2,6,12,0.75); }
+    .product-card p { color: #dbe0ff; }
+    .stardawg-title, .product-card h4 {
       font-family: 'Russo One', 'Bebas Neue', 'Orbitron', sans-serif;
-      font-size: 1.25rem;
-      letter-spacing: 0.08em;
+      font-size: 1.18rem;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      color: #e7f1ff;
-      text-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+      color: #f6f7ff;
+      text-shadow: 0 2px 18px rgba(124, 58, 237, 0.18);
+      margin-bottom: 6px;
     }
-    .stardawg-title .inline-flag {
-      width: 30px;
-      height: 20px;
-      border-radius: 4px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      object-fit: cover;
-    }
+    .stardawg-title .inline-flag { width: 28px; height: 18px; border-radius: 4px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12); object-fit: cover; }
+
+    /* Variant table — elevated, compact and refined */
     .variant-table {
       width: 100%;
-      margin-top: 16px;
+      margin-top: 12px;
       border-collapse: collapse;
-      font-size: 0.92rem;
-      background: rgba(10, 12, 20, 0.55);
-      border-radius: 16px;
+      font-size: 0.95rem;
+      background: linear-gradient(180deg, rgba(8,10,14,0.6), rgba(6,8,12,0.5));
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 12px 30px rgba(2,6,12,0.45);
     }
     .variant-table th,
     .variant-table td {
-      padding: 10px 14px;
+      padding: 12px 16px;
       text-align: left;
+      vertical-align: middle;
     }
     .variant-table thead {
-      background: rgba(124, 58, 237, 0.2);
+      background: linear-gradient(90deg, rgba(124,58,237,0.26), rgba(124,58,237,0.14));
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      font-size: 0.8rem;
-      color: #cdd4ff;
+      font-size: 0.82rem;
+      color: #eef0ff;
+      font-weight: 700;
     }
     .variant-table tbody tr {
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.18s ease, transform 0.12s ease;
+      will-change: transform;
     }
-    .variant-table tbody tr:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
+    .variant-table tbody tr:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.03); }
     .variant-table tbody tr:hover,
-    .variant-table tbody tr:focus {
-      background: rgba(124, 58, 237, 0.18);
-    }
+    .variant-table tbody tr:focus { background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(124,58,237,0.03)); transform: translateY(-2px); }
+    .variant-table td:nth-child(2), .variant-table td:nth-child(3) { text-align: right; }
     .variant-table .price-cell {
-      font-weight: 600;
-      color: #f8f4ff;
+      font-weight: 800;
+      color: #ffffff;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      padding-right: 6px;
     }
+    .variant-table td small { color: #9ba3d8; font-size: 0.86rem; }
+    .variant-table .per-gram { color: #9aa7d6; font-size: 0.88rem; }
     .product-flag {
       display: inline-flex;
       align-items: center;
@@ -245,8 +411,9 @@
       margin-bottom: 10px;
     }
     .hub-panel {
-      margin: 18px 0 10px;
+      margin: 18px auto 10px;
       display: none;
+      max-width: 1100px;
     }
     .hub-panel.active {
       display: block;
@@ -268,6 +435,9 @@
       background: rgba(12, 14, 22, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 25px 45px rgba(0, 0, 0, 0.45);
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .order-section .section-title {
       margin-top: 0;
@@ -362,7 +532,7 @@
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 16px;
+      margin: 0 0 16px 0;
     }
     .station-controls input {
       flex: 1;
@@ -581,30 +751,45 @@
       background: rgba(8, 9, 13, 0.75);
     }
     .logo-mark {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1.3rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
+      gap: 12px;
+      font-size: 1.15rem;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      font-weight: 700;
     }
+    .logo-link { display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
     .logo-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.9), rgba(16, 185, 129, 0.7));
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: linear-gradient(135deg,#7c3aed 0%, #10b981 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 22px rgba(2,6,23,0.6);
+      flex-shrink: 0;
     }
     .logo-icon svg {
       width: 26px;
       height: 26px;
     }
-    .logo-part { color: #d5ddff; font-weight: 600; }
+    /* larger logo image (uses uploads/logo.svg) */
+    .logo-icon img, .logo-img { width: 350px; height: 70px; object-fit: contain; border-radius: 8px; display:block; }
+    /* Responsive: scale down logo on small screens */
+    @media (max-width: 720px) {
+      .logo-icon img, .logo-img { width: 140px; height: auto; }
+      nav { padding: 8px 6px; }
+    }
+    nav { display:flex; align-items:center; justify-content:space-between; padding:6px 0; }
+    .logo-link { display:flex; align-items:center; gap:12px; }
+    .nav-menu { display:flex; gap:22px; align-items:center; }
+    .sr-only { position: absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    .logo-part { color: #e7f1ff; font-weight: 800; font-size:1.05rem; }
     .logo-part.mid { color: #82f5b2; }
+    .logo-part.sm { color: #cfeee0; font-weight:700; font-size:0.85rem; margin-left:6px; opacity:0.95; }
     .logo-num { color: var(--accent); font-weight: 700; }
     .logo-dot { color: #ffcc5c; font-weight: 700; }
     .nav-menu {
@@ -661,309 +846,289 @@
         max-height: none;
       }
     }
+    /* Floating contact buttons (bottom-right) */
+    #floating-contact {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1400;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      pointer-events: auto;
+    }
+    .fc-label {
+      background: rgba(255,255,255,0.03);
+      color: #e6f7ec;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 8px 18px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(4px);
+    }
+    .fc-button {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #2b3138, #101316);
+      box-shadow: 0 8px 22px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      text-decoration: none;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .fc-button:focus { outline: 2px solid rgba(130,245,178,0.18); transform: translateY(-3px); }
+    .fc-button:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(2,6,23,0.7); }
+    .fc-icon { width: 22px; height: 22px; }
+    .fc-img { width: 22px; height: 22px; object-fit: contain; display:block }
+    @media (max-width:480px){
+      #floating-contact{ right: 12px; bottom: 12px; }
+      .fc-button{ width:44px;height:44px }
+      .fc-icon{ width:18px;height:18px }
+    }
   </style>
 </head>
 <body>
   <div class="container" id="top">
     <nav>
       <div class="logo-mark">
-        <span class="logo-icon" aria-hidden="true">
-          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="presentation">
-            <rect x="7" y="11" width="22" height="18" rx="4" ry="4" fill="rgba(8,9,13,0.5)" stroke="#d4f8ff" stroke-width="1.4" />
-            <rect x="21" y="11" width="8" height="18" rx="3" ry="3" fill="rgba(255,255,255,0.15)" />
-            <circle cx="25" cy="20" r="2.4" fill="#82f5b2" />
-            <path d="M17 25c-2.6-2.3-4.4-5.8-1.7-8.1c1.5-1.3 3-0.4 3.4 0.1c0.4-0.8 1.8-1.6 3.2-0.2c2.5 2.4-0.3 5.4-2.2 8z" fill="#b0ffb3" stroke="#0f4d3d" stroke-width="0.6" stroke-linejoin="round" />
-          </svg>
-        </span>
-        <span class="logo-part">SUP</span>
-        <span class="logo-part mid">PLY</span>
-        <span class="logo-dot">•</span>
-        <span class="logo-num">24</span>
+        <a class="logo-link" href="#top" aria-label="Green Hub NI home">
+          <div class="logo-icon" aria-hidden="true">
+            <img src="uploads/logo.png" alt="Green Hub Northern Ireland" class="logo-img" loading="lazy" />
+          </div>
+          <span class="sr-only">Green Hub Northern Ireland</span>
+        </a>
       </div>
       <div class="nav-menu" id="nav-menu">
         <span class="nav-indicator" id="nav-indicator"></span>
-        <a href="#top" class="active">首页</a>
-        <a href="#hubs">站点</a>
-        <a href="#products">产品</a>
-        <a href="#stations">全部站点</a>
-        <a href="#contact">在线客服</a>
+        <a href="#top" class="active">Home</a>
+        <a href="#products">Products</a>
+        <a href="#stations">All hubs</a>
       </div>
     </nav>
 
     <header>
-      <h1>Supply 24</h1>
-      <p>Get What You Need in 1 Hour — Safe & Secure</p>
+      <h1>Green Hub Northern Ireland</h1>
+      <span class="site-subtitle">Same-Day Order &amp; Collection</span>
     </header>
 
-    <section class="hero parallax" id="gallery" data-depth="0.2">
-      <div class="hero-text">
-        <div class="flow-step">STEP 1</div>
-        <h2>先选择最近的 24/7 站点</h2>
-        <p>Across Northern Ireland · Fully self-service · Pick up from a nearby hub within 1 hour.</p>
+    
+
+    <section class="how-it-works" id="how">
+      <h3 class="section-title">How It Works</h3>
+      <!--
+        Replace the four image files below with the icons you provided.
+        Place the files in the repository at: uploads/how-step-1.png ... uploads/how-step-4.png
+        If you only have two image files, upload them and name them accordingly, or update the src paths.
+      -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:12px;">
+        <div class="card" style="text-align:center;">
+          <picture>
+            <source srcset="uploads/how-step-1.png" type="image/png">
+            <img src="uploads/how-step-1.svg" alt="Place your order" style="width:84px;height:auto;margin:6px auto 8px;display:block;" loading="lazy" />
+          </picture>
+          <h4 style="margin:8px 0 4px;">Place your order</h4>
+          <p style="font-size:0.95rem;margin:0;color:#cfd3ff;">Choose items and complete checkout online.</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <picture>
+            <source srcset="uploads/how-step-2.png" type="image/png">
+            <img src="uploads/how-step-2.svg" alt="Receive pickup code" style="width:84px;height:auto;margin:6px auto 8px;display:block;" loading="lazy" />
+          </picture>
+          <h4 style="margin:8px 0 4px;">Receive your pickup code</h4>
+          <p style="font-size:0.95rem;margin:0;color:#cfd3ff;">We’ll send a unique, secure code to your phone or email.</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <picture>
+            <source srcset="uploads/how-step-3.png" type="image/png">
+            <img src="uploads/how-step-3.svg" alt="Go to smart locker" style="width:84px;height:auto;margin:6px auto 8px;display:block;" loading="lazy" />
+          </picture>
+          <h4 style="margin:8px 0 4px;">Go to the smart locker and enter your code</h4>
+          <p style="font-size:0.95rem;margin:0;color:#cfd3ff;">Visit the hub shown on your confirmation and enter the code at the locker.</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <picture>
+            <source srcset="uploads/how-step-4.png" type="image/png">
+            <img src="uploads/how-step-4.svg" alt="Collect your item" style="width:84px;height:auto;margin:6px auto 8px;display:block;" loading="lazy" />
+          </picture>
+          <h4 style="margin:8px 0 4px;">Collect your item</h4>
+          <p style="font-size:0.95rem;margin:0;color:#cfd3ff;">Retrieve your parcel from the locker — contactless and secure.</p>
+        </div>
       </div>
-      <div class="hero-cta">
-        <button class="btn-primary" onclick="toggleHubPanel()">立即匹配取货站点</button>
-      </div>
+      
     </section>
 
+    <h3 class="section-title" id="products">Select Your Product</h3>
+    <div id="product-showcase" class="product-showcase" aria-live="polite">
+      <!-- Products will be rendered here from data/products.json -->
+    </div>
 
+    
     <div class="hub-panel" id="hub-panel">
       <div class="hub-card">
         <div class="hub-form">
-          <label for="postcode">邮编 Postcode</label>
+          <label for="postcode">Postcode</label>
           <div class="hub-form-row">
-            <input type="text" id="postcode" placeholder="例如 BT9 5AD" />
-            <button type="button" onclick="matchHub()">匹配站点</button>
+            <input type="text" id="postcode" placeholder="Enter postcode" />
+            <button type="button" onclick="matchHub()">Find hubs</button>
           </div>
         </div>
         <ul id="hub-list">
-          <li>输入邮编，立即推荐最近的 24/7 站点。</li>
+          <li>Enter a postcode to discover nearby 24/7 pickup hubs.</li>
         </ul>
         <div id="hub-map" class="hub-map" role="presentation" aria-hidden="true"></div>
-        <p class="hub-note">当前显示的是所有已激活的 24/7 取货站点示例。输入邮编即可返回最近的站点链接。</p>
+        <p class="hub-note">Showing available 24/7 pickup hubs. Enter your postcode to find the closest locations.</p>
       </div>
     </div>
 
-
-    <div class="flow-step" style="margin-top:40px;">STEP 2</div>
-    <h3 class="section-title" id="products">选择心仪产品</h3>
-    <div class="product-showcase">
-      <div class="card product-card">
-        <img src="https://flagcdn.com/w640/gb.png" alt="United Kingdom Flag" loading="lazy" />
-        <div class="product-flag" aria-label="英国">🇬🇧 英国</div>
-        <h4 class="stardawg-title">
-          <span>Stardawg</span>
-          <img class="inline-flag" src="https://flagcdn.com/w640/gb.png" alt="UK Flag" />
-        </h4>
-        <table class="variant-table" aria-label="Stardawg 规格价格">
-          <thead>
-            <tr>
-              <th>规格</th>
-              <th>示例售价</th>
-              <th>单克价</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="variant-row" data-product="Stardawg" data-variant="28g · £160 · £5.71/g">
-              <td>28g</td>
-              <td class="price-cell">£160</td>
-              <td>£5.71/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Stardawg" data-variant="62.5g · £325 · £5.20/g">
-              <td>62.5g</td>
-              <td class="price-cell">£325</td>
-              <td>£5.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Stardawg" data-variant="125g · £575 · £4.60/g">
-              <td>125g</td>
-              <td class="price-cell">£575</td>
-              <td>£4.60/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Stardawg" data-variant="250g · £1,050 · £4.20/g">
-              <td>250g</td>
-              <td class="price-cell">£1,050</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Stardawg" data-variant="500g · £2,100 · £4.20/g">
-              <td>500g</td>
-              <td class="price-cell">£2,100</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Stardawg" data-variant="1000g · £4,000 · £4.00/g">
-              <td>1000g</td>
-              <td class="price-cell">£4,000</td>
-              <td>£4.00/g</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card product-card">
-        <img src="https://flagcdn.com/w640/ca.png" alt="Canada Flag" loading="lazy" />
-        <div class="product-flag" aria-label="加拿大">🇨🇦 加拿大</div>
-        <h4>Nova Edge Pro</h4>
-        <table class="variant-table" aria-label="Nova Edge Pro 规格价格">
-          <thead>
-            <tr>
-              <th>规格</th>
-              <th>示例售价</th>
-              <th>单克价</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="28g · £160 · £5.71/g">
-              <td>28g</td>
-              <td class="price-cell">£160</td>
-              <td>£5.71/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="62.5g · £325 · £5.20/g">
-              <td>62.5g</td>
-              <td class="price-cell">£325</td>
-              <td>£5.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="125g · £575 · £4.60/g">
-              <td>125g</td>
-              <td class="price-cell">£575</td>
-              <td>£4.60/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="250g · £1,050 · £4.20/g">
-              <td>250g</td>
-              <td class="price-cell">£1,050</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="500g · £2,100 · £4.20/g">
-              <td>500g</td>
-              <td class="price-cell">£2,100</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Nova Edge Pro" data-variant="1000g · £4,000 · £4.00/g">
-              <td>1000g</td>
-              <td class="price-cell">£4,000</td>
-              <td>£4.00/g</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card product-card">
-        <img src="https://flagcdn.com/w640/us.png" alt="United States Flag" loading="lazy" />
-        <div class="product-flag" aria-label="美国">🇺🇸 美国</div>
-        <h4>Air Wave 一次性</h4>
-        <table class="variant-table" aria-label="Air Wave 一次性 规格价格">
-          <thead>
-            <tr>
-              <th>规格</th>
-              <th>示例售价</th>
-              <th>单克价</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="28g · £160 · £5.71/g">
-              <td>28g</td>
-              <td class="price-cell">£160</td>
-              <td>£5.71/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="62.5g · £325 · £5.20/g">
-              <td>62.5g</td>
-              <td class="price-cell">£325</td>
-              <td>£5.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="125g · £575 · £4.60/g">
-              <td>125g</td>
-              <td class="price-cell">£575</td>
-              <td>£4.60/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="250g · £1,050 · £4.20/g">
-              <td>250g</td>
-              <td class="price-cell">£1,050</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="500g · £2,100 · £4.20/g">
-              <td>500g</td>
-              <td class="price-cell">£2,100</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Air Wave 一次性" data-variant="1000g · £4,000 · £4.00/g">
-              <td>1000g</td>
-              <td class="price-cell">£4,000</td>
-              <td>£4.00/g</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card product-card">
-        <img src="https://flagcdn.com/w640/th.png" alt="Thailand Flag" loading="lazy" />
-        <div class="product-flag" aria-label="泰国">🇹🇭 泰国</div>
-        <h4>Carbon Pods 口味包</h4>
-        <table class="variant-table" aria-label="Carbon Pods 口味包 规格价格">
-          <thead>
-            <tr>
-              <th>规格</th>
-              <th>示例售价</th>
-              <th>单克价</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="28g · £160 · £5.71/g">
-              <td>28g</td>
-              <td class="price-cell">£160</td>
-              <td>£5.71/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="62.5g · £325 · £5.20/g">
-              <td>62.5g</td>
-              <td class="price-cell">£325</td>
-              <td>£5.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="125g · £575 · £4.60/g">
-              <td>125g</td>
-              <td class="price-cell">£575</td>
-              <td>£4.60/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="250g · £1,050 · £4.20/g">
-              <td>250g</td>
-              <td class="price-cell">£1,050</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="500g · £2,100 · £4.20/g">
-              <td>500g</td>
-              <td class="price-cell">£2,100</td>
-              <td>£4.20/g</td>
-            </tr>
-            <tr class="variant-row" data-product="Carbon Pods 口味包" data-variant="1000g · £4,000 · £4.00/g">
-              <td>1000g</td>
-              <td class="price-cell">£4,000</td>
-              <td>£4.00/g</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Modal for hub picker (will temporarily hold #hub-panel when open) -->
+    <div id="hub-modal" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-content" role="dialog" aria-modal="true" aria-label="Find pickup hubs">
+        <button class="modal-close" type="button" aria-label="Close modal" data-close-modal>&times;</button>
+        <div id="modal-hub-container"></div>
       </div>
     </div>
 
     <section class="order-section" id="order-form">
-      <div class="flow-step">STEP 3</div>
-      <h3 class="section-title">填写订购信息</h3>
-      <p class="order-desc">请留下详尽的联系与配送信息，专属客服将在 10-15 分钟内确认库存并回电协助完成下单。</p>
+      <h3 class="section-title">Order Details</h3>
+      <p class="order-desc">Please provide your contact details and pickup information. Our team will confirm stock and contact you within 10–15 minutes to finalise the order.</p>
       <form name="order-info" class="order-form" data-netlify="true">
         <input type="hidden" name="form-name" value="order-info" />
         <label class="full-width">
-          选购产品
-          <input type="text" name="product" id="order-product" placeholder="例如 Stardawg" required />
+          Product selected
+          <input type="text" name="product" id="order-product" placeholder="e.g. Stardawg" required />
         </label>
         <label>
-          联系人姓名
-          <input type="text" name="name" placeholder="您的姓名" required />
+          Full name
+          <input type="text" name="name" placeholder="Your full name" required />
         </label>
         <label>
-          联系电话
+          Phone
           <input type="tel" name="phone" placeholder="+44 7xxx xxx xxx" required />
         </label>
         <label>
-          电子邮箱
-          <input type="email" name="email" placeholder="用于接收确认邮件" />
+          Email
+          <input type="email" name="email" placeholder="For order confirmation" />
+        </label>
+        <label class="full-width" id="order-postcode-block">
+          Postcode
+          <div id="order-postcode-controls" style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+            <input type="text" id="order-postcode" placeholder="Enter postcode" />
+            <button type="button" id="order-station-search-btn" class="step-action" title="Search nearest hubs by postcode">Find hubs</button>
+          </div>
+          <p style="margin-top:10px;color:#d5d9ff;">Enter a postcode to discover nearby 24/7 pickup hubs.</p>
+          <p style="margin-top:6px;color:#aeb3d9;">Showing available 24/7 pickup hubs. Enter your postcode to find the closest locations.</p>
+          <input type="hidden" name="address" id="order-station" value="" />
+          <input type="hidden" name="hubId" id="order-hubId" value="" />
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+            <div id="order-station-summary" style="color:#cfe1ff;font-weight:600"></div>
+            <button type="button" id="order-station-change-btn" class="step-action" style="display:none;padding:6px 10px;font-size:0.9rem;">Change</button>
+          </div>
+
+          <!-- Pickup timing options (shown after hub selection) -->
+          <div id="pickup-options" style="display:none;margin-top:14px;">
+            <label style="color:#e6f1ff;font-weight:700;display:block;margin-bottom:8px;">When would you like to collect your order?</label>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+              <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);">
+                <input type="radio" name="pickup" value="same-day" data-surcharge="30" />
+                <span style="font-weight:600;">Same day</span>
+                <small style="margin-left:6px;color:#9ba3d8">+£30 — Express collection</small>
+              </label>
+              <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);">
+                <input type="radio" name="pickup" value="next-day" data-surcharge="20" />
+                <span style="font-weight:600;">Next day</span>
+                <small style="margin-left:6px;color:#9ba3d8">+£20 — Priority collection</small>
+              </label>
+              <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);">
+                <input type="radio" name="pickup" value="standard" data-surcharge="0" checked />
+                <span style="font-weight:600;">3–5 days</span>
+                <small style="margin-left:6px;color:#9ba3d8">Free — Standard collection</small>
+              </label>
+            </div>
+            <input type="hidden" name="pickupOption" id="pickup-option" value="standard" />
+            <input type="hidden" name="pickupSurcharge" id="pickup-surcharge" value="0" />
+          </div>
         </label>
         <label class="full-width">
-          已选择的站点信息
-          <input type="text" name="address" id="order-station" placeholder="系统会自动填入您刚选择的站点，可修改" required />
+          Notes / Special requests
+          <textarea name="notes" rows="4" placeholder="Flavour, quantity or special requests"></textarea>
         </label>
-        <label class="full-width">
-          备注需求
-          <textarea name="notes" rows="4" placeholder="口味、数量或其他要求"></textarea>
-        </label>
-        <button type="submit" class="submit-order">提交下单信息</button>
+        <button type="submit" class="submit-order">Submit order</button>
       </form>
-      <p class="order-hint">提交后将由人工审核订单信息，若需加急可直接通过页面底部的在线客服联系我们。</p>
+      <!-- Admin tools removed from homepage -->
+      <div id="payment-section" class="payment-section" aria-live="polite" style="display:none;margin-top:18px;">
+        <h4>Payment methods</h4>
+        <p id="payment-hint">Order created. Select a payment network to generate a payment link.</p>
+        <div id="payment-actions" class="pay-grid">
+          <button id="pay-trc20" class="step-action pay-option" type="button">
+            <span class="token-icon tron">T</span>
+            <span class="token-copy">
+              <strong>USDT · TRC20</strong>
+              <small>Lower network fee — recommended</small>
+            </span>
+          </button>
+          <button id="pay-erc20" class="step-action pay-option" type="button">
+            <span class="token-icon eth">T</span>
+            <span class="token-copy">
+              <strong>USDT · ERC20</strong>
+              <small>Ethereum network (higher gas)</small>
+            </span>
+          </button>
+          <button id="pay-bank" class="step-action pay-option" type="button">
+            <span class="token-icon bank">£</span>
+            <span class="token-copy">
+              <strong>银行转账</strong>
+              <small>使用参考号完成付款</small>
+            </span>
+          </button>
+        </div>
+        <div id="bank-details" style="display:none;margin-top:12px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);max-width:640px;">
+          <div style="display:flex;flex-direction:column;gap:6px;color:#e6f1ff;">
+            <div><strong>Account Name：</strong> Haige Wang</div>
+            <div><strong>Sort Code：</strong> 08-08-08</div>
+            <div><strong>Account Number：</strong> 54685685</div>
+            <p style="margin-top:8px;color:#cfe1ff;">Reference: <span id="bank-ref-example">W0XPSN</span></p>
+          </div>
+        </div>
+        <div id="invoice-box" style="margin-top:12px;display:none;">
+          <p id="invoice-info"></p>
+          <a id="invoice-link" class="btn-primary" href="#" target="_blank" rel="noopener">Proceed to payment</a>
+          <p id="waiting-note" style="margin-top:8px;">Please wait after payment; your order status will update when confirmation is received.</p>
+          <p id="order-status" style="font-weight:600;margin-top:8px;"></p>
+        </div>
+      </div>
+      <p class="order-hint">Orders are reviewed manually; if you need expedited assistance please contact support via the site footer.</p>
     </section>
 
     <section class="stations-section" id="stations">
-      <h3 class="section-title">全部 24/7 站点</h3>
+      <h3 class="section-title">All 24/7 Hubs</h3>
       <div class="station-controls">
-        <input id="station-search" type="text" placeholder="输入城市 / 地址 / 邮编关键字" />
-        <span class="station-count" id="station-count" aria-live="polite">加载中…</span>
+        <input id="station-search" type="text" placeholder="Enter city / address / postcode" />
+        <span class="station-count" id="station-count" aria-live="polite">Loading…</span>
       </div>
       <div class="station-list" id="station-list" aria-live="polite"></div>
     </section>
 
     <footer id="contact">
-      © 2026 Bloom Vapor · 仅面向 18+ 用户 | <a href="#">隐私政策</a> | <a href="#">联系我们</a>
+      © 2026 Green Hub Northern Ireland · Adults only (18+) | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a>
     </footer>
+
+    <!-- Floating contact buttons: Telegram & WhatsApp -->
+    <div id="floating-contact" aria-hidden="false">
+      <div class="fc-label">Live chat</div>
+      <a class="fc-button" id="fc-telegram" href="#" target="_blank" rel="noopener" aria-label="Live chat on Telegram" title="Live chat on Telegram">
+        <img class="fc-img" src="uploads/telegram.png" alt="Telegram" loading="lazy" />
+      </a>
+      <a class="fc-button" id="fc-whatsapp" href="#" target="_blank" rel="noopener" aria-label="Live chat on WhatsApp" title="Live chat on WhatsApp">
+        <img class="fc-img" src="uploads/whatsapp.png" alt="WhatsApp" loading="lazy" />
+      </a>
+    </div>
   </div>
   <script>
     const HUBS_ENDPOINT = '/.netlify/functions/stations';
@@ -977,14 +1142,14 @@
     let stationSearchValue = '';
 
     function goToOrderForm(productName, variantText) {
-      const formSection = document.getElementById('order-form');
-      if (formSection) {
-        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const orderSection = document.getElementById('order-form');
+      if (orderSection) {
+        orderSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       const productInput = document.getElementById('order-product');
       if (productInput && productName) {
         productInput.value = variantText ? `${productName} · ${variantText}` : productName;
-        productInput.focus();
+        try { productInput.focus({ preventScroll: true }); } catch(e) { productInput.focus(); }
       }
     }
 
@@ -998,16 +1163,41 @@
       });
     }
 
-    function applyStationSelection(stationName, stationAddress, stationPostcode) {
+    function applyStationSelection(stationId, stationName, stationAddress, stationPostcode) {
       const formSection = document.getElementById('order-form');
       if (formSection) {
         formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      // Fill hidden address field and update visible summary
       const stationInput = document.getElementById('order-station');
+      const summaryEl = document.getElementById('order-station-summary');
+      const postcodeControls = document.getElementById('order-postcode-controls');
+      const hubIdInput = document.getElementById('order-hubId');
+      const changeBtn = document.getElementById('order-station-change-btn');
+      const postcodeInput = document.getElementById('order-postcode');
       if (stationInput) {
         const summary = [stationName, stationAddress, stationPostcode].filter(Boolean).join(' · ');
         stationInput.value = summary;
-        stationInput.focus({ preventScroll: true });
+        if (summaryEl) summaryEl.textContent = summary;
+        // hide postcode input and show only summary + change control
+        try { if (postcodeControls) postcodeControls.style.display = 'none'; } catch(e) {}
+        try { if (changeBtn) changeBtn.style.display = 'inline-block'; } catch(e) {}
+        if (postcodeInput && stationPostcode) postcodeInput.value = stationPostcode;
+        if (hubIdInput) hubIdInput.value = stationId || '';
+        // Show pickup timing options when a hub is selected
+        try {
+          const pickupBlock = document.getElementById('pickup-options');
+          const defaultRadio = document.querySelector('input[name="pickup"][value="standard"]');
+          const pickupHidden = document.getElementById('pickup-surcharge');
+          const pickupOptHidden = document.getElementById('pickup-option');
+          if (pickupBlock) pickupBlock.style.display = 'block';
+          if (defaultRadio) {
+            defaultRadio.checked = true;
+            if (pickupHidden) pickupHidden.value = defaultRadio.dataset.surcharge || '0';
+            if (pickupOptHidden) pickupOptHidden.value = defaultRadio.value || 'standard';
+          }
+        } catch (e) { console.warn('show pickup options failed', e); }
+          try { console.log('applyStationSelection -> hub set', { stationId, hubId: hubIdInput ? hubIdInput.value : null, stationName, stationPostcode }); } catch(e) {}
       }
     }
 
@@ -1017,7 +1207,7 @@
       panel.classList.toggle('active');
     }
 
-    /* ------------------- 导航高亮 ------------------- */
+    /* ------------------- Navigation indicator ------------------- */
     function initNavIndicator() {
       const menu = document.getElementById('nav-menu');
       const indicator = document.getElementById('nav-indicator');
@@ -1067,9 +1257,9 @@
       sectionMap.forEach((item) => observer.observe(item.section));
     }
 
-    /* ------------------- 站点总览列表 ------------------- */
+    /* ------------------- Stations list overview ------------------- */
     function cleanStationName(name = '') {
-      return name.replace(/^OOHPod\s*/i, '').trim() || 'Supply 24 Hub';
+      return name.replace(/^OOHPod\s*/i, '').trim() || 'GreenHub Locker';
     }
 
     function renderStationSkeleton(count = 6) {
@@ -1083,7 +1273,7 @@
         </div>`;
       list.innerHTML = new Array(count).fill(skeletonCard).join('');
       const countEl = document.getElementById('station-count');
-      if (countEl) countEl.textContent = '加载中…';
+      if (countEl) countEl.textContent = 'Loading…';
     }
 
     function renderStationCards(items) {
@@ -1091,7 +1281,7 @@
       const countEl = document.getElementById('station-count');
       if (!list) return;
       if (!items.length) {
-        list.innerHTML = '<p class="hub-note">暂无匹配的站点，请修改关键词。</p>';
+        list.innerHTML = '<p class="hub-note">No matching hubs found. Please refine your search.</p>';
       } else {
         list.innerHTML = items
           .map(
@@ -1105,7 +1295,7 @@
           .join('');
       }
       if (countEl) {
-        countEl.textContent = `${items.length} / ${allStations.length} 站点`;
+        countEl.textContent = `${items.length} / ${allStations.length} hubs`;
       }
     }
 
@@ -1123,7 +1313,7 @@
       renderStationSkeleton();
       try {
         const response = await fetch(STATIONS_SOURCE);
-        if (!response.ok) throw new Error('无法加载站点数据');
+        if (!response.ok) throw new Error('Failed to load hub data');
         allStations = await response.json();
         stationListReady = true;
         renderStationCards(filterStations(stationSearchValue));
@@ -1131,10 +1321,10 @@
         console.error('station list load error', error);
         const list = document.getElementById('station-list');
         if (list) {
-          list.innerHTML = '<p class="hub-note">站点列表暂不可用，请稍后刷新。</p>';
+          list.innerHTML = '<p class="hub-note">Hub list temporarily unavailable, please refresh later.</p>';
         }
         const countEl = document.getElementById('station-count');
-        if (countEl) countEl.textContent = '加载失败';
+        if (countEl) countEl.textContent = 'Load failed';
       }
     }
 
@@ -1221,7 +1411,7 @@
           className: 'user-pin'
         });
         userMarker = L.marker([user.latitude, user.longitude], { icon: userIcon }).addTo(hubMap);
-        userMarker.bindPopup(`你的位置: ${user.postcode}`);
+        userMarker.bindPopup(`Your location: ${user.postcode}`);
         bounds.push([user.latitude, user.longitude]);
       }
 
@@ -1249,19 +1439,19 @@
 
       const value = input.value.trim().toUpperCase();
       if (!value) {
-        alert('请输入邮编 (e.g. BT9 5AD)');
+        alert('Please enter a postcode (e.g. BT9 5AD)');
         input.focus();
         return;
       }
 
       const postcodePattern = /^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})$/;
       if (!postcodePattern.test(value)) {
-        alert('邮编格式不正确，请输入英国/北爱尔兰格式 (如 BT9 5AD)。');
+        alert('Invalid postcode format. Please enter a UK/NI postcode (e.g. BT9 5AD).');
         input.focus();
         return;
       }
 
-      list.innerHTML = '<li>查询中...</li>';
+      list.innerHTML = '<li>Searching...</li>';
       clearDynamicNotes(card);
 
       try {
@@ -1277,13 +1467,13 @@
         }));
 
         if (!stations.length) {
-          list.innerHTML = '<li>未找到匹配站点，请检查邮编或稍后再试。</li>';
+          list.innerHTML = '<li>No matching hubs found. Please check the postcode or try again later.</li>';
           await renderHubMap(null, []);
           return;
         }
 
         list.innerHTML = stations
-          .map((station) => {
+          .map((station, _idx) => {
             const distance = station.distanceMiles
               ? `<span class="distance">${station.distanceMiles.toFixed(1)} mi</span>`
               : '';
@@ -1291,19 +1481,30 @@
             const safeName = cleanName.replace(/"/g, '&quot;');
             const safePostcode = station.postcode.replace(/"/g, '&quot;');
             const safeAddress = station.address.replace(/"/g, '&quot;');
+            // Ensure we have a stable id. if station.id not provided, derive one from postcode+address
+            const derivedId = station.id || (safePostcode + '|' + safeAddress + '|' + _idx);
             return `
-              <li class="hub-result" data-station-name="${safeName}" data-station-postcode="${safePostcode}" data-station-address="${safeAddress}">
+              <li class="hub-result" data-station-id="${derivedId}" data-station-name="${safeName}" data-station-postcode="${safePostcode}" data-station-address="${safeAddress}">
                 <div>
                   <strong>${cleanName}</strong> — ${station.address} · <span class="distance">${station.postcode}</span> ${distance}
                 </div>
-                <span class="select-chip">选择此站点领取</span>
+                <span class="select-chip">Select this hub to collect</span>
               </li>`;
           })
           .join('');
 
+        // highlight the nearest station visually and scroll it into view
+        requestAnimationFrame(() => {
+          const items = list.querySelectorAll('.hub-result');
+          if (items && items.length) {
+            items.forEach((it, idx) => it.classList.toggle('nearest', idx === 0));
+            try { items[0].scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+          }
+        });
+
         updateDynamicNote(
           card,
-          `根据 ${data.user?.postcode || value} 推荐最近的 ${stations.length} 个站点。`
+          `Based on ${data.user?.postcode || value}, recommending the nearest ${stations.length} hubs.`
         );
 
         renderHubMap(data.user, stations).catch((err) => {
@@ -1311,7 +1512,7 @@
         });
       } catch (error) {
         console.error('matchHub error', error);
-        list.innerHTML = '<li>服务暂不可用，请稍后重试。</li>';
+        list.innerHTML = '<li>Service temporarily unavailable. Please try again later.</li>';
         await renderHubMap(null, []);
       }
     }
@@ -1358,14 +1559,572 @@
       list.addEventListener('click', (event) => {
         const item = event.target.closest('.hub-result');
         if (!item) return;
+        const id = item.dataset.stationId || '';
         const name = item.dataset.stationName || '';
         const postcode = item.dataset.stationPostcode || '';
         const address = item.dataset.stationAddress || '';
         focusProducts(name, postcode);
-        applyStationSelection(name, address, postcode);
-        scrollToProducts();
+        applyStationSelection(id, name, address, postcode);
+        // Close the modal after selection; closeHubModal will handle scrolling/focus
+        try { if (typeof closeHubModal === 'function') closeHubModal(); } catch (e) { console.warn('closeHubModal failed', e); }
       });
     }
+
+    // Open modal and run postcode match inside it (used from the order form)
+    function openHubModalAndSearch(postcode) {
+      try {
+        openHubModal();
+      } catch (e) {
+        console.warn('openHubModal not available', e);
+      }
+      const modalInput = document.querySelector('#hub-modal #postcode') || document.getElementById('postcode');
+      if (modalInput && postcode) {
+        modalInput.value = String(postcode).trim().toUpperCase();
+      }
+      // Delay slightly to ensure modal is rendered before matching
+      setTimeout(() => {
+        try { if (typeof matchHub === 'function') matchHub(); } catch (e) { console.warn(e); }
+        // Try to fix Leaflet rendering
+        setTimeout(() => { try { if (window.hubMap && typeof window.hubMap.invalidateSize === 'function') window.hubMap.invalidateSize(); } catch (e) {} }, 300);
+      }, 150);
+    }
+
+    // Bind quick hub search on order form (Enter key or button)
+    function initOrderStationQuickSearch() {
+      const orderPostcode = document.getElementById('order-postcode');
+      if (!orderPostcode) return;
+      const btn = document.getElementById('order-station-search-btn');
+      if (btn) btn.addEventListener('click', () => openHubModalAndSearch(orderPostcode.value));
+      orderPostcode.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          openHubModalAndSearch(orderPostcode.value);
+        }
+      });
+      const changeBtn = document.getElementById('order-station-change-btn');
+      const postcodeControls = document.getElementById('order-postcode-controls');
+      const summaryEl = document.getElementById('order-station-summary');
+      if (changeBtn) {
+        changeBtn.addEventListener('click', () => {
+          try { if (postcodeControls) postcodeControls.style.display = ''; } catch(e) {}
+          try { changeBtn.style.display = 'none'; } catch(e) {}
+          if (summaryEl) summaryEl.textContent = '';
+          try { orderPostcode.focus(); } catch(e) {}
+        });
+      }
+    }
+
+    /* ------------------- Order & payment frontend integration ------------------- */
+    function showPaymentSection(orderId) {
+      const section = document.getElementById('payment-section');
+      const hint = document.getElementById('payment-hint');
+      const invoiceBox = document.getElementById('invoice-box');
+      const statusEl = document.getElementById('order-status');
+      if (!section) return;
+      section.style.display = 'block';
+      const parts = String(orderId).split('-');
+      const suffix = parts[parts.length - 1] || orderId;
+      hint.textContent = `Order ${suffix} created. Select a payment network to generate a payment link.`;
+      invoiceBox.style.display = 'none';
+      statusEl.textContent = '';
+      localStorage.setItem('supply24_orderId', orderId);
+      startOrderPolling(orderId);
+    }
+
+    async function createPaymentForOrder(orderId, network) {
+      const actions = document.getElementById('payment-actions');
+      const btnTrc = document.getElementById('pay-trc20');
+      const btnErc = document.getElementById('pay-erc20');
+      actions && (actions.style.pointerEvents = 'none');
+      btnTrc && (btnTrc.textContent = 'Processing...');
+      btnErc && (btnErc.textContent = 'Processing...');
+
+      try {
+        const resp = await fetch('/.netlify/functions/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, network })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed to create invoice');
+        renderInvoice(data);
+      } catch (err) {
+        alert('Failed to create invoice: ' + (err.message || err));
+        console.error(err);
+      } finally {
+        actions && (actions.style.pointerEvents = '');
+        btnTrc && (btnTrc.textContent = 'USDT TRC20');
+        btnErc && (btnErc.textContent = 'USDT ERC20');
+      }
+    }
+
+    function renderInvoice(invoice) {
+      const invoiceBox = document.getElementById('invoice-box');
+      const info = document.getElementById('invoice-info');
+      const link = document.getElementById('invoice-link');
+      const statusEl = document.getElementById('order-status');
+      if (!invoiceBox || !info || !link) return;
+      invoiceBox.style.display = 'block';
+      const amountLabel = invoice.payAmount
+        ? `${invoice.payAmount} ${invoice.payCurrency || ''}`
+        : `${invoice.priceAmount} ${invoice.priceCurrency || ''}`;
+      info.innerHTML = `Invoice <strong>${invoice.invoiceId}</strong> · Amount: <strong>${amountLabel}</strong>`;
+      if (invoice.payUrl) {
+        link.href = invoice.payUrl;
+        link.textContent = 'Open payment page';
+        link.target = '_blank';
+      } else {
+        link.removeAttribute('href');
+        link.textContent = 'Payment link unavailable';
+      }
+      statusEl.textContent = 'Waiting for payment confirmation...';
+    }
+
+    let _pollTimer = null;
+    async function pollOrderOnce(orderId) {
+      try {
+        const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
+        if (!resp.ok) return null;
+        const order = await resp.json();
+        return order;
+      } catch (err) {
+        console.warn('poll error', err);
+        return null;
+      }
+    }
+
+    function startOrderPolling(orderId) {
+      if (_pollTimer) clearInterval(_pollTimer);
+      const statusEl = document.getElementById('order-status');
+      _pollTimer = setInterval(async () => {
+        const order = await pollOrderOnce(orderId);
+        if (!order) return;
+        if (order.status === 'paid') {
+          statusEl && (statusEl.textContent = `Paid — ${order.paidAt || ''}`);
+          clearInterval(_pollTimer);
+          _pollTimer = null;
+        }
+      }, 5000);
+    }
+
+    async function loadChatLinks() {
+      try {
+        const resp = await fetch('/data/chat-links.json');
+        if (!resp.ok) return;
+        const links = await resp.json();
+        const tg = document.getElementById('fc-telegram');
+        const wa = document.getElementById('fc-whatsapp');
+        if (tg && links.telegram) tg.href = links.telegram;
+        if (wa && links.whatsapp) wa.href = links.whatsapp;
+      } catch (err) {
+        console.warn('chat links load failed', err);
+      }
+    }
+    loadChatLinks();
+
+    function bindOrderForm() {
+      const form = document.querySelector('form[name="order-info"]');
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        // Calculate product base price and add pickup surcharge so checkout settles both together
+        const prodText = formData.get('product') || '';
+        let basePrice = 0;
+        const priceMatch = prodText.toString().match(/£([0-9,\.]+)/);
+        if (priceMatch && priceMatch[1]) {
+          basePrice = Number(String(priceMatch[1]).replace(/,/g, '')) || 0;
+        }
+        const pickupSurcharge = Number(formData.get('pickupSurcharge') || 0);
+        const totalPrice = basePrice + pickupSurcharge;
+
+        const payload = {
+          productId: (prodText || '').toString().split(' ')[0] || formData.get('product'),
+          productName: prodText,
+          basePriceGbp: basePrice,
+          priceGbp: totalPrice,
+          hubId: formData.get('hubId') || '',
+          hubName: formData.get('address'),
+          hubPostcode: '',
+          customerName: formData.get('name'),
+          customerPhone: formData.get('phone'),
+          customerEmail: formData.get('email'),
+          notes: formData.get('notes'),
+          pickupOption: formData.get('pickupOption') || formData.get('pickup') || '',
+          pickupSurcharge: pickupSurcharge
+        };
+
+        const submitBtn = form.querySelector('.submit-order');
+        submitBtn && (submitBtn.disabled = true);
+        submitBtn && (submitBtn.textContent = 'Creating order...');
+
+        try {
+          try { console.log('create-order payload', payload); } catch(e) {}
+          const resp = await fetch('/.netlify/functions/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          try { console.log('create-order http status', resp.status, resp.statusText); } catch(e) {}
+          let data;
+          try {
+            data = await resp.json();
+            try { console.log('create-order json response', data); } catch(e) {}
+          } catch (parseErr) {
+            const txt = await resp.text().catch(() => 'Unable to read response');
+            console.error('create-order non-JSON response', resp.status, txt);
+            try { console.log('create-order raw response text', txt); } catch(e) {}
+            throw new Error(txt || `HTTP ${resp.status}`);
+          }
+          if (!resp.ok) throw new Error(data.error || 'Order failed');
+          // Redirect to payment page (placeholder options) with orderId
+          try {
+            const target = `payment.html?orderId=${encodeURIComponent(data.orderId)}`;
+            window.location.href = target;
+            return;
+          } catch (e) {
+            // fallback to inline payment section
+            showPaymentSection(data.orderId);
+          }
+        } catch (err) {
+          alert('Order failed: ' + (err.message || err));
+          console.error(err);
+        } finally {
+          submitBtn && (submitBtn.disabled = false);
+          submitBtn && (submitBtn.textContent = 'Submit order');
+        }
+      });
+
+        // payment buttons
+      const btnTrc = document.getElementById('pay-trc20');
+      const btnErc = document.getElementById('pay-erc20');
+      const btnBank = document.getElementById('pay-bank');
+      const bankDetails = document.getElementById('bank-details');
+      const bankRefExample = document.getElementById('bank-ref-example');
+      btnTrc && btnTrc.addEventListener('click', () => {
+        const id = localStorage.getItem('supply24_orderId');
+        if (!id) return alert('Please create an order first');
+        createPaymentForOrder(id, 'TRC20');
+      });
+      btnErc && btnErc.addEventListener('click', () => {
+        const id = localStorage.getItem('supply24_orderId');
+        if (!id) return alert('Please create an order first');
+        createPaymentForOrder(id, 'ERC20');
+      });
+      if (btnBank) {
+        btnBank.addEventListener('click', () => {
+          const id = localStorage.getItem('supply24_orderId') || '';
+          // show only the ID suffix (part after last dash)
+          if (bankRefExample) {
+            if (id) {
+              const parts = String(id).split('-');
+              bankRefExample.textContent = parts[parts.length - 1] || id;
+            } else {
+              bankRefExample.textContent = bankRefExample.textContent || 'W0XPSN';
+            }
+          }
+          if (bankDetails) {
+            bankDetails.style.display = 'block';
+            try { bankDetails.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+          }
+        });
+      }
+
+      // pickup option wiring: update hidden fields when radio selection changes
+      try {
+        const pickupRadios = document.querySelectorAll('input[name="pickup"]');
+        const pickupHidden = document.getElementById('pickup-surcharge');
+        const pickupOptHidden = document.getElementById('pickup-option');
+        if (pickupRadios && pickupRadios.length && pickupHidden && pickupOptHidden) {
+          pickupRadios.forEach((r) => {
+            r.addEventListener('change', () => {
+              pickupHidden.value = r.dataset.surcharge || '0';
+              pickupOptHidden.value = r.value || '';
+            });
+          });
+        }
+      } catch (e) {
+        console.warn('pickup wiring failed', e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      bindOrderForm();
+      // restore previous order view
+      const prev = localStorage.getItem('supply24_orderId');
+      if (prev) showPaymentSection(prev);
+      // Bind quick search button and Enter key on order form
+      try { initOrderStationQuickSearch(); } catch (e) { console.warn('initOrderStationQuickSearch failed', e); }
+      // Support Enter key on postcode input inside modal to trigger matching
+      const modalPostcode = document.getElementById('postcode');
+      if (modalPostcode) {
+        modalPostcode.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            try { matchHub(); } catch (err) { console.warn(err); }
+          }
+        });
+      }
+      // Load products from data file and render
+      try { loadAndRenderProducts(); } catch (err) { console.warn('load products failed', err); }
+      // Admin tools bindings
+      try { initAdminTools(); } catch (e) { console.warn('initAdminTools failed', e); }
+    });
+
+    // Admin tools: client-side handler to call admin-update-order function
+    function initAdminTools() {
+      const toggle = document.getElementById('admin-toggle');
+      const body = document.getElementById('admin-tools-body');
+      const sendBtn = document.getElementById('admin-send-btn');
+      const result = document.getElementById('admin-result');
+      if (toggle && body) {
+        toggle.addEventListener('click', () => { body.style.display = body.style.display === 'none' ? 'flex' : 'none'; });
+      }
+      if (!sendBtn) return;
+      sendBtn.addEventListener('click', async () => {
+        try {
+          const orderIdInput = document.getElementById('admin-orderId');
+          const tracking = document.getElementById('admin-tracking')?.value || '';
+          const password = document.getElementById('admin-password')?.value || '';
+          const sendEmail = !!document.getElementById('admin-send-email')?.checked;
+          let orderId = orderIdInput && orderIdInput.value ? orderIdInput.value.trim() : null;
+          if (!orderId) orderId = localStorage.getItem('supply24_orderId') || '';
+          if (!orderId) {
+            result.textContent = 'No orderId provided (enter or create order first)';
+            return;
+          }
+          result.textContent = 'Sending…';
+          const resp = await fetch('/.netlify/functions/admin-update-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, trackingNumber: tracking, password, sendEmail })
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            result.textContent = `Error: ${data.error || resp.statusText}`;
+            return;
+          }
+          result.textContent = data.ok ? `Updated ${data.orderId}. Email sent: ${data.emailSent}` : `Failed: ${JSON.stringify(data)}`;
+        } catch (err) {
+          console.error('admin update failed', err);
+          result.textContent = 'Request failed — see console';
+        }
+      });
+      const shareBtn = document.getElementById('admin-share-telegram');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          try {
+            let orderId = document.getElementById('admin-orderId')?.value?.trim() || localStorage.getItem('supply24_orderId') || '';
+            if (!orderId) {
+              result.textContent = 'No orderId provided (enter or create order first)';
+              return;
+            }
+            result.textContent = 'Preparing share message…';
+            const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
+            if (!resp.ok) {
+              result.textContent = `Failed to load order ${orderId}`;
+              return;
+            }
+            const order = await resp.json();
+            const lines = [];
+            lines.push(`Order: ${order.orderId}`);
+            lines.push(`Product: ${order.productName} (£${order.priceGbp})`);
+            lines.push(`Hub: ${order.hubName}`);
+            lines.push(`Name: ${order.customerName}`);
+            lines.push(`Phone: ${order.customerPhone}`);
+            if (order.customerEmail) lines.push(`Email: ${order.customerEmail}`);
+            if (order.notes) lines.push(`Notes: ${order.notes}`);
+            const text = lines.join('\n');
+            const shareUrl = `https://t.me/share/url?text=${encodeURIComponent(text)}`;
+            window.open(shareUrl, '_blank');
+            result.textContent = 'Opened Telegram share window (choose recipient in Telegram).';
+          } catch (err) {
+            console.error('share telegram failed', err);
+            result.textContent = 'Share failed — see console';
+          }
+        });
+      }
+    }
+
+    /* ------------------- Products dynamic renderer ------------------- */
+    async function loadAndRenderProducts() {
+      const container = document.getElementById('product-showcase');
+      if (!container) return;
+      container.innerHTML = '<p class="hub-note">Loading products…</p>';
+      try {
+        const resp = await fetch('data/products.json');
+        if (!resp.ok) throw new Error('Failed to load products');
+        const data = await resp.json();
+        const products = Array.isArray(data.products) ? data.products : data;
+        if (!products || !products.length) {
+          container.innerHTML = '<p class="hub-note">No products found.</p>';
+          return;
+        }
+        container.innerHTML = products
+          .filter(p => p.active !== false)
+          .map((p) => renderProductCard(p)).join('');
+      } catch (err) {
+        console.error('render products error', err);
+        container.innerHTML = '<p class="hub-note">Products temporarily unavailable.</p>';
+      }
+    }
+
+    function safeFormatGbp(val) {
+      const n = Number(String(val).replace(/[^0-9.-]/g, '')) || 0;
+      return n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
+    }
+
+    function renderProductCard(p) {
+      const image = p.image || p.flag || '';
+      const imgAlt = p.image_alt || `${p.name || ''} image`;
+      const countryFlag = p.flag ? `<img class="inline-flag" src="${p.flag}" alt="flag"/>` : '';
+      const header = `<h4 class="stardawg-title">${escapeHtml(p.name || '')} ${countryFlag}</h4>`;
+      const imgTag = image ? `<img src="${image}" alt="${escapeHtml(imgAlt)}" loading="lazy" />` : '';
+      const variants = Array.isArray(p.variants) ? p.variants : [];
+
+      function formatGbpDecimals(val, digits = 2) {
+        const n = Number(val) || 0;
+        return n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: digits, maximumFractionDigits: digits });
+      }
+
+      const rows = variants.map(v => {
+        // Price compatibility: accept numeric `price_gbp`, string `price`, or legacy `price` with currency symbol
+        function parsePriceField(x) {
+          if (x == null) return 0;
+          if (typeof x === 'number') return x;
+          const cleaned = String(x).replace(/[^0-9.-]/g, '');
+          const n = Number(cleaned);
+          return Number.isFinite(n) ? n : 0;
+        }
+
+        const price = parsePriceField(v.price_gbp ?? v.price ?? v.priceGbp ?? v.price_gbp);
+        const priceFmt = safeFormatGbp(price);
+
+        // Weight compatibility: prefer explicit `grams` field, else parse from label, else fallback to unit
+        let gramsValue = null;
+        if (v.grams != null && !Number.isNaN(Number(v.grams))) gramsValue = Number(v.grams);
+        const labelText = String(v.label || '').trim();
+        if (gramsValue == null) {
+          const gramsMatch = labelText.match(/([0-9]+(?:[.,][0-9]+)?)\s*g/i);
+          if (gramsMatch) gramsValue = parseFloat(gramsMatch[1].replace(',', '.')) || null;
+        }
+
+        let perGramText = '';
+        if (gramsValue && gramsValue > 0) {
+          const perGramValue = price / gramsValue;
+          perGramText = `${formatGbpDecimals(perGramValue, 2)}/g`;
+        }
+        // Fallback to explicit unit field if present
+        if (!perGramText && v.unit) {
+          perGramText = escapeHtml(String(v.unit));
+        }
+
+        const variantLabel = escapeHtml(labelText || '');
+        const dataVariant = `${variantLabel} · ${priceFmt} · ${perGramText}`;
+        return `<tr class="variant-row" data-product="${escapeHtml(p.name)}" data-variant="${escapeHtml(dataVariant)}">
+                  <td>${variantLabel}</td>
+                  <td class="price-cell">${priceFmt}</td>
+                  <td class="per-gram">${escapeHtml(perGramText)}</td>
+                </tr>`;
+      }).join('');
+
+      return `
+        <div class="card product-card">
+          ${imgTag}
+          <div class="product-flag">${p.country ? escapeHtml(p.country) : ''}</div>
+          ${header}
+          <table class="variant-table" aria-label="${escapeHtml(p.name)} variants">
+            <thead>
+              <tr><th>Variant</th><th>Price</th><th>Price per g</th></tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]; }); }
+
+    // Modal open/close helpers for hub picker
+    (function() {
+      let _originalParent = null;
+      let _nextSibling = null;
+      // order form is no longer moved into the modal; no original parent tracking needed
+
+      window.openHubModal = function() {
+        const modal = document.getElementById('hub-modal');
+        const modalContainer = document.getElementById('modal-hub-container');
+        const hubPanel = document.getElementById('hub-panel');
+        if (!modal || !modalContainer || !hubPanel) return;
+        if (!_originalParent) {
+          _originalParent = hubPanel.parentNode;
+          _nextSibling = hubPanel.nextSibling;
+        }
+        modalContainer.appendChild(hubPanel);
+        // Note: do NOT move the order form into the modal (keep Order Details on page)
+        // ensure panel presents in modal
+        hubPanel.classList.add('active');
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        const input = modal.querySelector('#postcode');
+        if (input) {
+          input.focus();
+          // If the user already entered a postcode, auto-run a match
+          const val = input.value && String(input.value).trim();
+          if (val) {
+            // Small delay to ensure modal has rendered
+            setTimeout(() => {
+              try {
+                if (typeof matchHub === 'function') matchHub();
+              } catch (e) {
+                console.warn('auto matchHub failed', e);
+              }
+              // fix leaflet rendering if map exists
+              setTimeout(() => {
+                try { if (window.hubMap && typeof window.hubMap.invalidateSize === 'function') window.hubMap.invalidateSize(); } catch (e) {}
+              }, 300);
+            }, 120);
+          }
+        }
+        document.body.style.overflow = 'hidden';
+      };
+
+      window.closeHubModal = function() {
+        const modal = document.getElementById('hub-modal');
+        const hubPanel = document.getElementById('hub-panel');
+        if (!modal || !hubPanel) return;
+        if (_originalParent) {
+          if (_nextSibling) _originalParent.insertBefore(hubPanel, _nextSibling);
+          else _originalParent.appendChild(hubPanel);
+        }
+        // After closing modal, scroll to Order Details and focus first input
+        try {
+          setTimeout(() => {
+            const orderSection = document.getElementById('order-form');
+            if (orderSection) {
+              try { orderSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+              const firstInput = orderSection.querySelector('input[name="name"], input, textarea');
+              if (firstInput) firstInput.focus({ preventScroll: true });
+            }
+          }, 140);
+        } catch (e) {}
+        // remove active state
+        hubPanel.classList.remove('active');
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      document.addEventListener('click', (e) => {
+        const close = e.target.closest('[data-close-modal]');
+        if (close) closeHubModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeHubModal();
+      });
+    })();
 
     document.addEventListener('DOMContentLoaded', () => {
       initNavIndicator();

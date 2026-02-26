@@ -6,14 +6,52 @@ media_folder: "uploads"
 public_folder: "/uploads"
 
 collections:
-  - name: "page"
-    label: "Landing Page"
+  - name: "bank"
+    label: "Bank Transfer Details"
     files:
-      - file: "index.html"
-        name: "homepage"
-        label: "Homepage"
+      - file: "data/bank.json"
+        name: "bank_details"
+        label: "Bank Details"
         fields:
-          - label: "Hero Title"
-            name: "hero_title"
-            widget: "string"
-            required: false
+          - { label: "Account Name", name: "accountName", widget: "string" }
+          - { label: "Sort Code", name: "sortCode", widget: "string" }
+          - { label: "Account Number", name: "accountNumber", widget: "string" }
+
+  - name: "chat_links"
+    label: "Live Chat Links"
+    files:
+      - file: "data/chat-links.json"
+        name: "chat_links_json"
+        label: "Live Chat"
+        fields:
+          - { label: "Telegram URL", name: "telegram", widget: "string" }
+          - { label: "WhatsApp URL", name: "whatsapp", widget: "string" }
+
+  - name: "products"
+    label: "Products"
+    files:
+      - file: "data/products.json"
+        name: "products_json"
+        label: "Products JSON"
+        fields:
+          - label: "Products"
+            name: "products"
+            widget: "list"
+            hint: "Manage product entries (name, id, country, flag, variants, active, sort_order, media)"
+            fields:
+              - { label: "ID", name: "id", widget: "string" }
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Country", name: "country", widget: "string", required: false }
+              - { label: "Flag URL", name: "flag", widget: "string", required: false }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Image alt text", name: "image_alt", widget: "string", required: false }
+              - { label: "Active", name: "active", widget: "boolean", default: true }
+              - { label: "Sort Order", name: "sort_order", widget: "number", required: false }
+              - label: "Variants"
+                name: "variants"
+                widget: "list"
+                fields:
+                  - { label: "Label", name: "label", widget: "string" }
+                  - { label: "Price (GBP)", name: "price_gbp", widget: "number", value_type: "float" }
+                  - { label: "Weight (grams)", name: "grams", widget: "number", value_type: "float", required: false, hint: "Enter numeric grams (e.g. 28 or 62.5) to show £/g" }
+                  - { label: "Unit override", name: "unit", widget: "string", required: false, hint: "Optional fallback text for per-gram column" }

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Place your order">
+  <rect x="30" y="14" width="180" height="212" rx="18" fill="#1b1f23" stroke="#dbeff0" stroke-opacity="0.06"/>
+  <rect x="48" y="28" width="144" height="156" rx="10" fill="#0f1720"/>
+  <g transform="translate(60,56) scale(1.2)">
+    <g fill="#7ce06a">
+      <path d="M8 8h56v6H8z"/>
+      <circle cx="18" cy="40" r="8"/>
+      <circle cx="50" cy="40" r="8"/>
+    </g>
+    <path d="M12 16h44l-6 18H20z" fill="#bfeec8" opacity="0.95"/>
+    <rect x="6" y="2" width="56" height="8" rx="2" fill="#82f5b2" opacity="0.9"/>
+  </g>
+</svg>

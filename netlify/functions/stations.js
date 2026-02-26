@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = path.resolve(__dirname, '../../data/hubs-ni.json');
 const POSTCODES_IO_BASE = 'https://api.postcodes.io';
-const MAX_RESULTS = 8;
+const MAX_RESULTS = 67;
 
 /** @type {Array<{name:string,address:string,postcode:string,region?:string,latitude?:number|null,longitude?:number|null}> | null} */
 let cachedStations = null;
