@@ -112,10 +112,10 @@ export async function handler(event) {
 
     const statusLabel = '等待付款';
     const pickupLine = order.pickupOption
-      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
+      ? `\n提货方式：${order.pickupOption}${order.pickupSurchargeGbp ? `（加价 £${order.pickupSurchargeGbp}）` : ''}`
       : '';
-    const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const text = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nBase price: £${order.basePriceGbp || order.priceGbp}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
+    const emailLine = order.customerEmail ? `\n邮箱：${order.customerEmail}` : '';
+    const text = `🆕 新订单 <b>${orderId}</b>\n状态：${statusLabel}\n产品：${order.productName}\n基础价格：£${order.basePriceGbp || order.priceGbp}\n总金额：£${order.priceGbp}${pickupLine}\n取货门店：${order.hubName} ${order.hubPostcode || ''}\n客户：${order.customerName}\n电话：${order.customerPhone}${emailLine}`;
     let telegramSent = false;
     let fastTelegramSent = false;
     try {
