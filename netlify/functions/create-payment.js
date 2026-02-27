@@ -96,6 +96,9 @@ export async function handler(event) {
     if (!order.priceGbp || Number(order.priceGbp) <= 0) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Order amount invalid' }) };
     }
+    if (!order.otpVerifiedAt) {
+      return { statusCode: 403, body: JSON.stringify({ error: 'Phone verification required before payment' }) };
+    }
 
     const baseUrl = resolveBaseUrl(event);
     const invoice = await createNowPaymentsInvoice(order, network, baseUrl);

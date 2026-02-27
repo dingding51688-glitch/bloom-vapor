@@ -37,8 +37,17 @@ async function airtableRequest(method, tableName, { recordId, params, body } = {
     url += `/${recordId}`;
   }
   if (params) {
-    const search = new URLSearchParams(params);
-    url += `?${search.toString()}`;
+    const search = new URLSearchParams();
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+      if (Array.isArray(value)) {
+        value.forEach((item) => search.append(key, item));
+      } else {
+        search.append(key, value);
+      }
+    });
+    const query = search.toString();
+    if (query) url += `?${query}`;
   }
   const res = await fetchFn(url, {
     method,
@@ -68,6 +77,22 @@ export async function updateOrderRecord(recordId, fields) {
     body: { fields }
   });
   return data;
+}
+
+export async function listOrderRecords({ pageSize = 50, offset, filterByFormula } = {}) {
+  const params = {
+    pageSize: Math.min(Math.max(Number(pageSize) || 1, 1), 100),
+    offset,
+    filterByFormula,
+    'sort[0][field]': 'createdAt',
+    'sort[0][direction]': 'desc'
+  };
+  const data = await airtableRequest('GET', AIRTABLE_ORDERS_TABLE, { params });
+  const records = data.records || [];
+  return {
+    orders: records.map((record) => airtableRecordToOrder(record)),
+    offset: data.offset || null
+  };
 }
 
 async function findRecordByField(field, value) {
@@ -113,6 +138,9 @@ export function airtableRecordToOrder(record) {
     trackingNumber: fields.trackingNumber || '',
     password: fields.password || '',
     payment: parsePaymentPayload(fields.paymentPayload),
+    otpCode: fields.otpCode || '',
+    otpExpiresAt: fields.otpExpiresAt || null,
+    otpVerifiedAt: fields.otpVerifiedAt || null,
     createdAt: fields.createdAt || null,
     updatedAt: fields.updatedAt || null,
     paidAt: fields.paidAt || null,
@@ -137,3 +165,5 @@ export function parsePaymentPayload(payload) {
     return null;
   }
 }
+
+export { escapeFormulaValue };

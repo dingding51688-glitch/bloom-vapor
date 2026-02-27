@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orders Manager · Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #06080d;
+        --panel: #0d1117;
+        --border: #1f2933;
+        --accent: #2dd4bf;
+        --accent-strong: #14b8a6;
+        --text: #f8fafc;
+        --text-dim: #94a3b8;
+        --danger: #f87171;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: radial-gradient(circle at top, #0f172a, #020617 60%);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 24px;
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 1.75rem;
+      }
+      .card {
+        background: rgba(6, 11, 20, 0.75);
+        border: 1px solid rgba(45, 212, 191, 0.15);
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 20px 70px rgba(2, 6, 23, 0.7);
+        backdrop-filter: blur(16px);
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      label {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+      }
+      select,
+      input[type="text"] {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: var(--text);
+        font-size: 0.95rem;
+        min-width: 160px;
+      }
+      input[type="text"]::placeholder {
+        color: rgba(148, 163, 184, 0.8);
+      }
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--accent);
+        color: #04131b;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(13, 148, 136, 0.25);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      thead {
+        background: rgba(15, 23, 42, 0.8);
+      }
+      th,
+      td {
+        padding: 10px 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        text-align: left;
+        font-size: 0.9rem;
+      }
+      tbody tr:hover {
+        background: rgba(15, 23, 42, 0.55);
+      }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+      }
+      .status-pill[data-status="pending"] {
+        color: #fcd34d;
+        border-color: rgba(252, 211, 77, 0.4);
+      }
+      .status-pill[data-status="paid"] {
+        color: #34d399;
+        border-color: rgba(52, 211, 153, 0.4);
+      }
+      .status-pill[data-status="ready"] {
+        color: #60a5fa;
+        border-color: rgba(96, 165, 250, 0.4);
+      }
+      .status-pill[data-status="cancelled"] {
+        color: var(--danger);
+        border-color: rgba(248, 113, 113, 0.4);
+      }
+      .input-inline {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .input-inline input[type="text"] {
+        min-width: 220px;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px 0;
+        color: var(--text-dim);
+      }
+      .badge {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+      .muted {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+      }
+      .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+      }
+      @media (max-width: 960px) {
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+        thead tr {
+          display: none;
+        }
+        tbody tr {
+          border: 1px solid rgba(148, 163, 184, 0.2);
+          border-radius: 12px;
+          margin-bottom: 16px;
+          padding: 12px;
+        }
+        td {
+          border: none;
+          padding: 6px 0;
+        }
+        td::before {
+          content: attr(data-label);
+          display: block;
+          font-size: 0.78rem;
+          color: var(--text-dim);
+          margin-bottom: 2px;
+        }
+        .input-inline input[type="text"] {
+          min-width: unset;
+        }
+      }
+      .auth-card {
+        max-width: 480px;
+        margin: 15vh auto 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="auth" class="card auth-card" hidden>
+      <h1>Orders Console</h1>
+      <p class="muted">Log in with Netlify Identity to manage orders.</p>
+      <button id="login-btn">Sign in</button>
+    </div>
+    <div id="app" class="card" hidden>
+      <div class="flex-row" style="justify-content: space-between; gap: 16px; align-items: flex-start;">
+        <div>
+          <h1>Orders Console</h1>
+          <p class="muted">Review orders, update tracking / pickup codes, and send pickup emails.</p>
+        </div>
+        <div class="muted" id="user-info"></div>
+      </div>
+      <div class="controls">
+        <label>
+          <span>Status</span><br />
+          <select id="status-filter">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="ready">Ready</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </label>
+        <label>
+          <span>Search</span><br />
+          <input type="text" id="search-input" placeholder="Order ID, name, phone or email" />
+        </label>
+        <div class="flex-row">
+          <button id="refresh-btn">Refresh</button>
+          <button id="load-more-btn" disabled>Load more</button>
+        </div>
+      </div>
+      <div id="orders-container">
+        <p class="muted">Loading orders…</p>
+      </div>
+    </div>
+
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+      const state = {
+        orders: [],
+        nextOffset: null,
+        loading: false,
+        search: '',
+        status: 'all'
+      };
+
+      const authCard = document.getElementById('auth');
+      const loginBtn = document.getElementById('login-btn');
+      const app = document.getElementById('app');
+      const userInfo = document.getElementById('user-info');
+      const statusFilter = document.getElementById('status-filter');
+      const searchInput = document.getElementById('search-input');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const container = document.getElementById('orders-container');
+
+      function renderOrders() {
+        if (!state.orders.length) {
+          container.innerHTML = '<div class="empty-state">No orders match your filters.</div>';
+          loadMoreBtn.disabled = true;
+          return;
+        }
+        const rows = state.orders
+          .map((order, index) => {
+            const created = order.createdAt ? new Date(order.createdAt) : null;
+            const updated = order.updatedAt ? new Date(order.updatedAt) : null;
+            const createdText = created ? created.toLocaleString() : '—';
+            const updatedText = updated ? updated.toLocaleString() : '—';
+            return `
+              <tr data-order-index="${index}">
+                <td data-label="Order">
+                  <strong>${order.orderId || '—'}</strong>
+                  <div class="muted">${order.productName || '—'}</div>
+                  <div class="muted">${order.priceGbp ? '£' + order.priceGbp : '—'}</div>
+                </td>
+                <td data-label="Customer">
+                  <div>${order.customerName || '—'}</div>
+                  <div class="muted">${order.customerPhone || ''}</div>
+                  <div class="muted">${order.customerEmail || ''}</div>
+                </td>
+                <td data-label="Hub">
+                  <div>${order.hubName || '—'}</div>
+                  <div class="muted">${order.hubPostcode || ''}</div>
+                </td>
+                <td data-label="Status">
+                  <span class="status-pill" data-status="${order.status || 'pending'}">${(order.status || 'pending').toUpperCase()}</span>
+                  <div class="muted">Created: ${createdText}</div>
+                  <div class="muted">Updated: ${updatedText}</div>
+                </td>
+                <td data-label="Tracking" class="input-inline">
+                  <input type="text" class="tracking-input" placeholder="Tracking number" value="${order.trackingNumber || ''}" />
+                  <input type="text" class="password-input" placeholder="Pickup password" value="${order.password || ''}" />
+                  <label class="checkbox">
+                    <input type="checkbox" class="send-email-checkbox" />
+                    Send ready-for-pickup email
+                  </label>
+                </td>
+                <td data-label="Actions">
+                  <button class="save-btn">Save</button>
+                  <div class="muted" data-role="row-status"></div>
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+        container.innerHTML = `
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Hub</th>
+                  <th>Status</th>
+                  <th>Tracking & Password</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      async function fetchOrders({ append = false } = {}) {
+        if (state.loading) return;
+        state.loading = true;
+        const params = new URLSearchParams({ limit: '25' });
+        if (state.status) params.set('status', state.status);
+        if (state.search) params.set('search', state.search);
+        if (append && state.nextOffset) params.set('offset', state.nextOffset);
+
+        container.innerHTML = '<p class="muted">Loading orders…</p>';
+        try {
+          const resp = await fetch(`/.netlify/functions/list-orders?${params.toString()}`);
+          if (!resp.ok) throw new Error('Failed to load orders');
+          const data = await resp.json();
+          state.nextOffset = data.nextOffset || null;
+          if (append) {
+            state.orders = state.orders.concat(data.orders || []);
+          } else {
+            state.orders = data.orders || [];
+          }
+          renderOrders();
+          loadMoreBtn.disabled = !state.nextOffset;
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = '<p class="muted" style="color: var(--danger);">Failed to load orders.</p>';
+          loadMoreBtn.disabled = true;
+        } finally {
+          state.loading = false;
+        }
+      }
+
+      function attachTableHandlers() {
+        container.addEventListener('click', async (event) => {
+          const btn = event.target.closest('.save-btn');
+          if (!btn) return;
+          const row = btn.closest('tr');
+          if (!row) return;
+          const index = Number(row.dataset.orderIndex);
+          const order = state.orders[index];
+          if (!order) return;
+          const tracking = row.querySelector('.tracking-input')?.value || '';
+          const password = row.querySelector('.password-input')?.value || '';
+          const sendEmail = row.querySelector('.send-email-checkbox')?.checked || false;
+          const statusEl = row.querySelector('[data-role="row-status"]');
+          btn.disabled = true;
+          statusEl.textContent = 'Saving…';
+          try {
+            const resp = await fetch('/.netlify/functions/admin-update-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: order.orderId,
+                trackingNumber: tracking,
+                password,
+                sendEmail
+              })
+            });
+            const payload = await resp.json();
+            if (!resp.ok) throw new Error(payload.error || 'Update failed');
+            statusEl.textContent = payload.emailSent ? 'Saved and email sent' : 'Saved';
+            statusEl.style.color = '#34d399';
+            row.querySelector('.send-email-checkbox').checked = false;
+          } catch (err) {
+            console.error(err);
+            statusEl.textContent = err.message || 'Failed';
+            statusEl.style.color = 'var(--danger)';
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      function initIdentity() {
+        if (!window.netlifyIdentity) {
+          authCard.hidden = false;
+          loginBtn.addEventListener('click', () => window.location.reload());
+          return;
+        }
+        window.netlifyIdentity.on('init', (user) => {
+          if (user) {
+            authCard.hidden = true;
+            app.hidden = false;
+            userInfo.textContent = user.email || '';
+            fetchOrders();
+          } else {
+            authCard.hidden = false;
+            app.hidden = true;
+          }
+        });
+        window.netlifyIdentity.init();
+        loginBtn.addEventListener('click', () => window.netlifyIdentity.open());
+      }
+
+      statusFilter.addEventListener('change', () => {
+        state.status = statusFilter.value || 'all';
+        state.nextOffset = null;
+        fetchOrders({ append: false });
+      });
+
+      searchInput.addEventListener('input', (event) => {
+        state.search = event.target.value.trim();
+        state.nextOffset = null;
+        fetchOrders({ append: false });
+      });
+
+      refreshBtn.addEventListener('click', () => {
+        state.nextOffset = null;
+        fetchOrders({ append: false });
+      });
+
+      loadMoreBtn.addEventListener('click', () => {
+        if (!state.nextOffset) return;
+        fetchOrders({ append: true });
+      });
+
+      attachTableHandlers();
+      initIdentity();
+    </script>
+  </body>
+</html>

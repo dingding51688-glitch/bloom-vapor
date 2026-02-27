@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-products.js"
+  },
+  "dependencies": {
+    "twilio": "^4.21.0"
   }
 }

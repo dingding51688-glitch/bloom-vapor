@@ -69,6 +69,7 @@
   </div>
 
   <script>
+    let otpVerified = false;
     // Read orderId from query and show it (display only the suffix)
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('orderId') || '';
@@ -82,6 +83,20 @@
           const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
           if (!resp.ok) return;
           const order = await resp.json();
+          if (order && !order.otpVerifiedAt) {
+            const notice = document.createElement('p');
+            notice.className = 'note';
+            notice.style.color = '#f97316';
+            notice.textContent = '请先返回上一步完成短信验证码验证，然后再来到此页面进行付款。';
+            const card = document.querySelector('.card');
+            if (card) card.insertBefore(notice, card.querySelector('.options'));
+            document.querySelectorAll('.btn').forEach((btn) => {
+              btn.classList.add('disabled');
+              btn.style.pointerEvents = 'none';
+              btn.style.opacity = '0.5';
+            });
+          }
+          otpVerified = !!(order && order.otpVerifiedAt);
           if (order && (order.priceGbp != null)) {
             const amt = Number(order.priceGbp) || 0;
             const el = document.createElement('p');
@@ -125,6 +140,10 @@
     async function handlePayClick(e, network) {
       e.preventDefault();
       if (!orderId) return alert('Missing orderId');
+      if (!otpVerified) {
+        alert('请先完成短信验证码验证，再继续付款。');
+        return;
+      }
       const btn = e.currentTarget;
       const label = btn.textContent;
       btn.textContent = 'Creating invoice...';

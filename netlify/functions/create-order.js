@@ -96,6 +96,9 @@ export async function handler(event) {
     trackingNumber: '',
     password: '',
     payment: null,
+    otpCode: '',
+    otpExpiresAt: null,
+    otpVerifiedAt: null,
     createdAt: now,
     updatedAt: now
   };

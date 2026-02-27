@@ -1822,7 +1822,171 @@
       invoiceBox.style.display = 'none';
       statusEl.textContent = '';
       localStorage.setItem('supply24_orderId', orderId);
+      localStorage.setItem('supply24_verified_order', orderId);
       startOrderPolling(orderId);
+    }
+
+    const otpState = {
+      orderId: null,
+      phone: '',
+      resendTimer: null
+    };
+
+    function maskPhoneDisplay(phone) {
+      if (!phone) return '';
+      const clean = String(phone).replace(/\s+/g, '');
+      if (clean.length <= 4) return clean;
+      const headLength = clean.startsWith('+') ? 3 : 2;
+      const head = clean.slice(0, headLength);
+      const tail = clean.slice(-2);
+      return `${head}••••${tail}`;
+    }
+
+    function getOtpElements() {
+      return {
+        modal: document.getElementById('otp-modal'),
+        phone: document.getElementById('otp-phone'),
+        status: document.getElementById('otp-status'),
+        code: document.getElementById('otp-code'),
+        submit: document.getElementById('otp-submit'),
+        resend: document.getElementById('otp-resend')
+      };
+    }
+
+    function setOtpStatus(message = '', tone = 'muted') {
+      const { status } = getOtpElements();
+      if (!status) return;
+      status.textContent = message;
+      status.dataset.tone = tone;
+    }
+
+    function openOtpModal() {
+      const { modal, code } = getOtpElements();
+      if (!modal) return;
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (code) {
+        code.value = '';
+        setTimeout(() => {
+          try { code.focus(); } catch (e) {}
+        }, 50);
+      }
+    }
+
+    function closeOtpModal() {
+      const { modal } = getOtpElements();
+      if (!modal) return;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      setOtpStatus('');
+    }
+
+    async function requestOtpCode() {
+      if (!otpState.orderId) return;
+      const { resend } = getOtpElements();
+      setOtpStatus('验证码发送中…', 'muted');
+      if (resend) resend.disabled = true;
+      try {
+        const resp = await fetch('/.netlify/functions/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: otpState.orderId })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || '无法发送验证码');
+        const display = data.phone || maskPhoneDisplay(otpState.phone);
+        setOtpStatus(`验证码已发送至 ${display}`, 'success');
+      } catch (err) {
+        console.error('request otp failed', err);
+        setOtpStatus(err.message || '验证码发送失败', 'error');
+        throw err;
+      } finally {
+        if (resend) {
+          clearTimeout(otpState.resendTimer);
+          otpState.resendTimer = setTimeout(() => {
+            resend.disabled = false;
+          }, 15000);
+        }
+      }
+    }
+
+    async function startOtpFlow(orderId, phone, { sendImmediately = true } = {}) {
+      otpState.orderId = orderId;
+      otpState.phone = phone || '';
+      const { phone: phoneEl } = getOtpElements();
+      if (phoneEl) {
+        phoneEl.textContent = maskPhoneDisplay(otpState.phone) || '您的手机号';
+      }
+      openOtpModal();
+      if (sendImmediately) {
+        try {
+          await requestOtpCode();
+        } catch (err) {
+          // status already shown
+        }
+      } else {
+        setOtpStatus('请输入收到的验证码，或点击重新发送。', 'muted');
+      }
+    }
+
+    async function verifyOtpCode() {
+      if (!otpState.orderId) return;
+      const { code, submit } = getOtpElements();
+      const value = code?.value?.trim() || '';
+      if (!/^\d{6}$/.test(value)) {
+        setOtpStatus('请输入 6 位数字验证码', 'error');
+        try { code && code.focus(); } catch (e) {}
+        return;
+      }
+      if (submit) submit.disabled = true;
+      setOtpStatus('验证中…', 'muted');
+      try {
+        const resp = await fetch('/.netlify/functions/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: otpState.orderId, code: value })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || '验证码错误');
+        setOtpStatus('验证成功，正在跳转付款页面…', 'success');
+        showPaymentSection(otpState.orderId);
+        closeOtpModal();
+        redirectToPayment(otpState.orderId);
+      } catch (err) {
+        console.error('verify otp failed', err);
+        setOtpStatus(err.message || '验证码验证失败', 'error');
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    }
+
+    function redirectToPayment(orderId) {
+      const target = `payment.html?orderId=${encodeURIComponent(orderId)}`;
+      try {
+        window.location.href = target;
+      } catch (err) {
+        console.warn('payment redirect failed', err);
+        showPaymentSection(orderId);
+      }
+    }
+
+    async function resumeOrderFlow(orderId) {
+      try {
+        const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
+        if (!resp.ok) throw new Error('order not found');
+        const order = await resp.json();
+        if (order.otpVerifiedAt) {
+          showPaymentSection(orderId);
+          return;
+        }
+        await startOtpFlow(orderId, order.customerPhone, { sendImmediately: false });
+      } catch (err) {
+        console.warn('resume order failed', err);
+        localStorage.removeItem('supply24_orderId');
+        localStorage.removeItem('supply24_verified_order');
+      }
     }
 
     async function createPaymentForOrder(orderId, network) {
@@ -2040,15 +2204,10 @@
             throw new Error(txt || `HTTP ${resp.status}`);
           }
           if (!resp.ok) throw new Error(data.error || 'Order failed');
-          // Redirect to payment page (placeholder options) with orderId
-          try {
-            const target = `payment.html?orderId=${encodeURIComponent(data.orderId)}`;
-            window.location.href = target;
-            return;
-          } catch (e) {
-            // fallback to inline payment section
-            showPaymentSection(data.orderId);
-          }
+          localStorage.setItem('supply24_orderId', data.orderId);
+          localStorage.removeItem('supply24_verified_order');
+          await startOtpFlow(data.orderId, payload.customerPhone);
+          return;
         } catch (err) {
           alert('Order failed: ' + (err.message || err));
           console.error(err);
@@ -2113,9 +2272,10 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       bindOrderForm();
-      // restore previous order view
       const prev = localStorage.getItem('supply24_orderId');
-      if (prev) showPaymentSection(prev);
+      if (prev) {
+        resumeOrderFlow(prev).catch((err) => console.warn('resumeOrderFlow failed', err));
+      }
       // Bind quick search button and Enter key on order form
       try { initOrderStationQuickSearch(); } catch (e) { console.warn('initOrderStationQuickSearch failed', e); }
       // Support Enter key on postcode input inside modal to trigger matching
@@ -2134,6 +2294,34 @@
       try { initProductImagePreview(); } catch (err) { console.warn('initProductImagePreview failed', err); }
       // Admin tools bindings
       try { initAdminTools(); } catch (e) { console.warn('initAdminTools failed', e); }
+      const otpClose = document.getElementById('otp-close');
+      if (otpClose) otpClose.addEventListener('click', (e) => { e.preventDefault(); closeOtpModal(); });
+      const otpModal = document.getElementById('otp-modal');
+      if (otpModal) {
+        otpModal.addEventListener('click', (e) => {
+          if (e.target === otpModal) closeOtpModal();
+        });
+      }
+      const otpSubmit = document.getElementById('otp-submit');
+      if (otpSubmit) {
+        otpSubmit.addEventListener('click', (e) => { e.preventDefault(); verifyOtpCode(); });
+      }
+      const otpResend = document.getElementById('otp-resend');
+      if (otpResend) {
+        otpResend.addEventListener('click', (e) => { e.preventDefault(); requestOtpCode().catch(() => {}); });
+      }
+      const otpCodeInput = document.getElementById('otp-code');
+      if (otpCodeInput) {
+        otpCodeInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            verifyOtpCode();
+          }
+        });
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeOtpModal();
+      });
     });
 
     // Admin tools: client-side handler to call admin-update-order function
@@ -2423,7 +2611,103 @@
       initVariantSelectionClicks();
     });
   </script>
+  <div id="otp-modal" class="otp-modal" aria-hidden="true">
+    <div class="otp-dialog">
+      <button id="otp-close" class="otp-close" type="button" aria-label="关闭">&times;</button>
+      <h3>短信验证</h3>
+      <p class="otp-desc">我们已向 <span id="otp-phone">您的手机号</span> 发送 6 位验证码，请输入后继续付款。</p>
+      <input id="otp-code" class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="输入 6 位验证码" />
+      <div class="otp-actions">
+        <button id="otp-submit" class="otp-btn primary" type="button">确认</button>
+        <button id="otp-resend" class="otp-btn ghost" type="button">重新发送</button>
+      </div>
+      <p id="otp-status" class="otp-status" data-tone="muted"></p>
+    </div>
+  </div>
 <style>
+    .otp-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 24px;
+    }
+    .otp-dialog {
+      width: min(420px, 100%);
+      background: linear-gradient(180deg, rgba(7,11,22,0.95), rgba(3,5,12,0.98));
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 18px;
+      padding: 26px 24px 28px;
+      box-shadow: 0 25px 60px rgba(2, 6, 23, 0.7);
+      position: relative;
+    }
+    .otp-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: none;
+      background: rgba(15, 23, 42, 0.6);
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      color: #f8fafc;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .otp-desc {
+      color: #cbd5f5;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .otp-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(2, 6, 23, 0.6);
+      color: #f8fafc;
+      font-size: 1.2rem;
+      text-align: center;
+      letter-spacing: 0.3em;
+    }
+    .otp-actions {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0 8px;
+    }
+    .otp-btn {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 0;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .otp-btn.primary {
+      background: linear-gradient(135deg, #22d3ee, #14b8a6);
+      color: #03131c;
+    }
+    .otp-btn.ghost {
+      background: rgba(15, 23, 42, 0.6);
+      color: #cbd5f5;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .otp-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .otp-status {
+      min-height: 20px;
+      font-size: 0.9rem;
+      color: #cbd5f5;
+    }
+    .otp-status[data-tone='error'] { color: #f87171; }
+    .otp-status[data-tone='success'] { color: #34d399; }
+    .otp-status[data-tone='muted'] { color: #94a3b8; }
     @media (min-width: 768px) {
       header {
         position: sticky;
