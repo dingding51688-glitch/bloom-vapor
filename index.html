@@ -1189,7 +1189,7 @@
         </label>
         <label>
           Phone
-          <input type="tel" name="phone" placeholder="+44 7xxx xxx xxx" required />
+          <input type="tel" name="phone" placeholder="07712345678" inputmode="numeric" pattern="^07\d{9}$" title="请输入以07开头的11位英国手机号" required />
         </label>
         <label>
           Email
@@ -2155,6 +2155,17 @@
         const pickupSurcharge = Number(formData.get('pickupSurcharge') || 0);
         const totalPrice = basePrice + pickupSurcharge;
 
+        const phoneInput = form.querySelector('input[name="phone"]');
+        const rawPhone = (formData.get('phone') || '').toString().replace(/\s+/g, '');
+        const phoneValid = /^07\d{9}$/.test(rawPhone);
+        if (!phoneValid) {
+          alert('请输入以07开头的11位英国手机号码');
+          if (phoneInput) {
+            try { phoneInput.focus(); } catch (e) {}
+          }
+          return;
+        }
+
         const payload = {
           productId: (prodText || '').toString().split(' ')[0] || formData.get('product'),
           productName: prodText,
@@ -2164,7 +2175,7 @@
           hubName: formData.get('address'),
           hubPostcode: '',
           customerName: formData.get('name'),
-          customerPhone: formData.get('phone'),
+          customerPhone: rawPhone,
           customerEmail: formData.get('email'),
           notes: formData.get('notes'),
           pickupOption: formData.get('pickupOption') || formData.get('pickup') || '',
