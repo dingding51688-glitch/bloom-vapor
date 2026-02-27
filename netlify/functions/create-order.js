@@ -145,6 +145,9 @@ export async function handler(event) {
     const metaBlock = ['Client info:', ...clientMetaLines].join('\n');
     order.notes = [order.notes, metaBlock].filter(Boolean).join('\n\n');
   }
+  const telegramMetaLines = clientMetaLines.filter((line) => {
+    return line && !line.startsWith('Screen:') && !line.startsWith('Window:');
+  });
 
   try {
     await createOrderRecord({
@@ -176,7 +179,7 @@ export async function handler(event) {
       ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
       : '';
     const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const metaDetails = clientMetaLines.length ? `\n${clientMetaLines.join('\n')}` : '';
+    const metaDetails = telegramMetaLines.length ? `\n${telegramMetaLines.join('\n')}` : '';
     const telegramText = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}${metaDetails}`;
     let telegramSent = false;
     let fastTelegramSent = false;
