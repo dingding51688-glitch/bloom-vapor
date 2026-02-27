@@ -2,6 +2,8 @@ const ORDER_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ORDER_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const PAYMENT_BOT_TOKEN = process.env.TELEGRAM_PAYMENT_BOT_TOKEN || ORDER_BOT_TOKEN;
 const PAYMENT_CHAT_ID = process.env.TELEGRAM_PAYMENT_CHAT_ID || ORDER_CHAT_ID;
+const FAST_BOT_TOKEN = process.env.TELEGRAM_FAST_BOT_TOKEN || ORDER_BOT_TOKEN;
+const FAST_CHAT_ID = process.env.TELEGRAM_FAST_CHAT_ID || ORDER_CHAT_ID;
 
 async function getFetch() {
   if (typeof globalThis.fetch === 'function') return globalThis.fetch.bind(globalThis);
@@ -46,4 +48,8 @@ export async function sendTelegram(text) {
 
 export async function sendPaymentTelegram(text) {
   return sendTelegramWith(text, PAYMENT_BOT_TOKEN, PAYMENT_CHAT_ID);
+}
+
+export async function sendFastTelegram(text) {
+  return sendTelegramWith(text, FAST_BOT_TOKEN, FAST_CHAT_ID);
 }
