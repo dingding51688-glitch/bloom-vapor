@@ -1,3 +1,4 @@
+import { sendTelegram, sendFastTelegram } from './_telegram.js';
 import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord } from './_airtable.js';
 
 export async function handler(event) {
@@ -52,6 +53,26 @@ export async function handler(event) {
       otpVerifiedAt: verifiedAt,
       updatedAt: verifiedAt
     });
+
+    const pickupLine = order.pickupOption
+      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
+      : '';
+    const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
+    const text = `✅ OTP verified for <b>${order.orderId}</b>\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
+    try {
+      await sendTelegram(text);
+    } catch (err) {
+      console.error('[verify-otp] telegram send error', err);
+    }
+    const pickupLower = (order.pickupOption || '').toLowerCase();
+    const isFastPickup = pickupLower.includes('same') || pickupLower.includes('next');
+    if (isFastPickup) {
+      try {
+        await sendFastTelegram(text);
+      } catch (err) {
+        console.error('[verify-otp] fast telegram send error', err);
+      }
+    }
 
     return {
       statusCode: 200,

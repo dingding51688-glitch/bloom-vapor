@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sendTelegram, sendFastTelegram } from './_telegram.js';
 import { createOrderRecord, serializePaymentPayload } from './_airtable.js';
 import { sendTemplatedEmail } from './_email.js';
 
@@ -113,33 +112,8 @@ export async function handler(event) {
 
     const bankDetails = await getBankDetails();
 
-    const statusLabel = 'Waiting for payment';
-    const pickupLine = order.pickupOption
-      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
-      : '';
-    const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const text = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nBase price: £${order.basePriceGbp || order.priceGbp}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
     let telegramSent = false;
     let fastTelegramSent = false;
-    try {
-      telegramSent = await sendTelegram(text);
-      if (!telegramSent) console.warn('[create-order] telegram send returned false');
-    } catch (err) {
-      console.error('[create-order] telegram send error', err);
-      telegramSent = false;
-    }
-
-    const pickupLower = (order.pickupOption || '').toLowerCase();
-    const isFastPickup = pickupLower.includes('same') || pickupLower.includes('next');
-    if (isFastPickup) {
-      try {
-        fastTelegramSent = await sendFastTelegram(text);
-        if (!fastTelegramSent) console.warn('[create-order] fast telegram send returned false');
-      } catch (err) {
-        console.error('[create-order] fast telegram send error', err);
-        fastTelegramSent = false;
-      }
-    }
 
     const siteUrl = resolveSiteUrl(event);
     const logoUrl = resolveLogoUrl(siteUrl);
