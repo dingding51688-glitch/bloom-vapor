@@ -23,6 +23,8 @@
     .total-amount strong{font-weight:900}
     .note{margin-top:14px;color:#9ba3d8}
     .spam-tip{color:#f87171;font-weight:600}
+    #bank-option.locked{opacity:0.5;border-style:dashed}
+    #bank-locked-message{margin-top:12px;color:#f97316}
   </style>
 </head>
 <body>
@@ -33,14 +35,15 @@
       <p class="muted" id="order-id">Order: —</p>
 
       <div class="options">
-        <div class="option">
+        <div class="option locked" id="bank-option">
           <h3>Bank transfer</h3>
-          <div id="bank-info" style="text-align:left;color:#e6f1ff;line-height:1.5">
+          <div id="bank-info" style="text-align:left;color:#e6f1ff;line-height:1.5;display:none;">
             <div><strong>Account Name：</strong> <span id="bank-account-name">—</span></div>
             <div><strong>Sort Code：</strong> <span id="bank-sort-code">—</span></div>
             <div><strong>Account Number：</strong> <span id="bank-account-number">—</span></div>
             <p style="margin-top:8px;color:#cfe1ff;">Reference: <span id="bank-ref">W0XPSN</span></p>
           </div>
+          <p class="muted" id="bank-locked-message">Complete email verification to view bank details.</p>
         </div>
         <div class="option">
           <h3>USDT (TRC20)</h3>
@@ -70,6 +73,24 @@
 
   <script>
     let otpVerified = false;
+    const bankOption = document.getElementById('bank-option');
+    const bankInfo = document.getElementById('bank-info');
+    const bankLockedMessage = document.getElementById('bank-locked-message');
+
+    function updateBankVisibility() {
+      if (!bankOption || !bankInfo || !bankLockedMessage) return;
+      if (otpVerified) {
+        bankOption.classList.remove('locked');
+        bankInfo.style.display = 'block';
+        bankLockedMessage.style.display = 'none';
+      } else {
+        bankOption.classList.add('locked');
+        bankInfo.style.display = 'none';
+        bankLockedMessage.style.display = 'block';
+      }
+    }
+
+    updateBankVisibility();
     // Read orderId from query and show it (display only the suffix)
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('orderId') || '';
@@ -83,12 +104,12 @@
           const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
           if (!resp.ok) return;
           const order = await resp.json();
+          const card = document.querySelector('.card');
           if (order && !order.otpVerifiedAt) {
             const notice = document.createElement('p');
             notice.className = 'note';
             notice.style.color = '#f97316';
             notice.textContent = 'Please complete the email verification step before returning to this payment page.';
-            const card = document.querySelector('.card');
             if (card) card.insertBefore(notice, card.querySelector('.options'));
             document.querySelectorAll('.btn').forEach((btn) => {
               btn.classList.add('disabled');
@@ -97,6 +118,7 @@
             });
           }
           otpVerified = !!(order && order.otpVerifiedAt);
+          updateBankVisibility();
           if (order && (order.priceGbp != null)) {
             const amt = Number(order.priceGbp) || 0;
             const el = document.createElement('p');
