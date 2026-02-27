@@ -34,6 +34,34 @@ function parsePrice(value) {
   return Number.isFinite(num) ? num : 0;
 }
 
+function getClientIp(event) {
+  const headers = event?.headers || {};
+  const forwarded = headers['x-forwarded-for'];
+  if (forwarded) return String(forwarded).split(',')[0].trim();
+  return headers['client-ip'] || headers['x-nf-client-connection-ip'] || '';
+}
+
+function formatClientMeta(meta, clientIp) {
+  const lines = [];
+  if (clientIp) lines.push(`IP: ${clientIp}`);
+  if (!meta || typeof meta !== 'object') return lines;
+  if (meta.timeOnPageMs) {
+    const seconds = (Number(meta.timeOnPageMs) / 1000).toFixed(1);
+    lines.push(`Time on page: ${seconds}s`);
+  }
+  if (meta.pageViewCount) {
+    lines.push(`Page views: ${meta.pageViewCount}`);
+  }
+  if (meta.referrer) lines.push(`Referrer: ${meta.referrer}`);
+  if (meta.language) lines.push(`Language: ${meta.language}`);
+  if (meta.timezone) lines.push(`Timezone: ${meta.timezone}`);
+  if (meta.screen) lines.push(`Screen: ${meta.screen}`);
+  if (meta.window) lines.push(`Window: ${meta.window}`);
+  if (meta.platform) lines.push(`Platform: ${meta.platform}`);
+  if (meta.userAgent) lines.push(`UA: ${meta.userAgent}`);
+  return lines;
+}
+
 function generateOtpCode() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
@@ -110,6 +138,14 @@ export async function handler(event) {
     updatedAt: now
   };
 
+  const clientMeta = payload?.clientMeta && typeof payload.clientMeta === 'object' ? payload.clientMeta : null;
+  const clientIp = getClientIp(event);
+  const clientMetaLines = formatClientMeta(clientMeta, clientIp);
+  if (clientMetaLines.length) {
+    const metaBlock = ['Client info:', ...clientMetaLines].join('\n');
+    order.notes = [order.notes, metaBlock].filter(Boolean).join('\n\n');
+  }
+
   try {
     await createOrderRecord({
       ...order,
@@ -140,7 +176,8 @@ export async function handler(event) {
       ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
       : '';
     const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const telegramText = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
+    const metaDetails = clientMetaLines.length ? `\n${clientMetaLines.join('\n')}` : '';
+    const telegramText = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}${metaDetails}`;
     let telegramSent = false;
     let fastTelegramSent = false;
     try {

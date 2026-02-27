@@ -1828,6 +1828,28 @@
     }
 
     /* ------------------- Order & payment frontend integration ------------------- */
+    const sessionStart = Date.now();
+    let pageViewCount = 1;
+
+    function trackPageInteraction() {
+      pageViewCount += 1;
+    }
+
+    function registerInteractionTracking() {
+      const selectors = ['.nav-menu a', '.hero-cta button', '#order-station-search-btn', '#order-station-change-btn', '.cta button'];
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          el.addEventListener('click', trackPageInteraction);
+        });
+      });
+      document.addEventListener('click', (event) => {
+        if (event.target.closest('.variant-card') || event.target.closest('.product-card') || event.target.closest('.pay-option') || event.target.closest('#hub-modal .card-link')) {
+          trackPageInteraction();
+        }
+      });
+      window.addEventListener('hashchange', trackPageInteraction);
+    }
+
     function showPaymentSection(orderId) {
       const section = document.getElementById('payment-section');
       const hint = document.getElementById('payment-hint');
@@ -2192,6 +2214,19 @@
           return;
         }
 
+        const timeOnPageMs = Date.now() - sessionStart;
+        const clientMeta = {
+          userAgent: navigator.userAgent || '',
+          language: navigator.language || '',
+          platform: navigator.platform || '',
+          timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone) || '',
+          timeOnPageMs,
+          pageViewCount,
+          referrer: document.referrer || '',
+          screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
+          window: `${window.innerWidth || 0}x${window.innerHeight || 0}`
+        };
+
         const payload = {
           productId: (prodText || '').toString().split(' ')[0] || formData.get('product'),
           productName: prodText,
@@ -2207,6 +2242,7 @@
           pickupOption: formData.get('pickupOption') || formData.get('pickup') || '',
           pickupSurcharge: pickupSurcharge
         };
+        payload.clientMeta = clientMeta;
 
         if (!payload.hubId) {
           alert('Please select a pickup hub before submitting your order.');
@@ -2310,6 +2346,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       bindOrderForm();
       try { initPhoneInputMask(); } catch (e) { console.warn('initPhoneInputMask failed', e); }
+      try { registerInteractionTracking(); } catch (e) { console.warn('registerInteractionTracking failed', e); }
       const prev = localStorage.getItem('supply24_orderId');
       if (prev) {
         resumeOrderFlow(prev).catch((err) => console.warn('resumeOrderFlow failed', err));
@@ -2567,6 +2604,7 @@
       // order form is no longer moved into the modal; no original parent tracking needed
 
       window.openHubModal = function() {
+        try { trackPageInteraction(); } catch (e) {}
         const modal = document.getElementById('hub-modal');
         const modalContainer = document.getElementById('modal-hub-container');
         const hubPanel = document.getElementById('hub-panel');
