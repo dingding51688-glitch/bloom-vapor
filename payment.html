@@ -121,7 +121,7 @@
             notice.style.color = '#f97316';
             notice.textContent = 'Please complete the email verification step before returning to this payment page.';
             if (card) card.insertBefore(notice, card.querySelector('.options'));
-            document.querySelectorAll('.btn').forEach((btn) => {
+            document.querySelectorAll('.pay-option .btn').forEach((btn) => {
               btn.classList.add('disabled');
               btn.style.pointerEvents = 'none';
               btn.style.opacity = '0.5';

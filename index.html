@@ -2076,8 +2076,12 @@
         const links = await resp.json();
         const tg = document.getElementById('fc-telegram');
         const wa = document.getElementById('fc-whatsapp');
+        const payTg = document.getElementById('livechat-tg');
+        const payWa = document.getElementById('livechat-wa');
         if (tg && links.telegram) tg.href = links.telegram;
         if (wa && links.whatsapp) wa.href = links.whatsapp;
+        if (payTg && links.telegram) payTg.href = links.telegram;
+        if (payWa && links.whatsapp) payWa.href = links.whatsapp;
       } catch (err) {
         console.warn('chat links load failed', err);
       }

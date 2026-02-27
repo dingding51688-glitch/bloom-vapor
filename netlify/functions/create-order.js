@@ -232,6 +232,6 @@ export async function handler(event) {
     };
   } catch (err) {
     console.error('[create-order] error', err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Could not create order' }) };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message || 'Could not create order' }) };
   }
 }
