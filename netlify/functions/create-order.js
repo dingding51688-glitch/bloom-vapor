@@ -3,12 +3,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createOrderRecord, serializePaymentPayload } from './_airtable.js';
 import { sendTemplatedEmail } from './_email.js';
+import { sendTelegram, sendFastTelegram } from './_telegram.js';
 
 const CURRENT_DIR = typeof __dirname !== 'undefined'
   ? __dirname
   : path.dirname(fileURLToPath(import.meta.url));
 const BANK_PATH = path.resolve(CURRENT_DIR, '../../data/bank.json');
 const FALLBACK_SITE_URL = 'https://marvelous-pothos-05456a.netlify.app';
+const OTP_EXPIRY_MINUTES = 10;
 
 function resolveSiteUrl(event) {
   const envUrl = process.env.SITE_URL || process.env.URL;
@@ -30,6 +32,10 @@ function parsePrice(value) {
   const cleaned = String(value).replace(/[^0-9.]/g, '');
   const num = Number(cleaned);
   return Number.isFinite(num) ? num : 0;
+}
+
+function generateOtpCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 function generateOrderId() {
@@ -75,6 +81,8 @@ export async function handler(event) {
   const basePrice = parsePrice(payload.basePriceGbp);
   const totalPrice = parsePrice(payload.priceGbp);
   const surcharge = parsePrice(payload.pickupSurcharge);
+  const otpCode = generateOtpCode();
+  const otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
   const order = {
     orderId,
@@ -95,8 +103,8 @@ export async function handler(event) {
     trackingNumber: '',
     password: '',
     payment: null,
-    otpCode: '',
-    otpExpiresAt: null,
+    otpCode,
+    otpExpiresAt,
     otpVerifiedAt: null,
     createdAt: now,
     updatedAt: now
@@ -110,10 +118,45 @@ export async function handler(event) {
       paymentPaymentId: ''
     });
 
+    if (order.customerEmail) {
+      await sendTemplatedEmail({
+        to: order.customerEmail,
+        subject: `Your Green Hub verification code (${orderId})`,
+        template: 'order-otp-code.html',
+        vars: {
+          customerName: order.customerName || 'there',
+          orderId,
+          otpCode,
+          expiresMinutes: OTP_EXPIRY_MINUTES,
+          year: new Date().getFullYear()
+        }
+      });
+    }
+
     const bankDetails = await getBankDetails();
 
+    const statusLabel = 'Awaiting email verification';
+    const pickupLine = order.pickupOption
+      ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
+      : '';
+    const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
+    const telegramText = `🆕 New order <b>${orderId}</b>\nStatus: ${statusLabel}\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
     let telegramSent = false;
     let fastTelegramSent = false;
+    try {
+      telegramSent = await sendTelegram(telegramText);
+    } catch (err) {
+      console.error('[create-order] telegram send error', err);
+    }
+    const pickupLower = (order.pickupOption || '').toLowerCase();
+    const isFastPickup = pickupLower.includes('same') || pickupLower.includes('next');
+    if (isFastPickup) {
+      try {
+        fastTelegramSent = await sendFastTelegram(telegramText);
+      } catch (err) {
+        console.error('[create-order] fast telegram send error', err);
+      }
+    }
 
     const siteUrl = resolveSiteUrl(event);
     const logoUrl = resolveLogoUrl(siteUrl);

@@ -58,7 +58,7 @@ export async function handler(event) {
       ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
       : '';
     const emailLine = order.customerEmail ? `\nEmail: ${order.customerEmail}` : '';
-    const text = `✅ OTP verified for <b>${order.orderId}</b>\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
+    const text = `✅ OTP verified for <b>${order.orderId}</b>\nStatus: Ready for payment\nProduct: ${order.productName}\nTotal: £${order.priceGbp}${pickupLine}\nHub: ${order.hubName} ${order.hubPostcode || ''}\nName: ${order.customerName}\nPhone: ${order.customerPhone}${emailLine}`;
     try {
       await sendTelegram(text);
     } catch (err) {
