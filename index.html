@@ -1863,7 +1863,6 @@
       invoiceBox.style.display = 'none';
       statusEl.textContent = '';
       localStorage.setItem('supply24_orderId', orderId);
-      localStorage.setItem('supply24_verified_order', orderId);
       startOrderPolling(orderId);
     }
 
@@ -1990,6 +1989,7 @@
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) throw new Error(data.error || 'Invalid code');
         setOtpStatus('Verified — redirecting to payment…', 'success');
+        try { localStorage.setItem('supply24_verified_order', otpState.orderId); } catch (e) {}
         showPaymentSection(otpState.orderId);
         closeOtpModal();
         redirectToPayment(otpState.orderId);
@@ -2372,9 +2372,12 @@
       const otpClose = document.getElementById('otp-close');
       if (otpClose) otpClose.addEventListener('click', (e) => { e.preventDefault(); closeOtpModal(); });
       const otpModal = document.getElementById('otp-modal');
+      // disable backdrop click to avoid accidental close
       if (otpModal) {
         otpModal.addEventListener('click', (e) => {
-          if (e.target === otpModal) closeOtpModal();
+          if (e.target === otpModal) {
+            e.stopPropagation();
+          }
         });
       }
       const otpSubmit = document.getElementById('otp-submit');
@@ -2384,6 +2387,16 @@
       const otpResend = document.getElementById('otp-resend');
       if (otpResend) {
         otpResend.addEventListener('click', (e) => { e.preventDefault(); requestOtpCode().catch(() => {}); });
+      }
+      const otpSkip = document.getElementById('otp-skip');
+      if (otpSkip) {
+        otpSkip.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (!otpState.orderId) return;
+          closeOtpModal();
+          showPaymentSection(otpState.orderId);
+          redirectToPayment(otpState.orderId);
+        });
       }
       const otpCodeInput = document.getElementById('otp-code');
       if (otpCodeInput) {
@@ -2395,7 +2408,9 @@
         });
       }
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeOtpModal();
+        if (otpState.orderId && e.key === 'Escape') {
+          e.preventDefault();
+        }
       });
     });
 
@@ -2697,6 +2712,7 @@
         <button id="otp-submit" class="otp-btn primary" type="button">Verify</button>
         <button id="otp-resend" class="otp-btn ghost" type="button">Resend code</button>
       </div>
+      <button id="otp-skip" class="otp-btn link" type="button">Verify later</button>
       <p id="otp-status" class="otp-status" data-tone="muted"></p>
     </div>
   </div>
@@ -2762,6 +2778,16 @@
       padding: 12px 0;
       font-weight: 600;
       cursor: pointer;
+    }
+    .otp-btn.link {
+      display: inline-block;
+      margin-top: 8px;
+      width: 100%;
+      background: none;
+      color: #38bdf8;
+      border: none;
+      text-decoration: underline;
+      font-weight: 500;
     }
     .otp-btn.primary {
       background: linear-gradient(135deg, #22d3ee, #14b8a6);
