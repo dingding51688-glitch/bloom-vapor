@@ -1784,6 +1784,25 @@
     }
 
     // Bind quick hub search on order form (Enter key or button)
+    function initPhoneInputMask() {
+      const phoneInput = document.querySelector('input[name="phone"]');
+      if (!phoneInput) return;
+      phoneInput.addEventListener('input', () => {
+        let digits = phoneInput.value.replace(/[^0-9]/g, '');
+        if (digits.startsWith('447')) {
+          digits = '0' + digits.slice(2);
+        } else if (digits.startsWith('44')) {
+          digits = '0' + digits.slice(2);
+        } else if (digits.startsWith('7')) {
+          digits = '0' + digits;
+        }
+        if (!digits.startsWith('07')) {
+          digits = '07' + digits.replace(/^0+/, '');
+        }
+        phoneInput.value = digits.slice(0, 11);
+      });
+    }
+
     function initOrderStationQuickSearch() {
       const orderPostcode = document.getElementById('order-postcode');
       if (!orderPostcode) return;
@@ -2283,6 +2302,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       bindOrderForm();
+      try { initPhoneInputMask(); } catch (e) { console.warn('initPhoneInputMask failed', e); }
       const prev = localStorage.getItem('supply24_orderId');
       if (prev) {
         resumeOrderFlow(prev).catch((err) => console.warn('resumeOrderFlow failed', err));
