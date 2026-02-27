@@ -2249,6 +2249,9 @@
           if (!resp.ok) throw new Error(data.error || 'Order failed');
           localStorage.setItem('supply24_orderId', data.orderId);
           showVerificationReminder(data.orderId, payload.customerEmail);
+          try { window.location.href = `payment.html?orderId=${encodeURIComponent(data.orderId)}`; } catch (e) {
+            console.warn('payment redirect failed', e);
+          }
           return;
         } catch (err) {
           alert('Order failed: ' + (err.message || err));
