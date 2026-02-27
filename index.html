@@ -1189,7 +1189,7 @@
         </label>
         <label>
           Phone
-          <input type="tel" name="phone" placeholder="07712345678" inputmode="numeric" pattern="^07\d{9}$" title="请输入以07开头的11位英国手机号" required />
+          <input type="tel" name="phone" placeholder="07712345678" inputmode="numeric" pattern="^07\d{9}$" title="Enter an 11-digit UK mobile number starting with 07" required />
         </label>
         <label>
           Email
@@ -1905,7 +1905,7 @@
     async function requestOtpCode() {
       if (!otpState.orderId) return;
       const { resend } = getOtpElements();
-      setOtpStatus('验证码发送中…', 'muted');
+      setOtpStatus('Sending code…', 'muted');
       if (resend) resend.disabled = true;
       try {
         const resp = await fetch('/.netlify/functions/request-otp', {
@@ -1914,12 +1914,12 @@
           body: JSON.stringify({ orderId: otpState.orderId })
         });
         const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || '无法发送验证码');
+        if (!resp.ok) throw new Error(data.error || 'Failed to send code');
         const display = data.phone || maskPhoneDisplay(otpState.phone);
-        setOtpStatus(`验证码已发送至 ${display}`, 'success');
+        setOtpStatus(`Code sent to ${display}`, 'success');
       } catch (err) {
         console.error('request otp failed', err);
-        setOtpStatus(err.message || '验证码发送失败', 'error');
+        setOtpStatus(err.message || 'Could not send code', 'error');
         throw err;
       } finally {
         if (resend) {
@@ -1946,7 +1946,7 @@
           // status already shown
         }
       } else {
-        setOtpStatus('请输入收到的验证码，或点击重新发送。', 'muted');
+        setOtpStatus('Enter the code you received, or resend if needed.', 'muted');
       }
     }
 
@@ -1955,7 +1955,7 @@
       const { code, submit } = getOtpElements();
       const value = code?.value?.trim() || '';
       if (!/^\d{6}$/.test(value)) {
-        setOtpStatus('请输入 6 位数字验证码', 'error');
+        setOtpStatus('Enter the 6-digit code from SMS', 'error');
         try { code && code.focus(); } catch (e) {}
         return;
       }
@@ -1968,14 +1968,14 @@
           body: JSON.stringify({ orderId: otpState.orderId, code: value })
         });
         const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || '验证码错误');
-        setOtpStatus('验证成功，正在跳转付款页面…', 'success');
+        if (!resp.ok) throw new Error(data.error || 'Invalid code');
+        setOtpStatus('Verified — redirecting to payment…', 'success');
         showPaymentSection(otpState.orderId);
         closeOtpModal();
         redirectToPayment(otpState.orderId);
       } catch (err) {
         console.error('verify otp failed', err);
-        setOtpStatus(err.message || '验证码验证失败', 'error');
+        setOtpStatus(err.message || 'Verification failed', 'error');
       } finally {
         if (submit) submit.disabled = false;
       }
@@ -2178,7 +2178,7 @@
         const rawPhone = (formData.get('phone') || '').toString().replace(/\s+/g, '');
         const phoneValid = /^07\d{9}$/.test(rawPhone);
         if (!phoneValid) {
-          alert('请输入以07开头的11位英国手机号码');
+          alert('Please enter an 11-digit UK mobile number starting with 07');
           if (phoneInput) {
             try { phoneInput.focus(); } catch (e) {}
           }
@@ -2645,12 +2645,12 @@
   <div id="otp-modal" class="otp-modal" aria-hidden="true">
     <div class="otp-dialog">
       <button id="otp-close" class="otp-close" type="button" aria-label="关闭">&times;</button>
-      <h3>短信验证</h3>
-      <p class="otp-desc">我们已向 <span id="otp-phone">您的手机号</span> 发送 6 位验证码，请输入后继续付款。</p>
-      <input id="otp-code" class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="输入 6 位验证码" />
+      <h3>SMS verification</h3>
+      <p class="otp-desc">We've sent a 6-digit code to <span id="otp-phone">your phone</span>. Enter it to continue to payment.</p>
+      <input id="otp-code" class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit code" />
       <div class="otp-actions">
-        <button id="otp-submit" class="otp-btn primary" type="button">确认</button>
-        <button id="otp-resend" class="otp-btn ghost" type="button">重新发送</button>
+        <button id="otp-submit" class="otp-btn primary" type="button">Verify</button>
+        <button id="otp-resend" class="otp-btn ghost" type="button">Resend code</button>
       </div>
       <p id="otp-status" class="otp-status" data-tone="muted"></p>
     </div>

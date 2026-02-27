@@ -87,7 +87,7 @@
             const notice = document.createElement('p');
             notice.className = 'note';
             notice.style.color = '#f97316';
-            notice.textContent = '请先返回上一步完成短信验证码验证，然后再来到此页面进行付款。';
+            notice.textContent = 'Please complete SMS verification before returning to this payment page.';
             const card = document.querySelector('.card');
             if (card) card.insertBefore(notice, card.querySelector('.options'));
             document.querySelectorAll('.btn').forEach((btn) => {
@@ -141,7 +141,7 @@
       e.preventDefault();
       if (!orderId) return alert('Missing orderId');
       if (!otpVerified) {
-        alert('请先完成短信验证码验证，再继续付款。');
+        alert('Please complete SMS verification first.');
         return;
       }
       const btn = e.currentTarget;
