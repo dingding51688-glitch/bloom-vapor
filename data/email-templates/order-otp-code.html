@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your verification code</title>
+    <title>Verify your order</title>
     <style>
       body {
         margin: 0;
@@ -38,17 +38,21 @@
         line-height: 1.6;
         color: #d3daf6;
       }
-      .code-box {
-        margin: 20px 0;
-        padding: 16px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+      .cta {
+        display: block;
+        margin: 18px auto;
         text-align: center;
-        letter-spacing: 0.3em;
-        font-size: 26px;
-        font-weight: 700;
-        color: #fefefe;
+        padding: 14px 20px;
+        border-radius: 999px;
+        background: linear-gradient(120deg, #7c3aed, #31c48d);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .link-hint {
+        font-size: 13px;
+        color: #a0abc5;
+        word-break: break-all;
       }
       .footer {
         padding: 0 26px 26px;
@@ -61,15 +65,17 @@
   <body>
     <div class="wrapper">
       <div class="card">
-        <div class="header">Green Hub verification</div>
+        <div class="header">Verify your Green Hub order</div>
         <div class="content">
           <p>Hi {{customerName}},</p>
           <p>
-            Your verification code for order <strong>{{orderId}}</strong> is below. Enter it on the
-            website to continue to payment.
+            Please verify order <strong>{{orderId}}</strong> by clicking the button below. This confirms
+            your email address and unlocks the payment options. If you don’t see the message right away,
+            please check your Promotions/Spam folder.
           </p>
-          <div class="code-box">{{otpCode}}</div>
-          <p>This code expires in {{expiresMinutes}} minutes. If you didn't request it, you can safely ignore this email.</p>
+          <a class="cta" href="{{verificationUrl}}" target="_blank" rel="noopener">Verify order</a>
+          <p class="link-hint">Or paste this link into your browser:<br />{{verificationUrl}}</p>
+          <p>This link expires in {{expiresMinutes}} minutes. If it expires, you can request a new one from the website.</p>
         </div>
         <div class="footer">© {{year}} Green Hub Northern Ireland</div>
       </div>

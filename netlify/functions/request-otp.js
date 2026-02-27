@@ -2,9 +2,10 @@ import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord } from './
 import { sendTemplatedEmail } from './_email.js';
 
 const OTP_EXPIRY_MINUTES = 10;
+const FALLBACK_SITE_URL = 'https://marvelous-pothos-05456a.netlify.app';
 
-function generateOtpCode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+function generateOtpToken() {
+  return Array.from({ length: 2 }, () => Math.random().toString(36).slice(2, 10)).join('');
 }
 
 function maskEmail(email = '') {
@@ -13,6 +14,13 @@ function maskEmail(email = '') {
   if (!user) return `***@${domain}`;
   const prefix = user.slice(0, 2);
   return `${prefix}${'*'.repeat(Math.max(1, user.length - 2))}@${domain}`;
+}
+
+function resolveSiteUrl(event) {
+  const envUrl = process.env.SITE_URL || process.env.URL;
+  const headerUrl = event?.headers?.origin || event?.headers?.referer;
+  const url = envUrl || headerUrl || FALLBACK_SITE_URL;
+  return url.replace(/\/$/, '');
 }
 
 export async function handler(event) {
@@ -43,24 +51,28 @@ export async function handler(event) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Email required for verification' }) };
     }
 
-    const otpCode = generateOtpCode();
+    const otpToken = generateOtpToken();
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
     await updateOrderRecord(record.id, {
-      otpCode,
+      customerEmail: email,
+      otpToken,
       otpExpiresAt: expiresAt,
       otpVerifiedAt: null,
       updatedAt: new Date().toISOString()
     });
 
+    const siteUrl = resolveSiteUrl(event);
+    const verificationUrl = `${siteUrl}/verify-otp.html?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(otpToken)}`;
+
     const emailSent = await sendTemplatedEmail({
       to: email,
-      subject: `Your Green Hub verification code (${orderId})`,
+      subject: `Verify your Green Hub order ${orderId}`,
       template: 'order-otp-code.html',
       vars: {
         customerName: order.customerName || 'there',
         orderId,
-        otpCode,
+        verificationUrl,
         expiresMinutes: OTP_EXPIRY_MINUTES,
         year: new Date().getFullYear()
       }
@@ -78,7 +90,7 @@ export async function handler(event) {
     console.error('[request-otp] error', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || 'Could not send OTP' })
+      body: JSON.stringify({ error: err.message || 'Could not send verification email' })
     };
   }
 }

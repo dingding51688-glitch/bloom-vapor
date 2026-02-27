@@ -1240,6 +1240,16 @@
         </label>
         <button type="submit" class="submit-order">Submit order</button>
       </form>
+      <div id="verification-banner" class="verification-banner" style="display:none;">
+        <p class="verification-text">
+          We've emailed a verification link to <strong id="verification-email">your email</strong>.
+          Delivery can take 1–3 minutes — please check your inbox and spam folder.
+        </p>
+        <div class="verification-actions">
+          <button id="verification-resend" type="button">Resend link</button>
+          <span id="verification-status" data-tone="muted"></span>
+        </div>
+      </div>
       <!-- Admin tools removed from homepage -->
       <div id="payment-section" class="payment-section" aria-live="polite" style="display:none;margin-top:18px;">
         <h4>Payment methods</h4>
@@ -1850,6 +1860,105 @@
       window.addEventListener('hashchange', trackPageInteraction);
     }
 
+    const verificationState = {
+      orderId: null,
+      email: '',
+      resendTimer: null
+    };
+
+    function maskEmailDisplay(email) {
+      if (!email || !email.includes('@')) return email || '';
+      const [user, domain] = email.split('@');
+      const visible = (user || '').slice(0, 2);
+      return `${visible}${user && user.length > 2 ? '***' : ''}@${domain || ''}`;
+    }
+
+    function setVerificationStatus(message = '', tone = 'muted') {
+      const statusEl = document.getElementById('otp-status');
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.dataset.tone = tone;
+    }
+
+    function updateVerificationEmailLabel() {
+      const emailLabel = document.getElementById('otp-email');
+      if (!emailLabel) return;
+      emailLabel.textContent = verificationState.email ? maskEmailDisplay(verificationState.email) : 'your email';
+    }
+
+    function showVerificationReminder(orderId, email) {
+      verificationState.orderId = orderId;
+      verificationState.email = email || '';
+      localStorage.setItem('supply24_orderId', orderId);
+      updateVerificationEmailLabel();
+      setVerificationStatus('We emailed a secure link to your inbox. Click it to unlock payment options.', 'muted');
+      const modal = document.getElementById('otp-modal');
+      if (modal) {
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function closeVerificationModal() {
+      const modal = document.getElementById('otp-modal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function resendVerificationLink(newEmail) {
+      if (!verificationState.orderId) return;
+      const payload = { orderId: verificationState.orderId };
+      const targetEmail = newEmail ? newEmail.trim() : '';
+      if (targetEmail) payload.email = targetEmail;
+      const button = document.getElementById('otp-resend');
+      if (button) button.disabled = true;
+      setVerificationStatus('Sending verification email…', 'muted');
+      try {
+        const resp = await fetch('/.netlify/functions/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || 'Failed to send email');
+        if (targetEmail) verificationState.email = targetEmail;
+        updateVerificationEmailLabel();
+        setVerificationStatus(`Verification link sent to ${maskEmailDisplay(verificationState.email)}`, 'success');
+      } catch (err) {
+        console.error('resend verification failed', err);
+        setVerificationStatus(err.message || 'Could not send email', 'error');
+      } finally {
+        if (button) {
+          clearTimeout(verificationState.resendTimer);
+          verificationState.resendTimer = setTimeout(() => {
+            button.disabled = false;
+          }, 15000);
+        }
+      }
+    }
+
+    function handleSkipVerification() {
+      if (!verificationState.orderId) return;
+      closeVerificationModal();
+      showPaymentSection(verificationState.orderId);
+      redirectToPayment(verificationState.orderId);
+    }
+
+    function showVerificationReminder(orderId, email) {
+      localStorage.setItem('supply24_orderId', orderId);
+      const modal = document.getElementById('otp-modal');
+      const emailLabel = document.getElementById('otp-email');
+      if (emailLabel) {
+        const [user, domain] = String(email || '').split('@');
+        emailLabel.textContent = email ? `${user?.slice(0, 2)}***@${domain || ''}` : 'your email';
+      }
+      if (modal) {
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
     function showPaymentSection(orderId) {
       const section = document.getElementById('payment-section');
       const hint = document.getElementById('payment-hint');
@@ -1863,153 +1972,10 @@
       invoiceBox.style.display = 'none';
       statusEl.textContent = '';
       localStorage.setItem('supply24_orderId', orderId);
+      closeVerificationModal();
       startOrderPolling(orderId);
     }
 
-    const otpState = {
-      orderId: null,
-      email: '',
-      resendTimer: null
-    };
-
-    function maskEmailDisplay(email) {
-      if (!email || !email.includes('@')) return email || '';
-      const [user, domain] = email.split('@');
-      if (!user) return `***@${domain}`;
-      const visible = user.slice(0, 2);
-      return `${visible}${'*'.repeat(Math.max(1, user.length - 2))}@${domain}`;
-    }
-
-    function getOtpElements() {
-      return {
-        modal: document.getElementById('otp-modal'),
-        emailLabel: document.getElementById('otp-email'),
-        status: document.getElementById('otp-status'),
-        code: document.getElementById('otp-code'),
-        submit: document.getElementById('otp-submit'),
-        resend: document.getElementById('otp-resend')
-      };
-    }
-
-    function setOtpStatus(message = '', tone = 'muted') {
-      const { status } = getOtpElements();
-      if (!status) return;
-      status.textContent = message;
-      status.dataset.tone = tone;
-    }
-
-    function openOtpModal() {
-      const { modal, code } = getOtpElements();
-      if (!modal) return;
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      if (code) {
-        code.value = '';
-        setTimeout(() => {
-          try { code.focus(); } catch (e) {}
-        }, 50);
-      }
-    }
-
-    function closeOtpModal() {
-      const { modal } = getOtpElements();
-      if (!modal) return;
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      setOtpStatus('');
-    }
-
-    async function requestOtpCode() {
-      if (!otpState.orderId) return;
-      const { resend } = getOtpElements();
-      setOtpStatus('Sending code…', 'muted');
-      if (resend) resend.disabled = true;
-      try {
-        const resp = await fetch('/.netlify/functions/request-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: otpState.orderId })
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || 'Failed to send code');
-        const display = data.email || maskEmailDisplay(otpState.email) || 'your email';
-        setOtpStatus(`Code sent to ${display}`, 'success');
-      } catch (err) {
-        console.error('request otp failed', err);
-        setOtpStatus(err.message || 'Could not send code', 'error');
-        throw err;
-      } finally {
-        if (resend) {
-          clearTimeout(otpState.resendTimer);
-          otpState.resendTimer = setTimeout(() => {
-            resend.disabled = false;
-          }, 15000);
-        }
-      }
-    }
-
-    async function startOtpFlow(orderId, email, { sendImmediately = true } = {}) {
-      otpState.orderId = orderId;
-      otpState.email = email || '';
-      const { emailLabel } = getOtpElements();
-      if (emailLabel) {
-        emailLabel.textContent = maskEmailDisplay(otpState.email) || 'your email address';
-      }
-      openOtpModal();
-      if (sendImmediately) {
-        try {
-          await requestOtpCode();
-        } catch (err) {
-          // status already shown
-        }
-      } else {
-        setOtpStatus('We already emailed the code — please check your inbox and spam folder.', 'muted');
-      }
-    }
-
-    async function verifyOtpCode() {
-      if (!otpState.orderId) return;
-      const { code, submit } = getOtpElements();
-      const value = code?.value?.trim() || '';
-      if (!/^\d{6}$/.test(value)) {
-        setOtpStatus('Enter the 6-digit code from your email (check spam if needed)', 'error');
-        try { code && code.focus(); } catch (e) {}
-        return;
-      }
-      if (submit) submit.disabled = true;
-      setOtpStatus('Verifying…', 'muted');
-      try {
-        const resp = await fetch('/.netlify/functions/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: otpState.orderId, code: value })
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || 'Invalid code');
-        setOtpStatus('Verified — redirecting to payment…', 'success');
-        try { localStorage.setItem('supply24_verified_order', otpState.orderId); } catch (e) {}
-        showPaymentSection(otpState.orderId);
-        closeOtpModal();
-        redirectToPayment(otpState.orderId);
-      } catch (err) {
-        console.error('verify otp failed', err);
-        setOtpStatus(err.message || 'Verification failed', 'error');
-      } finally {
-        if (submit) submit.disabled = false;
-      }
-    }
-
-    function redirectToPayment(orderId) {
-      const target = `payment.html?orderId=${encodeURIComponent(orderId)}`;
-      try {
-        window.location.href = target;
-      } catch (err) {
-        console.warn('payment redirect failed', err);
-        showPaymentSection(orderId);
-      }
-    }
     async function resumeOrderFlow(orderId) {
       try {
         const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
@@ -2019,7 +1985,7 @@
           showPaymentSection(orderId);
           return;
         }
-        await startOtpFlow(orderId, order.customerEmail, { sendImmediately: false });
+        showVerificationReminder(orderId, order.customerEmail);
       } catch (err) {
         console.warn('resume order failed', err);
         localStorage.removeItem('supply24_orderId');
@@ -2278,8 +2244,7 @@
           }
           if (!resp.ok) throw new Error(data.error || 'Order failed');
           localStorage.setItem('supply24_orderId', data.orderId);
-          localStorage.removeItem('supply24_verified_order');
-          await startOtpFlow(data.orderId, payload.customerEmail, { sendImmediately: false });
+          showVerificationReminder(data.orderId, payload.customerEmail);
           return;
         } catch (err) {
           alert('Order failed: ' + (err.message || err));
@@ -2351,6 +2316,8 @@
       if (prev) {
         resumeOrderFlow(prev).catch((err) => console.warn('resumeOrderFlow failed', err));
       }
+      const otpClose = document.getElementById('otp-close');
+      if (otpClose) otpClose.addEventListener('click', (e) => { e.preventDefault(); closeVerificationModal(); });
       // Bind quick search button and Enter key on order form
       try { initOrderStationQuickSearch(); } catch (e) { console.warn('initOrderStationQuickSearch failed', e); }
       // Support Enter key on postcode input inside modal to trigger matching
@@ -2369,49 +2336,14 @@
       try { initProductImagePreview(); } catch (err) { console.warn('initProductImagePreview failed', err); }
       // Admin tools bindings
       try { initAdminTools(); } catch (e) { console.warn('initAdminTools failed', e); }
-      const otpClose = document.getElementById('otp-close');
-      if (otpClose) otpClose.addEventListener('click', (e) => { e.preventDefault(); closeOtpModal(); });
-      const otpModal = document.getElementById('otp-modal');
-      // disable backdrop click to avoid accidental close
-      if (otpModal) {
-        otpModal.addEventListener('click', (e) => {
-          if (e.target === otpModal) {
-            e.stopPropagation();
-          }
-        });
-      }
-      const otpSubmit = document.getElementById('otp-submit');
-      if (otpSubmit) {
-        otpSubmit.addEventListener('click', (e) => { e.preventDefault(); verifyOtpCode(); });
-      }
       const otpResend = document.getElementById('otp-resend');
       if (otpResend) {
-        otpResend.addEventListener('click', (e) => { e.preventDefault(); requestOtpCode().catch(() => {}); });
+        otpResend.addEventListener('click', (e) => { e.preventDefault(); resendVerificationLink().catch(() => {}); });
       }
       const otpSkip = document.getElementById('otp-skip');
       if (otpSkip) {
-        otpSkip.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (!otpState.orderId) return;
-          closeOtpModal();
-          showPaymentSection(otpState.orderId);
-          redirectToPayment(otpState.orderId);
-        });
+        otpSkip.addEventListener('click', (e) => { e.preventDefault(); handleSkipVerification(); });
       }
-      const otpCodeInput = document.getElementById('otp-code');
-      if (otpCodeInput) {
-        otpCodeInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            verifyOtpCode();
-          }
-        });
-      }
-      document.addEventListener('keydown', (e) => {
-        if (otpState.orderId && e.key === 'Escape') {
-          e.preventDefault();
-        }
-      });
     });
 
     // Admin tools: client-side handler to call admin-update-order function

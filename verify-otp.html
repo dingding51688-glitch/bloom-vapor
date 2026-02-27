@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Verify order · Green Hub</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; background:#05070f; color:#eef2ff; margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { max-width:480px; width:100%; background:#0e1323; border-radius:18px; border:1px solid rgba(255,255,255,0.08); padding:32px 28px; box-shadow:0 25px 60px rgba(5,7,23,0.6); text-align:center; }
+    h1 { margin-top:0; font-size:1.4rem; }
+    p { line-height:1.5; color:#c8cce5; }
+    .status { margin:20px 0; font-weight:600; }
+    .success { color:#34d399; }
+    .error { color:#f87171; }
+    .actions { display:flex; flex-direction:column; gap:12px; margin-top:24px; }
+    a.btn { display:inline-block; padding:12px 18px; border-radius:999px; background:linear-gradient(120deg,#7c3aed,#31c48d); color:#fff; text-decoration:none; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Verifying your order…</h1>
+    <p id="status" class="status">Please wait while we confirm your link.</p>
+    <div class="actions" id="actions" style="display:none;"></div>
+  </div>
+
+  <script>
+    async function verify() {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('orderId') || '';
+      const token = params.get('token') || '';
+      const statusEl = document.getElementById('status');
+      const actionsEl = document.getElementById('actions');
+      if (!orderId || !token) {
+        statusEl.textContent = 'Missing order information. Please open the link from your email again.';
+        statusEl.classList.add('error');
+        return;
+      }
+      try {
+        const resp = await fetch(`/.netlify/functions/verify-otp-link?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(token)}`);
+        const data = await resp.json();
+        if (!resp.ok || !data.ok) {
+          throw new Error(data.error || 'Verification failed');
+        }
+        statusEl.textContent = 'Email verified successfully! You can continue to payment.';
+        statusEl.classList.remove('error');
+        statusEl.classList.add('success');
+        actionsEl.innerHTML = `<a class="btn" href="/payment.html?orderId=${encodeURIComponent(orderId)}">Open payment page</a>`;
+        actionsEl.style.display = 'flex';
+      } catch (err) {
+        statusEl.textContent = err.message || 'Verification failed. Please request a new link from the website.';
+        statusEl.classList.add('error');
+        actionsEl.innerHTML = `<a class="btn" href="/">Return to homepage</a>`;
+        actionsEl.style.display = 'flex';
+      }
+    }
+    verify();
+  </script>
+</body>
+</html>

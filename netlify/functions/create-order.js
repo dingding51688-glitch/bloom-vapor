@@ -62,8 +62,8 @@ function formatClientMeta(meta, clientIp) {
   return lines;
 }
 
-function generateOtpCode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+function generateOtpToken() {
+  return Array.from({ length: 2 }, () => Math.random().toString(36).slice(2, 10)).join('');
 }
 
 function generateOrderId() {
@@ -109,7 +109,7 @@ export async function handler(event) {
   const basePrice = parsePrice(payload.basePriceGbp);
   const totalPrice = parsePrice(payload.priceGbp);
   const surcharge = parsePrice(payload.pickupSurcharge);
-  const otpCode = generateOtpCode();
+  const otpToken = generateOtpToken();
   const otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
   const order = {
@@ -131,7 +131,8 @@ export async function handler(event) {
     trackingNumber: '',
     password: '',
     payment: null,
-    otpCode,
+    otpCode: '',
+    otpToken,
     otpExpiresAt,
     otpVerifiedAt: null,
     createdAt: now,
@@ -149,6 +150,10 @@ export async function handler(event) {
     return line && !line.startsWith('Screen:') && !line.startsWith('Window:');
   });
 
+  const siteUrl = resolveSiteUrl(event);
+  const logoUrl = resolveLogoUrl(siteUrl);
+  const verificationUrl = `${siteUrl}/verify-otp.html?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(otpToken)}`;
+
   try {
     await createOrderRecord({
       ...order,
@@ -160,12 +165,12 @@ export async function handler(event) {
     if (order.customerEmail) {
       await sendTemplatedEmail({
         to: order.customerEmail,
-        subject: `Your Green Hub verification code (${orderId})`,
+        subject: `Verify your Green Hub order ${orderId}`,
         template: 'order-otp-code.html',
         vars: {
           customerName: order.customerName || 'there',
           orderId,
-          otpCode,
+          verificationUrl,
           expiresMinutes: OTP_EXPIRY_MINUTES,
           year: new Date().getFullYear()
         }
@@ -198,8 +203,6 @@ export async function handler(event) {
       }
     }
 
-    const siteUrl = resolveSiteUrl(event);
-    const logoUrl = resolveLogoUrl(siteUrl);
     const paymentUrl = `${siteUrl}/payment.html?orderId=${orderId}`;
     if (order.customerEmail) {
       await sendTemplatedEmail({

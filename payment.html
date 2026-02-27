@@ -23,6 +23,9 @@
     .total-amount strong{font-weight:900}
     .note{margin-top:14px;color:#9ba3d8}
     .spam-tip{color:#f87171;font-weight:600}
+    .livechat{margin-top:20px;padding:16px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)}
+    .livechat-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .btn.btn-small{padding:8px 14px;font-size:0.9rem}
     #bank-option.locked{opacity:0.5;border-style:dashed}
     #bank-locked-message{margin-top:12px;color:#f97316}
   </style>
@@ -67,7 +70,14 @@
         </div>
       </div>
 
-      <p class="note">After payment, your order status will update automatically. <span class="spam-tip">We’ve sent payment instructions to your email — if you can’t see it, please check your Promotions/spam folder and mark it as “Not spam.”</span> If you need help, contact Live chat in the site corner.</p>
+      <p class="note">After payment, your order status will update automatically. <span class="spam-tip">We’ve sent payment instructions to your email — if you can’t see it, please check your Promotions/spam folder and mark it as “Not spam.”</span></p>
+      <div class="livechat">
+        <p>Need help? Talk to us directly:</p>
+        <div class="livechat-actions">
+          <a id="livechat-tg" class="btn btn-small" href="#" target="_blank" rel="noopener">Telegram chat</a>
+          <a id="livechat-wa" class="btn btn-small" href="#" target="_blank" rel="noopener">WhatsApp chat</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -196,6 +206,21 @@
 
     document.getElementById('usdt-trc').addEventListener('click', (e) => handlePayClick(e, 'TRC20'));
     document.getElementById('usdt-erc').addEventListener('click', (e) => handlePayClick(e, 'ERC20'));
+
+    async function loadChatLinks() {
+      try {
+        const resp = await fetch('/data/chat-links.json');
+        if (!resp.ok) return;
+        const links = await resp.json();
+        const tg = document.getElementById('livechat-tg');
+        const wa = document.getElementById('livechat-wa');
+        if (tg && links.telegram) tg.href = links.telegram;
+        if (wa && links.whatsapp) wa.href = links.whatsapp;
+      } catch (err) {
+        console.warn('chat links load failed', err);
+      }
+    }
+    loadChatLinks();
   </script>
 </body>
 </html>

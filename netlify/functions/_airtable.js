@@ -139,6 +139,7 @@ export function airtableRecordToOrder(record) {
     password: fields.password || '',
     payment: parsePaymentPayload(fields.paymentPayload),
     otpCode: fields.otpCode || '',
+    otpToken: fields.otpToken || '',
     otpExpiresAt: fields.otpExpiresAt || null,
     otpVerifiedAt: fields.otpVerifiedAt || null,
     createdAt: fields.createdAt || null,
