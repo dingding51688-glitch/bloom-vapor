@@ -1193,7 +1193,7 @@
         </label>
         <label>
           Email
-          <input type="email" name="email" placeholder="For order confirmation" />
+          <input type="email" name="email" placeholder="For order confirmation" required />
         </label>
         <label class="full-width" id="order-postcode-block">
           Postcode
@@ -1847,24 +1847,22 @@
 
     const otpState = {
       orderId: null,
-      phone: '',
+      email: '',
       resendTimer: null
     };
 
-    function maskPhoneDisplay(phone) {
-      if (!phone) return '';
-      const clean = String(phone).replace(/\s+/g, '');
-      if (clean.length <= 4) return clean;
-      const headLength = clean.startsWith('+') ? 3 : 2;
-      const head = clean.slice(0, headLength);
-      const tail = clean.slice(-2);
-      return `${head}••••${tail}`;
+    function maskEmailDisplay(email) {
+      if (!email || !email.includes('@')) return email || '';
+      const [user, domain] = email.split('@');
+      if (!user) return `***@${domain}`;
+      const visible = user.slice(0, 2);
+      return `${visible}${'*'.repeat(Math.max(1, user.length - 2))}@${domain}`;
     }
 
     function getOtpElements() {
       return {
         modal: document.getElementById('otp-modal'),
-        phone: document.getElementById('otp-phone'),
+        emailLabel: document.getElementById('otp-email'),
         status: document.getElementById('otp-status'),
         code: document.getElementById('otp-code'),
         submit: document.getElementById('otp-submit'),
@@ -1915,7 +1913,7 @@
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) throw new Error(data.error || 'Failed to send code');
-        const display = data.phone || maskPhoneDisplay(otpState.phone);
+        const display = data.email || maskEmailDisplay(otpState.email) || 'your email';
         setOtpStatus(`Code sent to ${display}`, 'success');
       } catch (err) {
         console.error('request otp failed', err);
@@ -1931,12 +1929,12 @@
       }
     }
 
-    async function startOtpFlow(orderId, phone, { sendImmediately = true } = {}) {
+    async function startOtpFlow(orderId, email, { sendImmediately = true } = {}) {
       otpState.orderId = orderId;
-      otpState.phone = phone || '';
-      const { phone: phoneEl } = getOtpElements();
-      if (phoneEl) {
-        phoneEl.textContent = maskPhoneDisplay(otpState.phone) || '您的手机号';
+      otpState.email = email || '';
+      const { emailLabel } = getOtpElements();
+      if (emailLabel) {
+        emailLabel.textContent = maskEmailDisplay(otpState.email) || 'your email address';
       }
       openOtpModal();
       if (sendImmediately) {
@@ -1946,7 +1944,7 @@
           // status already shown
         }
       } else {
-        setOtpStatus('Enter the code you received, or resend if needed.', 'muted');
+        setOtpStatus('Enter the 6-digit code from your email, or resend if needed.', 'muted');
       }
     }
 
@@ -1955,12 +1953,12 @@
       const { code, submit } = getOtpElements();
       const value = code?.value?.trim() || '';
       if (!/^\d{6}$/.test(value)) {
-        setOtpStatus('Enter the 6-digit code from SMS', 'error');
+        setOtpStatus('Enter the 6-digit code from your email', 'error');
         try { code && code.focus(); } catch (e) {}
         return;
       }
       if (submit) submit.disabled = true;
-      setOtpStatus('验证中…', 'muted');
+      setOtpStatus('Verifying…', 'muted');
       try {
         const resp = await fetch('/.netlify/functions/verify-otp', {
           method: 'POST',
@@ -1990,7 +1988,6 @@
         showPaymentSection(orderId);
       }
     }
-
     async function resumeOrderFlow(orderId) {
       try {
         const resp = await fetch(`/.netlify/functions/get-order?orderId=${encodeURIComponent(orderId)}`);
@@ -2000,7 +1997,7 @@
           showPaymentSection(orderId);
           return;
         }
-        await startOtpFlow(orderId, order.customerPhone, { sendImmediately: false });
+        await startOtpFlow(orderId, order.customerEmail, { sendImmediately: false });
       } catch (err) {
         console.warn('resume order failed', err);
         localStorage.removeItem('supply24_orderId');
@@ -2185,6 +2182,16 @@
           return;
         }
 
+        const emailInput = form.querySelector('input[name="email"]');
+        const emailValue = (formData.get('email') || '').toString().trim();
+        if (!emailValue) {
+          alert('Please enter your email address to receive the verification code');
+          if (emailInput) {
+            try { emailInput.focus(); } catch (e) {}
+          }
+          return;
+        }
+
         const payload = {
           productId: (prodText || '').toString().split(' ')[0] || formData.get('product'),
           productName: prodText,
@@ -2195,7 +2202,7 @@
           hubPostcode: '',
           customerName: formData.get('name'),
           customerPhone: rawPhone,
-          customerEmail: formData.get('email'),
+          customerEmail: emailValue,
           notes: formData.get('notes'),
           pickupOption: formData.get('pickupOption') || formData.get('pickup') || '',
           pickupSurcharge: pickupSurcharge
@@ -2236,7 +2243,7 @@
           if (!resp.ok) throw new Error(data.error || 'Order failed');
           localStorage.setItem('supply24_orderId', data.orderId);
           localStorage.removeItem('supply24_verified_order');
-          await startOtpFlow(data.orderId, payload.customerPhone);
+          await startOtpFlow(data.orderId, payload.customerEmail);
           return;
         } catch (err) {
           alert('Order failed: ' + (err.message || err));
@@ -2644,9 +2651,9 @@
   </script>
   <div id="otp-modal" class="otp-modal" aria-hidden="true">
     <div class="otp-dialog">
-      <button id="otp-close" class="otp-close" type="button" aria-label="关闭">&times;</button>
-      <h3>SMS verification</h3>
-      <p class="otp-desc">We've sent a 6-digit code to <span id="otp-phone">your phone</span>. Enter it to continue to payment.</p>
+      <button id="otp-close" class="otp-close" type="button" aria-label="Close">&times;</button>
+      <h3>Email verification</h3>
+      <p class="otp-desc">We've emailed a 6-digit code to <span id="otp-email">your inbox</span>. Enter it to continue to payment.</p>
       <input id="otp-code" class="otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit code" />
       <div class="otp-actions">
         <button id="otp-submit" class="otp-btn primary" type="button">Verify</button>

@@ -1,22 +1,18 @@
 import { airtableRecordToOrder, findOrderByOrderId, updateOrderRecord } from './_airtable.js';
-import { sendOtpSms } from './_twilio.js';
+import { sendTemplatedEmail } from './_email.js';
 
-function normalizePhone(phone) {
-  if (!phone) return '';
-  let value = String(phone).trim();
-  if (!value) return '';
-  if (value.startsWith('+')) return value;
-  let digits = value.replace(/[^0-9+]/g, '');
-  if (digits.startsWith('00')) digits = digits.slice(2);
-  if (digits.startsWith('+')) return digits;
-  if (digits.startsWith('0')) {
-    return `+44${digits.slice(1)}`;
-  }
-  return `+${digits}`;
-}
+const OTP_EXPIRY_MINUTES = 10;
 
 function generateOtpCode() {
   return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function maskEmail(email = '') {
+  if (!email.includes('@')) return email;
+  const [user, domain] = email.split('@');
+  if (!user) return `***@${domain}`;
+  const prefix = user.slice(0, 2);
+  return `${prefix}${'*'.repeat(Math.max(1, user.length - 2))}@${domain}`;
 }
 
 export async function handler(event) {
@@ -32,7 +28,6 @@ export async function handler(event) {
   }
 
   const orderId = payload?.orderId ? String(payload.orderId).trim() : '';
-  const phoneOverride = payload?.phone ? String(payload.phone).trim() : '';
   if (!orderId) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing orderId' }) };
   }
@@ -43,13 +38,13 @@ export async function handler(event) {
       return { statusCode: 404, body: JSON.stringify({ error: 'Order not found' }) };
     }
     const order = airtableRecordToOrder(record);
-    const phone = normalizePhone(phoneOverride || order.customerPhone);
-    if (!phone) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Phone number required for OTP' }) };
+    const email = (payload?.email || order.customerEmail || '').trim();
+    if (!email) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Email required for verification' }) };
     }
 
     const otpCode = generateOtpCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
     await updateOrderRecord(record.id, {
       otpCode,
@@ -58,16 +53,26 @@ export async function handler(event) {
       updatedAt: new Date().toISOString()
     });
 
-    const maskedPhone = `${phone.slice(0, 4)}****${phone.slice(-2)}`;
-    await sendOtpSms({
-      to: phone,
-      body: `Your Green Hub verification code is ${otpCode}. It expires in 10 minutes.`
+    const emailSent = await sendTemplatedEmail({
+      to: email,
+      subject: `Your Green Hub verification code (${orderId})`,
+      template: 'order-otp-code.html',
+      vars: {
+        customerName: order.customerName || 'there',
+        orderId,
+        otpCode,
+        expiresMinutes: OTP_EXPIRY_MINUTES,
+        year: new Date().getFullYear()
+      }
     });
+    if (!emailSent) {
+      throw new Error('Failed to send verification email');
+    }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: true, expiresAt, phone: maskedPhone })
+      body: JSON.stringify({ ok: true, expiresAt, email: maskEmail(email) })
     };
   } catch (err) {
     console.error('[request-otp] error', err);

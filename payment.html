@@ -87,7 +87,7 @@
             const notice = document.createElement('p');
             notice.className = 'note';
             notice.style.color = '#f97316';
-            notice.textContent = 'Please complete SMS verification before returning to this payment page.';
+            notice.textContent = 'Please complete the email verification step before returning to this payment page.';
             const card = document.querySelector('.card');
             if (card) card.insertBefore(notice, card.querySelector('.options'));
             document.querySelectorAll('.btn').forEach((btn) => {
@@ -141,7 +141,7 @@
       e.preventDefault();
       if (!orderId) return alert('Missing orderId');
       if (!otpVerified) {
-        alert('Please complete SMS verification first.');
+        alert('Please complete the email verification first.');
         return;
       }
       const btn = e.currentTarget;

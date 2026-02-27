@@ -62,7 +62,7 @@ export async function handler(event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const required = ['productId', 'productName', 'priceGbp', 'hubId', 'hubName', 'customerName', 'customerPhone'];
+  const required = ['productId', 'productName', 'priceGbp', 'hubId', 'hubName', 'customerName', 'customerPhone', 'customerEmail'];
   for (const key of required) {
     const value = payload[key];
     if (value === undefined || value === null || String(value).trim() === '') {

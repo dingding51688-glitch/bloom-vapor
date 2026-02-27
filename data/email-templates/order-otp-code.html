@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your verification code</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+        background: #05070f;
+        color: #f4f5fb;
+      }
+      .wrapper {
+        padding: 24px;
+      }
+      .card {
+        max-width: 520px;
+        margin: 0 auto;
+        background: #0d111b;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+      }
+      .header {
+        padding: 26px;
+        background: linear-gradient(135deg, #18c8c0, #7c3aed);
+        color: #fff;
+        font-weight: 600;
+        font-size: 18px;
+      }
+      .content {
+        padding: 28px 26px 34px;
+      }
+      p {
+        margin: 0 0 14px;
+        line-height: 1.6;
+        color: #d3daf6;
+      }
+      .code-box {
+        margin: 20px 0;
+        padding: 16px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: center;
+        letter-spacing: 0.3em;
+        font-size: 26px;
+        font-weight: 700;
+        color: #fefefe;
+      }
+      .footer {
+        padding: 0 26px 26px;
+        font-size: 12px;
+        color: #9aa3c8;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="card">
+        <div class="header">Green Hub verification</div>
+        <div class="content">
+          <p>Hi {{customerName}},</p>
+          <p>
+            Your verification code for order <strong>{{orderId}}</strong> is below. Enter it on the
+            website to continue to payment.
+          </p>
+          <div class="code-box">{{otpCode}}</div>
+          <p>This code expires in {{expiresMinutes}} minutes. If you didn't request it, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">© {{year}} Green Hub Northern Ireland</div>
+      </div>
+    </div>
+  </body>
+</html>
