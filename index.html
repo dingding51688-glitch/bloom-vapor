@@ -1303,10 +1303,6 @@
             <input type="hidden" name="pickupSurcharge" id="pickup-surcharge" value="0" />
           </div>
         </label>
-        <label class="full-width">
-          Notes / Special requests
-          <textarea name="notes" rows="4" placeholder="Flavour, quantity or special requests"></textarea>
-        </label>
         <button type="submit" class="submit-order">Submit order</button>
       </form>
       <div id="verification-banner" class="verification-banner" style="display:none;">
@@ -2277,7 +2273,7 @@
           customerName: formData.get('name'),
           customerPhone: rawPhone,
           customerEmail: emailValue,
-          notes: formData.get('notes'),
+          notes: '',
           pickupOption: formData.get('pickupOption') || formData.get('pickup') || '',
           pickupSurcharge: pickupSurcharge
         };
