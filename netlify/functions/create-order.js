@@ -204,24 +204,6 @@ export async function handler(event) {
       }
     }
 
-    const paymentUrl = `${siteUrl}/payment.html?orderId=${orderId}`;
-    if (order.customerEmail) {
-      await sendTemplatedEmail({
-        to: order.customerEmail,
-        subject: `Your Green Hub order ${orderId} is awaiting payment`,
-        template: 'order-awaiting-payment.html',
-        vars: {
-          customerName: order.customerName || 'there',
-          orderId,
-          productName: order.productName,
-          priceAmount: order.priceGbp,
-          pickupOption: order.pickupOption || 'Standard (3-5 days)',
-          paymentUrl,
-          logoUrl,
-          year: new Date().getFullYear()
-        }
-      });
-    }
 
     const responseBody = { orderId, status: 'pending', telegramSent };
     if (bankDetails) responseBody.bankDetails = bankDetails;
