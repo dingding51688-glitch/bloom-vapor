@@ -1258,7 +1258,7 @@
         </label>
         <label>
           Phone
-          <input type="tel" name="phone" placeholder="07712345678" inputmode="numeric" pattern="^07\d{9}$" title="Enter an 11-digit UK mobile number starting with 07" required />
+          <input type="tel" name="phone" placeholder="e.g. 07123456789" inputmode="numeric" pattern="^\d{11}$" title="Enter an 11-digit UK phone number" required />
         </label>
         <label>
           Email
@@ -2234,9 +2234,9 @@
 
         const phoneInput = form.querySelector('input[name="phone"]');
         const rawPhone = (formData.get('phone') || '').toString().replace(/\s+/g, '');
-        const phoneValid = /^07\d{9}$/.test(rawPhone);
+        const phoneValid = /^\d{11}$/.test(rawPhone);
         if (!phoneValid) {
-          alert('Please enter an 11-digit UK mobile number starting with 07');
+          alert('Please enter an 11-digit UK phone number');
           if (phoneInput) {
             try { phoneInput.focus(); } catch (e) {}
           }
