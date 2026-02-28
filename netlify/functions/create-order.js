@@ -180,8 +180,6 @@ export async function handler(event) {
 
     const bankDetails = await getBankDetails();
 
-    const verificationUrl = `${siteUrl}/verify-otp.html?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(otpToken)}&lid=${encodeURIComponent(otpLinkId)}`;
-
     const statusLabel = 'Awaiting email verification';
     const pickupLine = order.pickupOption
       ? `\nPickup: ${order.pickupOption}${order.pickupSurchargeGbp ? ` (surcharge £${order.pickupSurchargeGbp})` : ''}`
