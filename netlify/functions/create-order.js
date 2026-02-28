@@ -110,6 +110,7 @@ export async function handler(event) {
   const totalPrice = parsePrice(payload.priceGbp);
   const surcharge = parsePrice(payload.pickupSurcharge);
   const otpToken = generateOtpToken();
+  const otpLinkId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
   const order = {
@@ -178,6 +179,8 @@ export async function handler(event) {
     }
 
     const bankDetails = await getBankDetails();
+
+    const verificationUrl = `${siteUrl}/verify-otp.html?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(otpToken)}&lid=${encodeURIComponent(otpLinkId)}`;
 
     const statusLabel = 'Awaiting email verification';
     const pickupLine = order.pickupOption

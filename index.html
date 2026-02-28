@@ -777,6 +777,72 @@
       font-weight: 600;
       cursor: pointer;
     }
+    .hub-tip {
+      font-size: 0.85rem;
+      color: #9aa4c2;
+      margin-top: 8px;
+    }
+    .hub-results {
+      margin-top: 16px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    #hub-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #hub-list li {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    #hub-list li .hub-meta {
+      font-size: 0.85rem;
+      color: #9aa4c2;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #hub-list li .hub-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #hub-list button {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(56, 189, 248, 0.15);
+      color: #eaf4ff;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    #hub-list button:hover {
+      background: rgba(56, 189, 248, 0.3);
+    }
+    .hub-results::after {
+      content: '';
+      display: block;
+      height: 4px;
+      opacity: 0;
+    }
+    @media (max-width: 640px) {
+      .hub-form-row { flex-direction: column; }
+      .hub-form-row button { width: 100%; }
+      #hub-panel .hub-card { padding: 16px; }
+      .hub-results { max-height: 420px; }
+      #hub-list button { width: 100%; }
+    }
     .hub-note {
       color: #9ba3d8;
       font-size: 0.9rem;
@@ -1156,10 +1222,13 @@
             <input type="text" id="postcode" placeholder="Enter postcode" />
             <button type="button" onclick="matchHub()">Find hubs</button>
           </div>
+          <p class="hub-tip">Enter your full postcode (e.g. BT12 6HN). On mobile, scroll the list below and tap “Select hub”.</p>
         </div>
-        <ul id="hub-list">
-          <li>Enter a postcode to discover nearby 24/7 pickup hubs.</li>
-        </ul>
+        <div class="hub-results">
+          <ul id="hub-list">
+            <li>Enter a postcode to discover nearby 24/7 pickup hubs.</li>
+          </ul>
+        </div>
         <div id="hub-map" class="hub-map" role="presentation" aria-hidden="true"></div>
         <p class="hub-note">Showing available 24/7 pickup hubs. Enter your postcode to find the closest locations.</p>
       </div>
