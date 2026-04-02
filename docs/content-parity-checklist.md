@@ -33,6 +33,7 @@
 | Wallet | Withdrawal | ✅ `/wallet/withdraw` 表单 + `/wallet/withdraw/history` 列表 | `lib/withdrawal-api.ts` + `docs/wallet-withdrawal.md`；Amount/Payout/Review stepper + 历史筛选/分页 + fixtures fallback。 | 2026-04-02 |
 | Wallet | Compliance update | ✅ Transfer ID banner + £20 最低限额 | `TransferIdNotice` + `deriveTransferId`，同时更新 `/wallet` / `/wallet/topup` / `/wallet/withdraw` 校验与文档。 | 2026-04-02 |
 | Referral | Landing page | ✅ `/invite` public funnel | Hero/Rewards/Steps/FAQ + query param detection + copy link CTA；详见 `docs/referral.md`。 | 2026-04-02 |
+| Referral | Poster generator | ✅ `/referral/poster` 可导出海报 | html-to-image + qrcode.react 生成 PNG/JPEG，模板/配色/自定义文案在 `docs/referral.md` 记录。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

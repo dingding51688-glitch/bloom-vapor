@@ -27,6 +27,13 @@ Public-facing explainer at `/invite` (SEO-friendly, no auth required):
 - Concierge CTA: reuses `contactChannels` to link to Telegram support and remind people to use their Transfer ID / referral code.
 - The page can accept manual code entry when no query param is supplied (Input field updates CTA + share link preview).
 
+## Poster generator (`/referral/poster`)
+- Requires login so we can inject the user’s referral link + Transfer ID.
+- Two templates (locker green portrait / night neon landscape) plus custom headline, subline, footer note, accent colour, avatar toggle.
+- Live preview renders inside a fixed-size div; export handled via `html-to-image` (PNG/JPEG). QR code generated via `qrcode.react` pointing at the invite URL.
+- Controls remind users of the £20 minimum payout and emphasise sampling Transfer ID in references.
+- Referral dashboard CTA now links to the poster page.
+
 ## Interactions
 - Copy button uses `navigator.clipboard.writeText`. On success/failure, inline toast text updates for 2.5s.
 - Share buttons open Telegram/WhatsApp share URLs with prefilled copy.
@@ -40,3 +47,9 @@ Public-facing explainer at `/invite` (SEO-friendly, no auth required):
 - Lifetime commission splits: click rewards (`clickPayoutTotal` @ £0.30/click) vs order rewards (`bonusEarned - clickPayoutTotal`).
 - Commission history table uses `CommissionTransaction` (fields: amount, status/type, sourceInvitee, createdAt).
 - Referral page listens for `NotificationProvider` messages of type `commission_award` to highlight pending rewards.
+
+## Tracking flow
+- Query param `?ref=CODE` 捕获后由 `ReferralTrackingProvider` 写入 cookie/localStorage (`referralCode`，30 天)。
+- Provider 在首次检测到 code 时调用 `/api/referral/click`，24 小时内同一 code 去重（localStorage: `referralClick:<code>`）。
+- 成功点击会记录 `referralClick:last`，失败写入 `referralClick:error` 以便 UI 给出刷新提示。
+- /register → `/api/auth/register`、/checkout → `/api/orders/checkout` 均在 payload 中附带 `referralCode`，后端即可发放 £0.30/click + 好友订单金额 10% 的奖励。
