@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Card, Button } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { featuredProducts } from "@/data/fixtures/marketing";
 import type { ProductCardData } from "@/lib/types";
 
@@ -12,6 +12,19 @@ export type ProductCollectionGridProps = {
 };
 
 const toneByIndex = (index: number) => (index % 2 === 0 ? "green" : "orange");
+
+const tonePalette = {
+  green: {
+    top: "#101c11",
+    bottom: "#1b2b1b",
+    accent: "#13a86b"
+  },
+  orange: {
+    top: "#2c1608",
+    bottom: "#3c200b",
+    accent: "#f2a33a"
+  }
+};
 
 export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>) {
   const content = {
@@ -49,29 +62,48 @@ export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>
       </div>
       {hasProducts ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {content.products?.map((product, index) => (
-            <Card key={product.id} tone={toneByIndex(index)} padding="md" className="flex flex-col gap-4">
-              {product.imageUrl && (
-                <div className="relative h-40 w-full overflow-hidden rounded-[28px] border border-white/15">
-                  <Image src={product.imageUrl} alt={product.title} fill className="object-cover" />
+          {content.products?.map((product, index) => {
+            const tone = toneByIndex(index);
+            const palette = tonePalette[tone as keyof typeof tonePalette] ?? tonePalette.green;
+            const background = `linear-gradient(180deg, ${palette.top} 0%, ${palette.top} 55%, ${palette.bottom} 55%, ${palette.bottom} 100%)`;
+
+            return (
+              <article
+                key={product.id}
+                className="relative flex min-h-[240px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-[#0b0b0b] text-white sm:flex-row"
+                style={{ background }}
+              >
+                <div className="relative z-10 flex flex-1 flex-col gap-3 p-5">
+                  {product.category && (
+                    <p className="text-[11px] uppercase tracking-[0.35em] text-white/70">{product.category}</p>
+                  )}
+                  <h3 className="text-xl font-semibold">{product.title}</h3>
+                  {product.description && (
+                    <p className="text-sm text-white/80">{product.description}</p>
+                  )}
+                  <div className="mt-auto flex items-center gap-4">
+                    {product.price && <span className="text-base font-semibold">{product.price}</span>}
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/10">
+                      <ArrowIcon />
+                    </span>
+                  </div>
                 </div>
-              )}
-              <div className="space-y-2">
-                {product.category && (
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
-                    {product.category}
-                  </p>
-                )}
-                <h3 className="text-lg font-semibold text-white">{product.title}</h3>
-                {product.description && (
-                  <p className="text-sm text-[rgba(255,255,255,0.75)]">{product.description}</p>
-                )}
-              </div>
-              {product.price && (
-                <p className="text-base font-semibold text-white">{product.price}</p>
-              )}
-            </Card>
-          ))}
+                <div className="relative z-10 flex w-full items-end justify-center pb-4 pr-4 sm:w-2/5">
+                  {product.imageUrl ? (
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.title}
+                      width={200}
+                      height={200}
+                      className="h-36 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+                    />
+                  ) : (
+                    <PlaceholderBadge title={product.title} />
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-[32px] border border-dashed border-white/20 px-6 py-10 text-center text-sm text-[rgba(255,255,255,0.6)]">
@@ -79,6 +111,23 @@ export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>
         </div>
       )}
     </section>
+  );
+}
+
+function PlaceholderBadge({ title }: { title: string }) {
+  const initial = title.charAt(0).toUpperCase();
+  return (
+    <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-white/5 text-3xl text-white/70">
+      {initial}
+    </div>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+    </svg>
   );
 }
 

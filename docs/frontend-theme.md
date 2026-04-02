@@ -67,6 +67,11 @@ Automation + capture runbook now lives in `docs/tests/frontend-shots.md`. Follow
 
 _(Playwright screenshot against the production site failed due to missing system libraries; SVG mockups are included to document visual parity.)_
 
-## 8. Testing
+## 8. Product cards
+- `ProductCategoryCard` drives the homepage FLOWERS / PRE-ROLLS / VAPES row. Each card stacks a #1E2D22 badge + copy on the left and product art on the right, with a split background (top vs bottom colors) and arrow badge. Tone presets: `green` (`#101c11 → #182818`), `orange` (`#2c1608 → #3c200b`), `cream` (`#332515 → #251c11`). Replace the placeholder “GH” logo with the official asset once supplied (see TODO in fixtures).
+- `ProductCollectionGrid` adopts the same split-background layout for live menu items. Category label + title/description stay on the left, image or placeholder badge on the right, arrow badge bottom-left. Palette automatically alternates between green/orange entries.
+- Product art currently references CMS URLs; if higher fidelity renders arrive, update `featuredCollectionsContent` or the Strapi product records. Missing imagery defaults to an initial badge.
+
+## 9. Testing
 - Unit tests for the section kit live in `components/sections/__tests__/` (HeroClassic, HowItWorksLocker, PaymentRecommendation, ProductCollectionGrid).
 - Run `pnpm test` (Vitest) + `pnpm lint` to validate changes.
