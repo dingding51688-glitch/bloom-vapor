@@ -61,3 +61,5 @@
 | Products | Hero simplified | ✅ Breadcrumb-only copy | /products 顶部仅保留 HOME / SHOP ALL / {category} 面包屑，tabs 直接跟随，其余提示容器已移除。 | 2026-04-02 |
 | Footer removed | Layout cleanup | ✅ Locker collective footer removed per client request | Header now ends page; policy links to be revisited on /about as needed. | 2026-04-02 |
 | Cereal Milk imagery | Product media | ✅ Kush Mintz photo set as Cereal Milk fallback | `/public/images/products/cereal-milk.jpg` + fixtures meta ensure consistent image sitewide. | 2026-04-02 |
+
+| Product detail | Image zoom | ✅ Full-screen modal | /products/[slug] 主图支持 tap + CTA 打开全屏 lightbox，含拖拽/双击缩放与 ESC 关闭。 | 2026-04-02 |

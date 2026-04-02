@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductImageZoom } from "@/components/ProductImageZoom";
 import type { ProductRecord, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
 import { ProductDetailPurchase } from "./purchase-panel";
@@ -115,24 +115,7 @@ function ProductHero({ product }: { product: ProductRecord }) {
   return (
     <div className="space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
       <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-        <div className="relative aspect-square w-full min-h-[320px] overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#0d1b13,#050505)]">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={imageAlt}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-contain p-6"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-sm text-white/70">Locker preview coming soon</div>
-          )}
-          {product.heroBadge && (
-            <span className="absolute left-4 top-4 rounded-full border border-white/30 bg-black/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white">
-              {product.heroBadge}
-            </span>
-          )}
-        </div>
+        <ProductImageZoom imageUrl={imageUrl} imageAlt={imageAlt} badge={product.heroBadge} />
         <div className="space-y-4">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">{product.strain} strain</p>
