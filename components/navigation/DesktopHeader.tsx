@@ -2,70 +2,93 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/components/providers/AuthProvider";
-import { Button } from "@/components/ui";
 import {
-  primaryNav,
   drawerSections,
   drawerQuickLinks,
   ctaButtons
 } from "@/data/fixtures/navigation";
 import { MobileDrawer } from "./MobileDrawer";
-import { NavLink } from "./NavLink";
+import { LogoMark } from "./LogoMark";
+
+function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-white/40"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function IconButton({ onClick, label, children }: { onClick: () => void; label: string; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-white/40"
+    >
+      {children}
+    </button>
+  );
+}
+
+const iconStroke = "stroke-white";
+
+function AccountIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={iconStroke}>
+      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={iconStroke}>
+      <path
+        d="M6.5 8.5h11l1 11a1.5 1.5 0 0 1-1.5 1.5h-10a1.5 1.5 0 0 1-1.5-1.5l1-11Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M9 8.5C9 6.567 10.567 5 12.5 5s3.5 1.567 3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={iconStroke}>
+      <path d="M4 7h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M4 17h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function DesktopHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { token, userEmail, logout } = useAuth();
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-[rgba(5,5,5,0.92)] shadow-header backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4">
-          <div className="flex items-center gap-3">
-            <button
-              className="rounded-full border border-white/15 p-2 text-white md:hidden"
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open menu"
-            >
-              <span className="inline-block text-lg leading-none">≡</span>
-            </button>
-            <Link href="/" className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
-                GreenHub NI
-              </span>
-              <span className="text-lg font-semibold text-white">Locker Network</span>
-            </Link>
-          </div>
-          <nav className="hidden items-center gap-5 md:flex">
-            {primaryNav.map((item) => (
-              <NavLink key={item.href} {...item} />
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button asChild size="sm" className="hidden md:inline-flex" variant="secondary">
-              <Link href={ctaButtons.secondary.href}>{ctaButtons.secondary.label}</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href={ctaButtons.primary.href}>{ctaButtons.primary.label}</Link>
-            </Button>
-            {token ? (
-              <div className="hidden items-center gap-3 rounded-pill border border-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-[rgba(255,255,255,0.7)] md:flex">
-                <span>{userEmail || "Member"}</span>
-                <button onClick={logout} className="text-white">
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="hidden items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)] md:flex">
-                <Link href="/login" className="hover:text-white">
-                  Login
-                </Link>
-                <span>/</span>
-                <Link href="/register" className="hover:text-white">
-                  Join
-                </Link>
-              </div>
-            )}
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#050505]">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
+          <Link href="/" className="flex items-center">
+            <LogoMark />
+          </Link>
+          <div className="flex items-center gap-2">
+            <IconLink href="/login" label="Account">
+              <AccountIcon />
+            </IconLink>
+            <IconLink href="/checkout" label="Shopping bag">
+              <BagIcon />
+            </IconLink>
+            <IconButton onClick={() => setDrawerOpen(true)} label="Open menu">
+              <MenuIcon />
+            </IconButton>
           </div>
         </div>
       </header>

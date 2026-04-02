@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import type { NavItem, DrawerSection, NavigationCTA } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
+import { LogoMark } from "./LogoMark";
 import { Button } from "@/components/ui";
 
 export type MobileDrawerProps = {
@@ -35,7 +36,7 @@ export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: Mobi
         )}
       >
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-white">Menu</p>
+          <LogoMark size={36} />
           <button
             className="rounded-full border border-white/15 p-2 text-white"
             onClick={onClose}

@@ -53,6 +53,8 @@ Fixtures for the kit live in `data/fixtures/marketing.ts`.
 
 ## 6. Navigation Shell (`components/navigation/`)
 - `DesktopHeader` + `MobileDrawer` now consume `primaryNav`, `drawerSections`, `drawerQuickLinks`, `ctaButtons` from `data/fixtures/navigation.ts`. Routing active state handled via `match` rules.
+- Header parity: both breakpoints share a circular logo badge (`#1E2D22` background, "GH" monogram) plus stacked copy (“GREEN HUB” / “DISTRIBUTOR”). Right-aligned icon set = account (→ `/login`), bag (→ `/checkout`), hamburger (opens drawer). Text nav links are moved into the drawer to mirror the legacy site composition.
+- Drawer header mirrors the same logo block and keeps CTA + section fixtures inside the sheet.
 - `Footer` pulls `marketingLinks`, `footerColumns`, `socialLinks`, `footerContact`.
 - **Adding a new link?** Update `data/fixtures/navigation.ts` (e.g., add to `marketingLinks`), not the components.
 
