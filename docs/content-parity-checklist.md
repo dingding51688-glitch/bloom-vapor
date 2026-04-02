@@ -67,3 +67,5 @@
 | Product detail | Copy update | ✅ WHERE WE SHIP + CTA removed | 主描述替换为“WHERE WE SHIP” 段落并删除 View strain info 按钮。 | 2026-04-02 |
 
 | Product detail | Weight cards parity | ✅ White card weight selector + Qty CTA | 4x weight tiers (3.5g / 7g / 14g / 28g) + MOST CHOSEN + quantity + CTA 1:1 with legacy shop. | 2026-04-02 |
+
+| Locker ETA | Reference page | ✅ Locker ETA sheet page | /locker-eta 提供 Morning/Afternoon/Evening 窗口 + 请求步骤 + PIN FAQ，入口来自产品/guide/support。 | 2026-04-02 |

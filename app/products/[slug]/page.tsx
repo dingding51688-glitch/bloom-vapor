@@ -146,7 +146,7 @@ function ProductHero({ product }: { product: ProductRecord }) {
 
 function StrainInfo() {
   return (
-    <section id="strain-info" className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+    <section id="strain-info" className="rounded-[32px] border border-white/10 bg-night-950/70 p-6">
       <Card
         title="Locker-ready experience"
         description="Locker-ready flower, hand bottled the morning of delivery. Expect dense buds, terpene-heavy aroma, and discreet packaging that slides into any Bloom locker."
@@ -156,12 +156,6 @@ function StrainInfo() {
           <li>Slow cured 14 days and nitrogen-flushed.</li>
           <li>Consumer lab reports available on request.</li>
         </ul>
-      </Card>
-      <Card tone="neutral" padding="sm" title="Need specific locker timing?">
-        <p className="text-sm text-ink-400">Drop a note in checkout and our courier adjusts your slot. Locker pins are valid for 2 hours by default.</p>
-        <Button asChild variant="ghost" className="mt-4 w-full">
-          <Link href="/checkout">Continue to checkout</Link>
-        </Button>
       </Card>
     </section>
   );
@@ -175,7 +169,6 @@ function CuratedPicks({ products }: { products: ProductRecord[] }) {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Curated picks</p>
           <h2 className="text-3xl font-semibold text-white">Related locker drops</h2>
-          <p className="text-sm text-ink-400">Fresh inventory hand-picked by concierge. Swipe a locker-ready alternative if this strain sells out.</p>
         </div>
         <Button asChild variant="ghost" className="w-full sm:w-auto">
           <Link href="/products">View menu</Link>

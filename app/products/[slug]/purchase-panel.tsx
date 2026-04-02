@@ -141,7 +141,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
         ADD TO CART
       </Button>
       <Link
-        href="/shipping"
+        href="/locker-eta"
         className="text-center text-xs font-semibold uppercase tracking-[0.35em] text-night-500 hover:text-night-700"
       >
         LOCKER ETA SHEET →
