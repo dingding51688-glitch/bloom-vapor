@@ -172,6 +172,14 @@ export default function WalletTopupPage() {
 
       <TransferIdNotice transferId={transferId} />
 
+      <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 text-sm text-white/70">
+        <p className="font-semibold text-white">Need a quick primer?</p>
+        <p className="mt-1">The payment guide walks through wallet recharges, NowPayments invoices, and bank/USDT transfers step by step.</p>
+        <Button asChild variant="ghost" size="sm" className="mt-3">
+          <Link href="/guide/payment">Read payment guide</Link>
+        </Button>
+      </div>
+
       {tiersError && (
         <StateMessage
           variant="error"

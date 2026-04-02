@@ -57,7 +57,11 @@ All of them are optional (fallback strings are shown in the UI, but update them 
 6. For bank/crypto methods, verify that the instructions surface `.env` data + Transfer ID reminders.
 7. Head back to `/wallet` and use the refresh buttons to reload balance + activity.
 
-## 6. Known limitations
+## 6. Guides & references
+
+- `/guide/payment` distills the wallet/NowPayments/manual transfer steps for new users. Both `/wallet` and `/wallet/topup` link to it so concierge can share a single URL.
+
+## 7. Known limitations
 
 - Strapi `Product` currently lacks draft/publish so “Save draft” behaves like publish – documented in `docs/admin-product.md`.
 - Wallet recharge relies on the `/api/wallet/recharge` controller (NowPayments). If the backend introduces `/api/wallet/topups`, update `lib/wallet-api.ts` accordingly.

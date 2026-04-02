@@ -168,6 +168,14 @@ export default function WalletPage() {
 
       <TransferIdNotice transferId={deriveTransferId(profile)} />
 
+      <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 text-sm text-white/70">
+        <p className="font-semibold text-white">New to payments?</p>
+        <p className="mt-1">Read the payment guide for wallet top-ups, NowPayments, and manual bank/USDT instructions.</p>
+        <Button asChild variant="ghost" size="sm" className="mt-3">
+          <Link href="/guide/payment">Open payment guide</Link>
+        </Button>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
         {balanceCard}
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-white/80">

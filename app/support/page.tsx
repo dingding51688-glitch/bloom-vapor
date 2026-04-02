@@ -72,7 +72,10 @@ export default function SupportPage() {
         <p className="mt-2 text-sm text-white/70">Telegram is fastest for locker swaps. Email or SMS for escalations. In emergencies, text HELP + locker ID.</p>
         <div className="mt-3 flex flex-wrap gap-3">
           <Button asChild variant="secondary" size="sm">
-            <Link href="/guide/locker">Read locker onboarding guide</Link>
+            <Link href="/guide/locker">Locker onboarding guide</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/guide/payment">Payment guide</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
             <a href="/invite">Share referral link</a>
