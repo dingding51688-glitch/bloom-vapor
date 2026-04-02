@@ -49,8 +49,8 @@ export type OrderItem = {
   title: string;
   quantity: number;
   unitPrice: number;
-  weight?: string | null;
   lineTotal: number;
+  weight?: string | null;
 };
 
 export type OrderRecord = {
@@ -61,6 +61,11 @@ export type OrderRecord = {
   totalAmount: number;
   currency: string;
   createdAt?: string;
+  updatedAt?: string;
+  lockerPostcode?: string | null;
+  lockerEta?: string | null;
+  paymentOption?: string | null;
+  walletDebit?: number | null;
   items?: OrderItem[];
 };
 
