@@ -1,0 +1,25 @@
+<svg width="400" height="760" viewBox="0 0 400 760" xmlns="http://www.w3.org/2000/svg" style="font-family:'Geist',sans-serif;background:#050505;border-radius:32px">
+  <defs>
+    <linearGradient id="heroOld" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#050505" />
+      <stop offset="100%" stop-color="#0f1412" />
+    </linearGradient>
+    <linearGradient id="ctaOld" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d5b3f" />
+      <stop offset="100%" stop-color="#13a86b" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="400" height="760" fill="#050505" />
+  <rect x="20" y="40" width="360" height="120" fill="#050505" stroke="#141414" stroke-width="1" rx="24" />
+  <text x="40" y="90" fill="#ffffff99" font-size="11" letter-spacing="8">MENU</text>
+  <rect x="20" y="180" width="360" height="280" rx="40" fill="url(#heroOld)" stroke="#141414" />
+  <text x="40" y="240" fill="#ffffff" font-size="28" font-weight="600">Locker hero sample</text>
+  <text x="40" y="270" fill="#ffffffcc" font-size="15">CTA gradient and stats</text>
+  <rect x="40" y="310" width="150" height="48" rx="24" fill="url(#ctaOld)" />
+  <text x="70" y="341" fill="#fff" font-size="14" font-weight="600">CTA</text>
+  <rect x="210" y="310" width="150" height="48" rx="24" stroke="#ffffff4d" fill="transparent" />
+  <text x="250" y="341" fill="#ffffffcc" font-size="14" font-weight="600">Secondary</text>
+  <rect x="20" y="480" width="170" height="200" rx="32" fill="url(#ctaOld)" opacity="0.6" />
+  <rect x="210" y="480" width="170" height="200" rx="32" fill="#af5a13" opacity="0.7" />
+  <text x="40" y="720" fill="#ffffff66" font-size="12">Reference: greenhub420.co.uk (mobile)</text>
+</svg>

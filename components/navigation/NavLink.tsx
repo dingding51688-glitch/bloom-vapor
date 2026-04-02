@@ -30,10 +30,16 @@ export function NavLink({ label, href, match, onClick, variant = "desktop" }: Na
         "transition-colors",
         variant === "desktop" &&
           clsx(
-            "text-sm font-medium pb-1 border-b-2 border-transparent",
-            active ? "text-white border-plum-400" : "text-ink-400 hover:text-white"
+            "text-[11px] uppercase tracking-[0.2em] pb-1.5 border-b-2 border-transparent",
+            active
+              ? "text-white border-white"
+              : "text-[rgba(255,255,255,0.55)] hover:text-white"
           ),
-        variant === "drawer" && (active ? "text-white font-semibold" : "text-ink-300")
+        variant === "drawer" &&
+          clsx(
+            "text-sm font-semibold uppercase tracking-[0.15em]",
+            active ? "text-white" : "text-[rgba(255,255,255,0.65)]"
+          )
       )}
     >
       {label}

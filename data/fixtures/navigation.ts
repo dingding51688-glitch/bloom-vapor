@@ -12,16 +12,18 @@ export type NavigationCTA = {
 };
 
 export const primaryNav: NavItem[] = [
-  { label: "Products", href: "/", match: "exact" },
-  { label: "Orders", href: "/orders", match: "prefix" },
-  { label: "Notifications", href: "/notifications", match: "prefix" },
-  { label: "How it works", href: "/how-it-works", match: "exact" },
-  { label: "Checkout", href: "/checkout", match: "exact" }
+  { label: "Home", href: "/", match: "exact" },
+  { label: "Shop all", href: "/products", match: "prefix" },
+  { label: "Flowers", href: "/products?category=flowers" },
+  { label: "Pre-rolls", href: "/products?category=pre-rolls" },
+  { label: "Vapes", href: "/products?category=vapes" },
+  { label: "How it works?", href: "/how-it-works", match: "exact" },
+  { label: "Contact", href: "/contact", match: "exact" }
 ];
 
 export const ctaButtons: { primary: NavigationCTA; secondary: NavigationCTA } = {
-  primary: { label: "Browse products", href: "/" },
-  secondary: { label: "Book a locker", href: "/lockers" }
+  primary: { label: "Browse products", href: "/products" },
+  secondary: { label: "Book a locker", href: "/checkout" }
 };
 
 export type DrawerSection = {
@@ -31,12 +33,16 @@ export type DrawerSection = {
 
 export const marketingLinks: NavItem[] = [
   { label: "About", href: "/about" },
-  { label: "Returns", href: "/returns" },
   { label: "Shipping", href: "/shipping" },
+  { label: "Returns", href: "/returns" },
   { label: "Terms", href: "/terms" }
 ];
 
 export const drawerSections: DrawerSection[] = [
+  {
+    title: "Menu",
+    links: primaryNav
+  },
   {
     title: "Account",
     links: [
@@ -59,7 +65,7 @@ export const drawerQuickLinks: NavItem[] = [
   { label: "FAQ", href: "/faq" },
   { label: "Shipping", href: "/shipping" },
   { label: "Returns", href: "/returns" },
-  { label: "Contact", href: "/support" }
+  { label: "Contact", href: "/contact" }
 ];
 
 export type FooterColumn = {

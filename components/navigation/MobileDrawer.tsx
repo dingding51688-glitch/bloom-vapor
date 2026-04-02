@@ -30,14 +30,14 @@ export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: Mobi
       />
       <aside
         className={clsx(
-          "absolute inset-y-0 right-0 flex w-80 max-w-full flex-col gap-6 border-l border-white/10 bg-night-950 p-6 shadow-surface transition-transform",
+          "absolute inset-y-0 right-0 flex w-80 max-w-full flex-col gap-6 border-l border-white/10 bg-[rgba(5,5,5,0.98)] p-6 shadow-header transition-transform",
           open ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-white">Menu</p>
           <button
-            className="rounded-full border border-white/10 p-2 text-white"
+            className="rounded-full border border-white/15 p-2 text-white"
             onClick={onClose}
             aria-label="Close menu"
           >
@@ -47,7 +47,7 @@ export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: Mobi
         <div className="flex flex-col gap-6 overflow-y-auto">
           {sections.map((section) => (
             <div key={section.title} className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink-500">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
                 {section.title}
               </p>
               <div className="flex flex-col gap-2">
@@ -63,7 +63,7 @@ export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: Mobi
             </div>
           ))}
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ink-500">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
               Quick links
             </p>
             <div className="flex flex-col gap-2">
