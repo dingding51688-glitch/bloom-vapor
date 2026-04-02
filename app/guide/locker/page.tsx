@@ -91,9 +91,6 @@ export default function LockerGuidePage() {
           <Button asChild variant="secondary">
             <Link href="/support">Talk to concierge</Link>
           </Button>
-          <Button asChild variant="ghost">
-            <Link href="/locker-eta">Locker ETA sheet</Link>
-          </Button>
         </div>
       </header>
 

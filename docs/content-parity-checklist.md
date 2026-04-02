@@ -16,7 +16,7 @@
 | Vapes | Hero / Category tabs / Cards | ✅ `/products?category=vapes` 复刻 vape 文案 & 卡片 | 数据缺失时展示 mock cart，等待 Strapi 图。 | 2026-04-02 |
 | Home | Removed sections | ✅ 客户指定的 Featured products / How lockers work / Recommended payment 已隐藏 | `/app/page.tsx` 仅保留 Hero + FeaturedCollections，便于与旧站结构一致。 | 2026-04-02 |
 | Home | Hero copy / bullets / CTA / stats | ✅ HeroClassic 呈现 HOME 面包屑、3 条 bullet、SHOP NOW/ HOW IT WORKS CTA 及 3 组统计 | `homeHeroContent` 与截图一致（全部大写文案+24/7 / 3.1k / 4.9/5 stats），`HeroClassic` 新增 bullets 渲染。 | 2026-04-02 |
-| Product detail | Hero / weight picker / curated picks | ✅ 顶部大图+评分/价格 / 新 weight picker + 数量步进器 / “Curated picks” 列表 | `/products/[slug]` hero 使用 coverImage + fallback，`purchase-panel` 复刻重量卡片与 Locker ETA 链接，底部 related products 用 `ProductCard`。 | 2026-04-02 |
+| Product detail | Hero / weight picker / curated picks | ✅ 顶部大图+评分/价格 / 新 weight picker + 数量步进器 / “Curated picks” 列表 | `/products/[slug]` hero 使用 coverImage + fallback，`purchase-panel` 复刻重量卡片与数量步进器，底部 related products 用 `ProductCard`。 | 2026-04-02 |
 | Product detail | Strapi fallback | ✅ serverFetch 失败时使用 fixtures/productListingFallbacks + meta | `getProduct` / `getRelatedProducts` 包装 try/catch 并回退 mock 数据（含 coverImage、rating、origin）；doc 记录 fallback 图源。 | 2026-04-02 |
 | Register | Form + Strapi register | ✅ /register 使用 RHF + zod + /api/auth/register proxy 完成注册并存储 JWT | React Hook Form 验证邮件/密码/Telegram/phone，成功后显示 CTA；API 代理读取 `NEXT_PUBLIC_AUTH_BASE_URL`，`AuthProvider` 持久化 token/email。 | 2026-04-02 |
 | Login / Account | Hooked to Strapi | ✅ /login 走 /api/auth/login，新 AuthProvider 管理 JWT + profile，/account 展示 Profile + Wallet | RHF + zod 登录表单（含 toast），`AuthProvider` 存 JWT 于 localStorage+cookie 并通过 `/api/auth/me` 刷新 profile，/account 顶部显示 email/phone/telegram。 | 2026-04-02 |
@@ -68,7 +68,7 @@
 
 | Product detail | Weight cards parity | ✅ White card weight selector + Qty CTA | 4x weight tiers (3.5g / 7g / 14g / 28g) + MOST CHOSEN + quantity + CTA 1:1 with legacy shop. | 2026-04-02 |
 
-| Locker ETA | Reference page | ✅ Locker ETA sheet page | /locker-eta 提供 Morning/Afternoon/Evening 窗口 + 请求步骤 + PIN FAQ，入口来自产品/guide/support。 | 2026-04-02 |
+| Locker ETA | Reference page | ⛔ Removed | Locker ETA sheet 页面与入口已撤回，等待新需求再重新设计。 | 2026-04-02 |
 | Product detail contrast | Weight cards / CTA | ✅ Color palette updated for weight cards, badges, quantity, CTA per spec | purchase-panel.tsx now uses #0B0F0D text, #23A26D borders/badges, lighter steppers. | 2026-04-02 |
 | Product detail color reset | Dark theme | ✅ Purchase panel back to black base with high-contrast text | purchase-panel.tsx uses #050708 bg, dark stepper, green CTA with border, white shipping copy. | 2026-04-02 |
 

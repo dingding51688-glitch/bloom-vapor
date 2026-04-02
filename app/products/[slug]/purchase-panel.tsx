@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import Link from "next/link";
 import { useState } from "react";
 import Button from "@/components/ui/button";
 import type { ProductRecord, WeightOption } from "@/lib/types";
@@ -140,12 +139,6 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       >
         ADD TO CART
       </Button>
-      <Link
-        href="/locker-eta"
-        className="text-center text-xs font-semibold uppercase tracking-[0.35em] text-white/80 hover:text-white"
-      >
-        LOCKER ETA SHEET →
-      </Link>
 
       <div className="rounded-[32px] border border-white/15 bg-[#0A0C0E] p-5 text-sm text-[#EDEDED]">
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">Where we ship</p>

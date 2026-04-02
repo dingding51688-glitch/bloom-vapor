@@ -82,9 +82,6 @@ export default function SupportPage() {
           <Button asChild variant="secondary" size="sm">
             <Link href="/guide/payment">Payment guide</Link>
           </Button>
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/locker-eta">Locker ETA sheet</Link>
-          </Button>
           <Button asChild variant="ghost" size="sm">
             <a href="/invite">Share referral link</a>
           </Button>
