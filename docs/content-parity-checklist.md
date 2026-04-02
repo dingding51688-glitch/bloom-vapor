@@ -19,7 +19,10 @@
 | Product detail | Hero / weight picker / curated picks | ✅ 顶部大图+评分/价格 / 新 weight picker + 数量步进器 / “Curated picks” 列表 | `/products/[slug]` hero 使用 coverImage + fallback，`purchase-panel` 复刻重量卡片与 Locker ETA 链接，底部 related products 用 `ProductCard`。 | 2026-04-02 |
 | Product detail | Strapi fallback | ✅ serverFetch 失败时使用 fixtures/productListingFallbacks + meta | `getProduct` / `getRelatedProducts` 包装 try/catch 并回退 mock 数据（含 coverImage、rating、origin）；doc 记录 fallback 图源。 | 2026-04-02 |
 | Register | Form + Strapi register | ✅ /register 使用 RHF + zod + /api/auth/register proxy 完成注册并存储 JWT | React Hook Form 验证邮件/密码/Telegram/phone，成功后显示 CTA；API 代理读取 `NEXT_PUBLIC_AUTH_BASE_URL`，`AuthProvider` 持久化 token/email。 | 2026-04-02 |
+| Login / Account | Hooked to Strapi | ✅ /login 走 /api/auth/login，新 AuthProvider 管理 JWT + profile，/account 展示 Profile + Wallet | RHF + zod 登录表单（含 toast），`AuthProvider` 存 JWT 于 localStorage+cookie 并通过 `/api/auth/me` 刷新 profile，/account 顶部显示 email/phone/telegram。 | 2026-04-02 |
+| Checkout / Orders | Stepper + Strapi订单 | ✅ /checkout 使用 Stepper + RHF/Zod + `createOrder`，/orders/[reference] 调用 tracking | `lib/orders-api.ts` 封装 checkout/list/tracking，checkout 汇总 slug/weight/qty→payload，确认页展示 locker ETA + concierge CTA。 | 2026-04-02 |
 | Admin | Product upload (`/admin/products/*`) | ✅ 新建/编辑 UI 与需求一致，集成 Strapi create/update + upload | `ProductEditor` + `lib/admin-api.ts`；参见 `docs/admin-product.md` 运行说明（JWT 共用、Save draft=publish 提示）。 | 2026-04-02 |
+| Wallet | Balance + Top-up | ✅ `/wallet` 展示余额/历史，`/wallet/topup` 串联 tier + NowPayments + 指南 | `lib/wallet-api.ts` + `docs/wallet-topup.md` 记录流程，支持 NowPayments / bank / crypto 指南（bank/crypto 暂手动）。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

@@ -197,3 +197,43 @@ export type CollectionRecord = {
   title: string;
   slug?: string;
 };
+
+export type TopupTier = {
+  id: number;
+  title: string;
+  description?: string | null;
+  minAmountUsdt: number;
+  maxAmountUsdt?: number | null;
+  bonusPercent?: number | null;
+  isActive?: boolean;
+};
+
+export type TopupIntentMeta = {
+  id: number;
+  orderCode: string;
+  invoiceUrl?: string;
+  amount: number;
+  chain: string;
+};
+
+export type TopupIntentResponse = {
+  success: boolean;
+  topup: TopupIntentMeta;
+};
+
+export type TopupRecord = {
+  id?: number;
+  orderCode: string;
+  status: string;
+  amountFiat: number;
+  fiatCurrency: string;
+  amountCrypto?: number | null;
+  cryptoCurrency?: string | null;
+  network?: string | null;
+  payAddress?: string | null;
+  invoiceUrl?: string | null;
+  expiresAt?: string | null;
+  bonusUsdt?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
