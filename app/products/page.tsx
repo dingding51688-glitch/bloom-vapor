@@ -87,56 +87,46 @@ export default function ProductsPage() {
   const hero = productCategoryContent[category];
 
   return (
-    <div className="space-y-8 pb-20">
-      <section className="rounded-[32px] border border-white/10 bg-white p-6 text-night-900 shadow-card">
-        <p className="text-xs uppercase tracking-[0.35em] text-night-500">{hero.breadcrumb}</p>
-        <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold">{hero.title}</h1>
-            <p className="text-sm text-night-600">{hero.description}</p>
-          </div>
-          {hero.helper && <p className="text-xs text-night-500">{hero.helper}</p>}
-        </div>
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2">
-            {CATEGORY_TABS.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                className={clsx(
-                  "rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition",
-                  category === tab ? "bg-night-900 text-white" : "bg-night-50 text-night-600 hover:text-night-900"
-                )}
-                onClick={() => handleCategoryChange(tab)}
-              >
-                {tab === "shop-all" ? "Shop All" : tab.replace("-", " ")}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {STRAIN_FILTERS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={clsx(
-                  "rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em]",
-                  strain === option
-                    ? "border-night-900 bg-night-900 text-white"
-                    : "border-night-200 bg-night-50 text-night-500 hover:text-night-800"
-                )}
-                onClick={() => handleFilterChange(option)}
-              >
-                {option === "all" ? "All" : option}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4">
-        <p className="text-sm text-white/70">
-          Showing {category === "shop-all" ? "all locker drops" : category.replace("-", " ")} – switch tabs or strains to explore more.
+    <div className="space-y-6 pb-20">
+      <div className="overflow-x-auto px-6 py-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 whitespace-nowrap">
+          {hero.breadcrumb}
         </p>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-night-950/60 p-4">
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_TABS.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={clsx(
+                "rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition",
+                category === tab ? "bg-night-900 text-white" : "bg-night-50 text-night-600 hover:text-night-900"
+              )}
+              onClick={() => handleCategoryChange(tab)}
+            >
+              {tab === "shop-all" ? "Shop All" : tab.replace("-", " ")}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {STRAIN_FILTERS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={clsx(
+                "rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em]",
+                strain === option
+                  ? "border-night-900 bg-night-900 text-white"
+                  : "border-night-200 bg-night-50 text-night-500 hover:text-night-800"
+              )}
+              onClick={() => handleFilterChange(option)}
+            >
+              {option === "all" ? "All" : option}
+            </button>
+          ))}
+        </div>
       </div>
 
       {isLoading && (
