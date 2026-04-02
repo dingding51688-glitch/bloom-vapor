@@ -1,28 +1,41 @@
+export type NavMatch = "exact" | "prefix";
+
 export type NavItem = {
+  label: string;
+  href: string;
+  match?: NavMatch;
+};
+
+export type NavigationCTA = {
   label: string;
   href: string;
 };
 
 export const primaryNav: NavItem[] = [
-  { label: "Products", href: "/" },
-  { label: "Orders", href: "/orders" },
-  { label: "Notifications", href: "/notifications" },
-  { label: "How it works", href: "/how-it-works" },
-  { label: "Checkout", href: "/checkout" }
+  { label: "Products", href: "/", match: "exact" },
+  { label: "Orders", href: "/orders", match: "prefix" },
+  { label: "Notifications", href: "/notifications", match: "prefix" },
+  { label: "How it works", href: "/how-it-works", match: "exact" },
+  { label: "Checkout", href: "/checkout", match: "exact" }
 ];
 
-export const ctaButtons = {
+export const ctaButtons: { primary: NavigationCTA; secondary: NavigationCTA } = {
   primary: { label: "Browse products", href: "/" },
   secondary: { label: "Book a locker", href: "/lockers" }
 };
 
-export const drawerSections = [
+export type DrawerSection = {
+  title: string;
+  links: NavItem[];
+};
+
+export const drawerSections: DrawerSection[] = [
   {
     title: "Account",
     links: [
-      { label: "Overview", href: "/account" },
-      { label: "Wallet", href: "/wallet" },
-      { label: "Rewards", href: "/rewards" }
+      { label: "Overview", href: "/account", match: "prefix" },
+      { label: "Wallet", href: "/wallet", match: "prefix" },
+      { label: "Rewards", href: "/rewards", match: "prefix" }
     ]
   },
   {
@@ -35,7 +48,18 @@ export const drawerSections = [
   }
 ];
 
-export const footerColumns = [
+export const drawerQuickLinks: NavItem[] = [
+  { label: "FAQ", href: "/faq" },
+  { label: "Shipping", href: "/shipping" },
+  { label: "Contact", href: "/support" }
+];
+
+export type FooterColumn = {
+  title: string;
+  links: NavItem[];
+};
+
+export const footerColumns: FooterColumn[] = [
   {
     title: "Company",
     links: [
@@ -51,15 +75,13 @@ export const footerColumns = [
       { label: "FAQ", href: "/faq" },
       { label: "Terms", href: "/terms" }
     ]
-  },
-  {
-    title: "Connect",
-    links: [
-      { label: "Instagram", href: "https://instagram.com/greenhub" },
-      { label: "Telegram", href: "https://t.me/greenhub" },
-      { label: "Email", href: "mailto:hi@greenhub.co.uk" }
-    ]
   }
+];
+
+export const socialLinks: NavItem[] = [
+  { label: "Instagram", href: "https://instagram.com/greenhub" },
+  { label: "Telegram", href: "https://t.me/greenhub" },
+  { label: "Email", href: "mailto:hi@greenhub.co.uk" }
 ];
 
 export const footerContact = {

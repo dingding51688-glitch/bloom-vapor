@@ -1,0 +1,36 @@
+<svg width="960" height="520" viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" style="font-family:'Space Grotesk',sans-serif;background:#05070c;border-radius:32px">
+  <defs>
+    <linearGradient id="navGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#05070c" stop-opacity="0.1" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="960" height="520" fill="#05070c" />
+  <rect x="0" y="32" width="960" height="96" fill="url(#navGradient)" />
+  <text x="60" y="80" fill="#aeb3d9" font-size="12" letter-spacing="6">GREENHUB NI</text>
+  <text x="60" y="110" fill="#fff" font-size="20" font-weight="600">Locker Network</text>
+
+  <g font-size="14" fill="#aeb3d9" text-anchor="middle">
+    <text x="340" y="110" fill="#ffffff" font-weight="600">Products</text>
+    <rect x="303" y="118" width="74" height="4" fill="#a56bff" rx="2" />
+    <text x="420" y="110">Orders</text>
+    <text x="500" y="110">Notifications</text>
+    <text x="610" y="110">How it works</text>
+    <text x="720" y="110">Checkout</text>
+  </g>
+
+  <rect x="760" y="86" width="140" height="36" rx="18" fill="#7c3aed" />
+  <text x="830" y="110" fill="#fff" font-size="14" font-weight="600" text-anchor="middle">Browse products</text>
+
+  <rect x="40" y="170" width="320" height="280" rx="24" fill="#0b1426" stroke="#1f2940" />
+  <text x="60" y="210" fill="#aeb3d9" font-size="12" letter-spacing="6">LOCKERS</text>
+  <text x="60" y="240" fill="#fff" font-size="24" font-weight="600">24/7 smart lockers</text>
+  <text x="60" y="270" fill="#8c92bb" font-size="14">Lower Ormeau · Cathedral Quarter · Titanic Quarter</text>
+
+  <rect x="400" y="170" width="520" height="280" rx="24" fill="#0b1426" stroke="#1f2940" />
+  <text x="430" y="210" fill="#aeb3d9" font-size="12" letter-spacing="6">FOOTER</text>
+  <text x="430" y="240" fill="#fff" font-size="20" font-weight="600">Connect with us</text>
+  <text x="430" y="270" fill="#8c92bb" font-size="14">hi@greenhub.co.uk · +44 28 1234 5678</text>
+  <text x="430" y="300" fill="#4fd9a9" font-size="13">Instagram · Telegram · Email</text>
+  <text x="430" y="340" fill="#8c92bb" font-size="12">Cannabis products sold in compliance with NI regulations. 21+ only.</text>
+</svg>

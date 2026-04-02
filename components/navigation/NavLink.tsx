@@ -10,23 +10,30 @@ type NavLinkProps = NavItem & {
   variant?: "desktop" | "drawer";
 };
 
-export function NavLink({ label, href, onClick, variant = "desktop" }: NavLinkProps) {
+function isActivePath(pathname: string, href: string, match?: "exact" | "prefix") {
+  if (match === "prefix") {
+    return pathname.startsWith(href);
+  }
+  return pathname === href;
+}
+
+export function NavLink({ label, href, match, onClick, variant = "desktop" }: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const active = isActivePath(pathname, href, match);
 
   return (
     <Link
       href={href}
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       className={clsx(
         "transition-colors",
-        variant === "desktop" && "text-sm font-medium",
-        variant === "drawer" && "text-base font-semibold",
-        isActive
-          ? "text-white"
-          : variant === "desktop"
-          ? "text-ink-400 hover:text-white"
-          : "text-ink-300 hover:text-white"
+        variant === "desktop" &&
+          clsx(
+            "text-sm font-medium pb-1 border-b-2 border-transparent",
+            active ? "text-white border-plum-400" : "text-ink-400 hover:text-white"
+          ),
+        variant === "drawer" && (active ? "text-white font-semibold" : "text-ink-300")
       )}
     >
       {label}
