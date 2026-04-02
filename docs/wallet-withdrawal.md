@@ -12,10 +12,11 @@ Requests are authenticated via the same Users-Permissions JWT stored by `AuthPro
 ## 2. `/wallet/withdraw`
 
 - 3-step wizard (Amount → Payout → Review) with inline validation.
-- Constants: `MIN_WITHDRAWAL = £50`, `FEE_PERCENT = 2%` (update when ops changes the policy). Fee + net payout are shown live under the amount field.
+- Constants: `MIN_WITHDRAWAL = £20`, `FEE_PERCENT = 2%`. Fee + net payout are shown live under the amount field.
+- Transfer ID banner appears above the wizard (shared with `/wallet` / `/wallet/topup`) so users remember to include it when ops requests screenshots or reference codes.
 - Supported payout methods and fields:
-  - **Bank transfer**: account name, account number, sort code, bank name.
-  - **USDT transfer**: network (TRC20/ERC20) + address.
+  - **Bank transfer**: account name, account number, sort code, bank name (reference reminder uses Transfer ID by default).
+  - **USDT transfer**: network (TRC20/ERC20) + address (reminds users to DM concierge with TX hash + Transfer ID).
   - **Locker wallet**: recipient handle + memo (for internal transfers).
 - On submit we call `createWithdrawalRequest()`. Success banner shows the reference and links to `/wallet/withdraw/history`.
 - If the API errors out (e.g., backend offline), the error text is displayed below the form.

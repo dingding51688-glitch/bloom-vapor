@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, Input, Textarea } from "@/components/ui";
 import { StateMessage } from "@/components/StateMessage";
+import { TransferIdNotice } from "@/components/wallet/TransferIdNotice";
 import { createTopupIntent, listTopupTiers, pollTopupStatus } from "@/lib/wallet-api";
 import type { TopupIntentMeta, TopupRecord, TopupTier } from "@/lib/types";
+import { deriveTransferId } from "@/lib/wallet-utils";
 
 const FALLBACK_TIERS: TopupTier[] = [
   { id: 1, title: "Starter", description: "Tap to add £100", minAmountUsdt: 100, bonusPercent: 0 },
@@ -24,6 +26,8 @@ const BANK_DETAILS = {
 
 const USDT_ADDRESS = process.env.NEXT_PUBLIC_TOPUP_USDT_ADDRESS || "TBD-USDT-ADDRESS";
 const USDT_QR = process.env.NEXT_PUBLIC_TOPUP_USDT_QR || "";
+
+const MIN_TRANSFER_GBP = 20;
 
 const METHOD_OPTIONS = [
   {
@@ -52,7 +56,8 @@ const doneStatuses = new Set(["confirmed", "failed", "expired", "refunded"]);
 
 export default function WalletTopupPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, profile } = useAuth();
+  const transferId = deriveTransferId(profile);
   const [selectedTierId, setSelectedTierId] = useState<number | null>(1);
   const [customAmount, setCustomAmount] = useState("");
   const [method, setMethod] = useState<MethodId>("nowpayments");
@@ -85,8 +90,8 @@ export default function WalletTopupPage() {
       router.push("/login");
       return;
     }
-    if (!amount || amount <= 0) {
-      setError("Enter an amount to continue");
+    if (amount < MIN_TRANSFER_GBP) {
+      setError(`Minimum transfer is £${MIN_TRANSFER_GBP}`);
       return;
     }
     if (method !== "nowpayments") {
@@ -165,6 +170,8 @@ export default function WalletTopupPage() {
         <p className="text-sm text-white/70">Pick a tier, choose payment method, and follow the instructions. Your wallet updates automatically when the status becomes confirmed.</p>
       </header>
 
+      <TransferIdNotice transferId={transferId} />
+
       {tiersError && (
         <StateMessage
           variant="error"
@@ -210,7 +217,7 @@ export default function WalletTopupPage() {
                 <Input
                   type="number"
                   step="1"
-                  min="50"
+                  min={MIN_TRANSFER_GBP}
                   placeholder="Enter amount (£)"
                   value={customAmount}
                   onChange={(event) => setCustomAmount(event.target.value)}
@@ -218,6 +225,7 @@ export default function WalletTopupPage() {
                 <span className="text-sm text-white/60">GBP</span>
               </div>
             )}
+            <p className="text-xs text-white/60">Minimum transfer is £{MIN_TRANSFER_GBP}. Add your Transfer ID to every payment reference.</p>
           </section>
 
           <section className="space-y-4">
@@ -280,9 +288,9 @@ export default function WalletTopupPage() {
           {method === "nowpayments" ? (
             <NowPaymentsPanel intent={intent} status={status} countdown={countdown} />
           ) : method === "bank" ? (
-            <BankInstructions amount={amount} />
+            <BankInstructions amount={amount} transferId={transferId} />
           ) : (
-            <CryptoInstructions amount={amount} chain={chain} />
+            <CryptoInstructions amount={amount} chain={chain} transferId={transferId} />
           )}
         </div>
 
@@ -344,7 +352,7 @@ function NowPaymentsPanel({ intent, status, countdown }: { intent: TopupIntentMe
   );
 }
 
-function BankInstructions({ amount }: { amount: number }) {
+function BankInstructions({ amount, transferId }: { amount: number; transferId?: string | null }) {
   return (
     <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
       <p className="font-semibold text-white">Send a Faster Payment</p>
@@ -353,14 +361,14 @@ function BankInstructions({ amount }: { amount: number }) {
         <li>Account number: {BANK_DETAILS.number}</li>
         <li>Sort code: {BANK_DETAILS.sortCode}</li>
         <li>Amount: £{amount.toFixed(2)} (or equivalent)</li>
-        <li>Reference: your locker email or @handle</li>
+        <li>Reference: {transferId || "your locker email"}</li>
       </ul>
-      <p className="text-xs text-white/50">Share the payment screenshot with concierge for manual credit if it hasn’t auto-posted within 30 minutes.</p>
+      <p className="text-xs text-white/50">Always include your Transfer ID so we can match the payment. Share the payment screenshot with concierge if it hasn’t auto-posted within 30 minutes.</p>
     </div>
   );
 }
 
-function CryptoInstructions({ amount, chain }: { amount: number; chain: "TRC20" | "ERC20" }) {
+function CryptoInstructions({ amount, chain, transferId }: { amount: number; chain: "TRC20" | "ERC20"; transferId?: string | null }) {
   return (
     <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
       <p className="font-semibold text-white">Send USDT ({chain})</p>
@@ -375,7 +383,7 @@ function CryptoInstructions({ amount, chain }: { amount: number; chain: "TRC20" 
           View QR code
         </a>
       )}
-      <p className="text-xs text-white/70">Send £{amount.toFixed(2)} worth of USDT. After broadcasting, share the TX hash with concierge so we can mark it confirmed.</p>
+      <p className="text-xs text-white/70">Send £{amount.toFixed(2)} worth of USDT. Include Transfer ID {transferId || "(see above)"} when you DM concierge with the TX hash.</p>
     </div>
   );
 }

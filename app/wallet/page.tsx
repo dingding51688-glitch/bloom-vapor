@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import { Button } from "@/components/ui";
+import { TransferIdNotice } from "@/components/wallet/TransferIdNotice";
 import { swrFetcher } from "@/lib/api";
 import type { WalletBalanceResponse, WalletTransaction, WalletTransactionsResponse } from "@/lib/types";
+import { deriveTransferId } from "@/lib/wallet-utils";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 const TIMESTAMP = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -52,7 +54,7 @@ const FALLBACK_TRANSACTIONS: WalletTransaction[] = [
 
 export default function WalletPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, profile } = useAuth();
 
   const {
     data: balanceData,
@@ -163,6 +165,8 @@ export default function WalletPage() {
           </Link>
         </div>
       </header>
+
+      <TransferIdNotice transferId={deriveTransferId(profile)} />
 
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
         {balanceCard}

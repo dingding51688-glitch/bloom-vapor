@@ -25,9 +25,12 @@
 | Notifications | Bell + Drawer + Inbox | ✅ 新增 SWR Provider、导航铃铛、/notifications 列表（筛选/分页/批量已读） | `lib/notifications-api.ts` 封装 list/count/mark*，`NotificationProvider` 轮询 60s，Drawer + 页面 CTA 与 Strapi metadata 对齐。 | 2026-04-02 |
 | Account profile edit | Phone/Telegram/Locker 保存 | ✅ /account 提供 RHF 表单 + /api/account/profile (GET/PUT) | proxy 调 Strapi customers/me，Zod 校验 phone/telegram，保存后刷新 SWR + AuthProvider profile。 | 2026-04-02 |
 | Referral dashboard | Code / Stats / History | ✅ /referral 卡片展示邀请链接、统计、历史（Invites / Commission） | `lib/referral-api.ts` 封装 summary/events/transactions，页面含复制/分享 CTA、fallback mock、FAQ CTA。 | 2026-04-02 |
+| Support hub | Channels + FAQ + Ticket | ✅ /support 集中客服渠道、FAQ、ticket 表单 + checkout/account 引用 | 复用 marketing fixtures、Clipboard toast、RHF + zod 表单（暂 mock 提交），Checkout/Account 改为链接 support hub。 | 2026-04-02 |
+| Customer dashboard | Wallet / Orders / Referrals | ✅ /dashboard 汇总钱包、最近订单、通知、support/referral 快捷入口 | SWR 复用 wallet balance + orders + notifications + referral summary，withdrawal 暂用 mock，CTA 跳转相关页面。 | 2026-04-02 |
 | Admin | Product upload (`/admin/products/*`) | ✅ 新建/编辑 UI 与需求一致，集成 Strapi create/update + upload | `ProductEditor` + `lib/admin-api.ts`；参见 `docs/admin-product.md` 运行说明（JWT 共用、Save draft=publish 提示）。 | 2026-04-02 |
 | Wallet | Balance + Top-up | ✅ `/wallet` 展示余额/历史，`/wallet/topup` 串联 tier + NowPayments + 指南 | `lib/wallet-api.ts` + `docs/wallet-topup.md` 记录流程，支持 NowPayments / bank / crypto 指南（bank/crypto 暂手动）。 | 2026-04-02 |
 | Wallet | Withdrawal | ✅ `/wallet/withdraw` 表单 + `/wallet/withdraw/history` 列表 | `lib/withdrawal-api.ts` + `docs/wallet-withdrawal.md`；Amount/Payout/Review stepper + 历史筛选/分页 + fixtures fallback。 | 2026-04-02 |
+| Wallet | Compliance update | ✅ Transfer ID banner + £20 最低限额 | `TransferIdNotice` + `deriveTransferId`，同时更新 `/wallet` / `/wallet/topup` / `/wallet/withdraw` 校验与文档。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

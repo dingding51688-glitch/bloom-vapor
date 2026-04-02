@@ -7,11 +7,13 @@ import useSWR from "swr";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, Input, Textarea } from "@/components/ui";
 import { StateMessage } from "@/components/StateMessage";
+import { TransferIdNotice } from "@/components/wallet/TransferIdNotice";
 import type { WalletBalanceResponse, WithdrawalRequest } from "@/lib/types";
 import { swrFetcher } from "@/lib/api";
 import { createWithdrawalRequest } from "@/lib/withdrawal-api";
+import { deriveTransferId } from "@/lib/wallet-utils";
 
-const MIN_WITHDRAWAL = 50;
+const MIN_WITHDRAWAL = 20;
 const FEE_PERCENT = 0.02; // 2% handling fee (update if ops changes)
 
 const payoutConfigs = {
@@ -47,7 +49,8 @@ type MethodId = keyof typeof payoutConfigs;
 
 export default function WalletWithdrawPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, profile } = useAuth();
+  const transferId = deriveTransferId(profile);
   const [step, setStep] = useState(1);
   const [amountInput, setAmountInput] = useState("100");
   const [method, setMethod] = useState<MethodId>("bank");
@@ -91,7 +94,7 @@ export default function WalletWithdrawPage() {
 
   const handleNext = () => {
     if (step === 1 && !amountValid) {
-      setError(`Enter at least £${MIN_WITHDRAWAL} (available £${available.toFixed(2)})`);
+      setError(`Minimum transfer is £${MIN_WITHDRAWAL} (available £${available.toFixed(2)})`);
       return;
     }
     if (step === 2) {
@@ -116,7 +119,7 @@ export default function WalletWithdrawPage() {
       return;
     }
     if (!amountValid) {
-      setError(`Amount must be between £${MIN_WITHDRAWAL} and £${available.toFixed(2)}`);
+      setError(`Amount must be at least £${MIN_WITHDRAWAL} and not exceed £${available.toFixed(2)}`);
       return;
     }
     const config = payoutConfigs[method];
@@ -165,6 +168,8 @@ export default function WalletWithdrawPage() {
           Request a payout to your bank, crypto wallet, or another concierge handle. Ops will verify within 12 hours.
         </p>
       </header>
+
+      <TransferIdNotice transferId={transferId} />
 
       {balanceError && (
         <StateMessage variant="error" title="Unable to load balance" body={balanceError.message} />
@@ -285,10 +290,10 @@ function AmountStep({
         step="5"
         value={amount}
         onChange={(event) => onAmountChange(event.target.value)}
-        placeholder="100"
+        placeholder="20"
       />
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-        <p>Minimum £{MIN_WITHDRAWAL}. Handling fee {Math.round(FEE_PERCENT * 100)}%.</p>
+        <p>Minimum transfer is £{MIN_WITHDRAWAL}. Handling fee {Math.round(FEE_PERCENT * 100)}%.</p>
         <p className="mt-1 text-xs text-white/50">Fee estimate £{fee.toFixed(2)} · You receive £{receiveAmount.toFixed(2)}</p>
       </div>
     </section>
