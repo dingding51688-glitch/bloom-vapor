@@ -56,3 +56,6 @@
 | Vapes | Done | 待提供（参考图待上传） | `/products?category=vapes` hero + 卡片 parity，缺少官方图像时使用 cms 远程图；待截图。 |
 | How it works? | Done | 待提供（建议保存 how-it-works-hero.png） | `/how-it-works` Hero breadcrumb、Locker steps、FAQ、Payment CTA 已 parity；待抓移动端截图后补入 `docs/frontend-shots/2026-04-02/`。 |
 | Contact | Done | 待提供（建议保存 contact-hero.png） | HeroClassic + channels + InPost Flow 已 parity；截图未存档，后续可抓移动端截屏入库。 |
+
+| Products | Hero + imagery | ✅ 新 hero tabs + 1:1 方图 | /products 顶部 tabs 使用浅色卡片，卡片/详情图像改为 aspect-square object-contain。 | 2026-04-02 |
+| Footer removed | Layout cleanup | ✅ Locker collective footer removed per client request | Header now ends page; policy links to be revisited on /about as needed. | 2026-04-02 |
