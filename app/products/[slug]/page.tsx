@@ -138,9 +138,6 @@ function ProductHero({ product }: { product: ProductRecord }) {
             {product.potency && <span className="rounded-full border border-white/20 px-3 py-1 text-white">{product.potency}</span>}
             <span className="rounded-full border border-white/20 px-3 py-1 text-white">{origin}</span>
           </div>
-          <Button asChild variant="secondary" className="w-full sm:w-auto">
-            <Link href="#strain-info">View strain info</Link>
-          </Button>
         </div>
       </div>
     </div>
@@ -150,15 +147,14 @@ function ProductHero({ product }: { product: ProductRecord }) {
 function StrainInfo() {
   return (
     <section id="strain-info" className="grid gap-4 lg:grid-cols-[2fr,1fr]">
-      <Card
-        title="Locker-ready experience"
-        description="Locker-ready flower, hand bottled the morning of delivery. Expect dense buds, terpene-heavy aroma, and discreet packaging that slides into any Bloom locker."
-      >
-        <ul className="list-disc space-y-2 pl-5 text-sm">
-          <li>Sourced from small-batch EU cultivators.</li>
-          <li>Slow cured 14 days and nitrogen-flushed.</li>
-          <li>Consumer lab reports available on request.</li>
+      <Card title="WHERE WE SHIP" description="We ship across the United Kingdom.">
+        <ul className="list-disc space-y-2 pl-5 text-sm text-ink-300">
+          <li>England</li>
+          <li>Scotland</li>
+          <li>Wales</li>
         </ul>
+        <p className="mt-4 text-sm text-ink-400">We do NOT ship to Northern Ireland.</p>
+        <p className="mt-2 text-sm text-ink-400">Orders are vacuum-sealed and discreetly packaged. Tracking number will be provided within 24 hours.</p>
       </Card>
       <Card tone="neutral" padding="sm" title="Need specific locker timing?">
         <p className="text-sm text-ink-400">Drop a note in checkout and our courier adjusts your slot. Locker pins are valid for 2 hours by default.</p>

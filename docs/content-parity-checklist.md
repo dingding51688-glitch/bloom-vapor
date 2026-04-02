@@ -63,3 +63,5 @@
 | Cereal Milk imagery | Product media | ✅ Kush Mintz photo set as Cereal Milk fallback | `/public/images/products/cereal-milk.jpg` + fixtures meta ensure consistent image sitewide. | 2026-04-02 |
 
 | Product detail | Image zoom | ✅ Full-screen modal | /products/[slug] 主图支持 tap + CTA 打开全屏 lightbox，含拖拽/双击缩放与 ESC 关闭。 | 2026-04-02 |
+
+| Product detail | Copy update | ✅ WHERE WE SHIP + CTA removed | 主描述替换为“WHERE WE SHIP” 段落并删除 View strain info 按钮。 | 2026-04-02 |
