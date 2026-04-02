@@ -36,7 +36,7 @@ import { DesktopHeader, Footer } from "@/components/navigation";
 
 ## 5. Fixtures (`data/fixtures/`)
 - `marketing.ts` — hero/copy/product/payment defaults for landing sections.
-- `navigation.ts` — primary nav items (with match rules), CTA buttons, drawer sections + quick links, footer columns, social links, and contact info.
+- `navigation.ts` — primary nav items (with match rules), CTA buttons, drawer sections + quick links, footer columns, social links, and contact info. All header/footer/drawer changes should be made here (e.g., add `/returns` → update `marketingLinks` + `footerColumns`), _not_ in components.
 
 ## 6. Testing Checklist
 - `pnpm lint`
