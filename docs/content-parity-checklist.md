@@ -33,6 +33,7 @@
 | Account security | Password/Devices | ✅ /account/security 含改密、2FA 提醒、近期设备列表 | 改密 POST 代理 `/api/auth/change-password`，设备 API 用 fixtures，docs/account.md 增 Security 章节。 | 2026-04-02 |
 | Telegram linking | Bot approvals | ✅ /account/telegram 指引绑定 bot、提示倒计时 + 解绑操作 | `/api/account/telegram` GET/DELETE + request-code/confirm 代理 Strapi，docs(account/notifications) 更新。 | 2026-04-02 |
 | Product search | Keyword/filters | ✅ /search 支持关键词 + strain/THC/potency 筛选、最近搜索、ProductCard 结果 | `lib/search-api.ts` 调 Strapi filters + fallback，导航入口跳转 /search，docs/search.md 记录。 | 2026-04-02 |
+| Product favorites | Heart/save | ✅ 收藏按钮 + /favorites 列表，状态同步 metadata | `/api/account/favorites` 代理 metadata，AuthProvider 提供 favorites + optimistic update，文档更新。 | 2026-04-02 |
 | Admin | Product upload (`/admin/products/*`) | ✅ 新建/编辑 UI 与需求一致，集成 Strapi create/update + upload | `ProductEditor` + `lib/admin-api.ts`；参见 `docs/admin-product.md` 运行说明（JWT 共用、Save draft=publish 提示）。 | 2026-04-02 |
 | Wallet | Balance + Top-up | ✅ `/wallet` 展示余额/历史，`/wallet/topup` 串联 tier + NowPayments + 指南 | `lib/wallet-api.ts` + `docs/wallet-topup.md` 记录流程，支持 NowPayments / bank / crypto 指南（bank/crypto 暂手动）。 | 2026-04-02 |
 | Wallet | Withdrawal | ✅ `/wallet/withdraw` 表单 + `/wallet/withdraw/history` 列表 | `lib/withdrawal-api.ts` + `docs/wallet-withdrawal.md`；Amount/Payout/Review stepper + 历史筛选/分页 + fixtures fallback。 | 2026-04-02 |
@@ -42,6 +43,7 @@
 | Referral | Leaderboard | ✅ `/referral/leaderboard` 展示达人榜 | Hero/Range tabs/Top 10 + Rising stars + 规则 FAQ；数据暂用 fixtures，接口 TODO 记于 `docs/referral.md`。 | 2026-04-02 |
 | Guide | Locker onboarding | ✅ `/guide/locker` 交互式流程+FAQ | 链接已嵌入 checkout/support/how-it-works；详见 `docs/how-it-works.md`。 | 2026-04-02 |
 | Guide | Payment guide | ✅ `/guide/payment` 付款教程 | Wallet/NowPayments/Manual transfer 步骤 + FAQ；链接嵌入 wallet/topup/support。 | 2026-04-02 |
+| FAQ | Refresh | ✅ `/faq` 搜索+分类 | 统一 Locker/Payment/Orders/Wallet/Referral 数据源，支持 query tab + 搜索；详见 `docs/faq.md`。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

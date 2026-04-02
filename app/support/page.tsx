@@ -7,7 +7,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
-import { contactChannels, contactHeroDetails, howItWorksFaq } from "@/data/fixtures/marketing";
+import { contactChannels, contactHeroDetails } from "@/data/fixtures/marketing";
+import { faqCategories } from "@/data/fixtures/faq";
 
 const ticketSchema = z.object({
   topic: z.enum(["locker", "payment", "order", "other"]),
@@ -23,9 +24,13 @@ const faqTopics = [
   { title: "Order tracking", answer: "Check /orders for live status. If a locker is stuck in ‘preparing’, ping Telegram concierge with your reference and we fast-track the drop." },
 ];
 
+const lockerFaq = faqCategories.find((category) => category.id === "locker")?.entries.slice(0, 1) ?? [];
+const paymentFaq = faqCategories.find((category) => category.id === "payment")?.entries.slice(0, 1) ?? [];
+
 const supportFaq = [
   ...faqTopics,
-  ...howItWorksFaq.slice(0, 2).map((faq) => ({ title: faq.question, answer: faq.answer }))
+  ...lockerFaq.map((faq) => ({ title: faq.question, answer: faq.answer })),
+  ...paymentFaq.map((faq) => ({ title: faq.question, answer: faq.answer }))
 ];
 
 export default function SupportPage() {

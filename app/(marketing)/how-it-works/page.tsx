@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HeroClassic, HowItWorksLocker, PaymentRecommendation } from "@/components/sections";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import { howItWorksFaq } from "@/data/fixtures/marketing";
+import { faqCategories } from "@/data/fixtures/faq";
 
 export const metadata = {
   title: "How GreenHub lockers work",
@@ -40,6 +40,7 @@ export default function HowItWorksPage() {
 }
 
 function FaqSection() {
+  const lockerFaq = faqCategories.find((category) => category.id === "locker")?.entries.slice(0, 4) ?? [];
   return (
     <section className="space-y-6 rounded-3xl border border-white/5 bg-night-950/80 p-6 shadow-surface sm:p-10">
       <header className="space-y-2">
@@ -48,8 +49,8 @@ function FaqSection() {
         <p className="text-sm text-ink-400">Short answers to the questions concierge receives most often.</p>
       </header>
       <div className="space-y-4">
-        {howItWorksFaq.map((item) => (
-          <Card key={item.question} padding="sm" className="bg-night-900/70">
+        {lockerFaq.map((item) => (
+          <Card key={item.id} padding="sm" className="bg-night-900/70">
             <h3 className="text-lg font-semibold text-white">{item.question}</h3>
             <p className="mt-2 text-sm text-ink-400">{item.answer}</p>
           </Card>
