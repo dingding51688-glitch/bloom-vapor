@@ -52,11 +52,11 @@ All tokens are defined in `app/globals.css` (CSS variables) and surfaced via Tai
 Fixtures for the kit live in `data/fixtures/marketing.ts`.
 
 ## 6. Navigation Shell (`components/navigation/`)
-- `DesktopHeader` + `MobileDrawer` now consume `primaryNav`, `drawerSections`, `drawerQuickLinks`, `ctaButtons` from `data/fixtures/navigation.ts`. Routing active state handled via `match` rules.
-- Header parity: both breakpoints share a circular logo badge (`#1E2D22` background, "GH" monogram) plus stacked copy (“GREEN HUB” / “DISTRIBUTOR”). Right-aligned icon set = account (→ `/login`), bag (→ `/checkout`), hamburger (opens drawer). Text nav links are moved into the drawer to mirror the legacy site composition.
-- Drawer header mirrors the same logo block and keeps CTA + section fixtures inside the sheet.
-- `Footer` pulls `marketingLinks`, `footerColumns`, `socialLinks`, `footerContact`.
-- **Adding a new link?** Update `data/fixtures/navigation.ts` (e.g., add to `marketingLinks`), not the components.
+- `DesktopHeader` + `MobileDrawer` consume `primaryNav`, `drawerSections`, `ctaButtons` from `data/fixtures/navigation.ts`. Routing active state handled via `match` rules.
+- Header parity: both breakpoints share a circular logo badge (`#1E2D22` background, "GH" monogram) plus stacked copy (“GREEN HUB” / “DISTRIBUTOR”). 右侧 icon set = account (`/login`), bag (`/checkout`), hamburger (opens drawer). 文本导航仅在 Drawer 中呈现。
+- Drawer 现仅保留两组：**Menu**（Home / Shop all / Flowers / Pre-rolls / Vapes / How it works? / Contact）及 **Account** （Overview / Wallet / Rewards）。旧站截图里没有 Locker network / Quick links，因此 fixtures 中对应区块已移除，底部 CTA（Browse products / Book a locker）仍保留。
+- `Footer` pulls `marketingLinks`, `footerColumns`, `socialLinks`, `footerContact`。
+- **Adding a new link?** Update `data/fixtures/navigation.ts` (e.g., add to `marketingLinks`), not the components。
 
 ## 7. Screenshots
 Screenshots stored under `docs/frontend-shots/2026-04-02/`:

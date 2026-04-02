@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import type { NavItem, DrawerSection, NavigationCTA } from "@/data/fixtures/navigation";
+import type { DrawerSection, NavigationCTA } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
 import { Button } from "@/components/ui";
@@ -10,11 +10,10 @@ export type MobileDrawerProps = {
   open: boolean;
   onClose: () => void;
   sections: DrawerSection[];
-  quickLinks: NavItem[];
   ctas: { primary: NavigationCTA; secondary: NavigationCTA };
 };
 
-export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: MobileDrawerProps) {
+export function MobileDrawer({ open, onClose, sections, ctas }: MobileDrawerProps) {
   return (
     <div
       className={clsx(
@@ -63,21 +62,6 @@ export function MobileDrawer({ open, onClose, sections, quickLinks, ctas }: Mobi
               </div>
             </div>
           ))}
-          <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
-              Quick links
-            </p>
-            <div className="flex flex-col gap-2">
-              {quickLinks.map((link) => (
-                <NavLink
-                  key={link.href}
-                  {...link}
-                  variant="drawer"
-                  onClick={onClose}
-                />
-              ))}
-            </div>
-          </div>
         </div>
         <div className="mt-auto space-y-3">
           <Button asChild fullWidth>

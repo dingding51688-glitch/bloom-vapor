@@ -50,22 +50,8 @@ export const drawerSections: DrawerSection[] = [
       { label: "Wallet", href: "/wallet", match: "prefix" },
       { label: "Rewards", href: "/rewards", match: "prefix" }
     ]
-  },
-  {
-    title: "Locker network",
-    links: [
-      { label: "Titanic Quarter", href: "/lockers/titanic" },
-      { label: "Cathedral Quarter", href: "/lockers/cathedral" },
-      { label: "Ormeau", href: "/lockers/ormeau" }
-    ]
   }
-];
-
-export const drawerQuickLinks: NavItem[] = [
-  { label: "FAQ", href: "/faq" },
-  { label: "Shipping", href: "/shipping" },
-  { label: "Returns", href: "/returns" },
-  { label: "Contact", href: "/contact" }
+  // Legacy locker network + quick links were removed to match the 420.co.uk drawer (menu + account only).
 ];
 
 export type FooterColumn = {

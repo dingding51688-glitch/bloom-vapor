@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   drawerSections,
-  drawerQuickLinks,
   ctaButtons
 } from "@/data/fixtures/navigation";
 import { MobileDrawer } from "./MobileDrawer";
@@ -96,7 +95,6 @@ export function DesktopHeader() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         sections={drawerSections}
-        quickLinks={drawerQuickLinks}
         ctas={ctaButtons}
       />
     </>
