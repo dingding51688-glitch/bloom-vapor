@@ -13,6 +13,7 @@ import Button from "@/components/ui/button";
 import { swrFetcher } from "@/lib/api";
 import type { ProductsResponse } from "@/lib/types";
 import { createOrder } from "@/lib/orders-api";
+import { getStoredReferralCode } from "@/lib/referral-tracking";
 
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
@@ -97,6 +98,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
     setAlert(null);
     try {
+      const referralCode = getStoredReferralCode();
       const payload = {
         items: [
           {
@@ -111,7 +113,8 @@ export default function CheckoutPage() {
         contactName: values.contactName,
         contactPhone: values.contactPhone,
         telegramHandle: values.telegramHandle,
-        paymentOption: values.paymentOption
+        paymentOption: values.paymentOption,
+        referralCode: referralCode || undefined
       };
       const response = await createOrder(payload);
       setAlert({ type: "success", message: `Order ${response.order.reference} created.` });
@@ -311,10 +314,15 @@ export default function CheckoutPage() {
           </div>
           <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
             <p className="font-semibold text-white">Need help?</p>
-            <p className="mt-1">Ping concierge via Telegram or email if you want to change lockers or payment.</p>
-            <Button asChild variant="ghost" className="mt-3 w-full">
-              <a href="/contact">Contact concierge</a>
-            </Button>
+            <p className="mt-1">Visit the support hub for locker swaps, payment escalations, or concierge chat links. First-time locker user? Read the onboarding guide.</p>
+            <div className="mt-3 space-y-2">
+              <Button asChild variant="ghost" className="w-full">
+                <a href="/support">Open support hub</a>
+              </Button>
+              <Button asChild variant="secondary" className="w-full">
+                <a href="/guide/locker">Locker onboarding guide</a>
+              </Button>
+            </div>
           </div>
         </aside>
       </div>

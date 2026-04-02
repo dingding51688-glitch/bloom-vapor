@@ -29,6 +29,8 @@
 | Customer dashboard | Wallet / Orders / Referrals | ✅ /dashboard 汇总钱包、最近订单、通知、support/referral 快捷入口 | SWR 复用 wallet balance + orders + notifications + referral summary，withdrawal 暂用 mock，CTA 跳转相关页面。 | 2026-04-02 |
 | Referral analytics tier-2 | Click/CTR/Commission | ✅ /referral + /dashboard 展示 clicks/CTR/转化率/点击佣金拆分 + commission history | `getReferralSummary()` 扩展字段，Commission history 表格、新规则文案、dashboard 卡展示 CTR & 本月佣金。 | 2026-04-02 |
 | Referral anti-fraud | Turnstile + fingerprint | ✅ Turnstile token + fingerprint 注入 referral click API，UI 提示异常点击暂停奖励 | `ReferralTrackingProvider` + `/api/referral/click` 增 token/fingerprint，docs 更新流程。 | 2026-04-02 |
+| Notification preferences | Email/Telegram/SMS | ✅ /account/notifications 管理渠道开关 + Quiet hours，落到 Strapi preferences | `/api/account/notifications` 代理 GET/PUT，RHF + optimistic update，docs/notifications.md 记录。 | 2026-04-02 |
+| Account security | Password/Devices | ✅ /account/security 含改密、2FA 提醒、近期设备列表 | 改密 POST 代理 `/api/auth/change-password`，设备 API 用 fixtures，docs/account.md 增 Security 章节。 | 2026-04-02 |
 | Admin | Product upload (`/admin/products/*`) | ✅ 新建/编辑 UI 与需求一致，集成 Strapi create/update + upload | `ProductEditor` + `lib/admin-api.ts`；参见 `docs/admin-product.md` 运行说明（JWT 共用、Save draft=publish 提示）。 | 2026-04-02 |
 | Wallet | Balance + Top-up | ✅ `/wallet` 展示余额/历史，`/wallet/topup` 串联 tier + NowPayments + 指南 | `lib/wallet-api.ts` + `docs/wallet-topup.md` 记录流程，支持 NowPayments / bank / crypto 指南（bank/crypto 暂手动）。 | 2026-04-02 |
 | Wallet | Withdrawal | ✅ `/wallet/withdraw` 表单 + `/wallet/withdraw/history` 列表 | `lib/withdrawal-api.ts` + `docs/wallet-withdrawal.md`；Amount/Payout/Review stepper + 历史筛选/分页 + fixtures fallback。 | 2026-04-02 |
@@ -36,6 +38,7 @@
 | Referral | Landing page | ✅ `/invite` public funnel | Hero/Rewards/Steps/FAQ + query param detection + copy link CTA；详见 `docs/referral.md`。 | 2026-04-02 |
 | Referral | Poster generator | ✅ `/referral/poster` 可导出海报 | html-to-image + qrcode.react 生成 PNG/JPEG，模板/配色/自定义文案在 `docs/referral.md` 记录。 | 2026-04-02 |
 | Referral | Leaderboard | ✅ `/referral/leaderboard` 展示达人榜 | Hero/Range tabs/Top 10 + Rising stars + 规则 FAQ；数据暂用 fixtures，接口 TODO 记于 `docs/referral.md`。 | 2026-04-02 |
+| Guide | Locker onboarding | ✅ `/guide/locker` 交互式流程+FAQ | 链接已嵌入 checkout/support/how-it-works；详见 `docs/how-it-works.md`。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 
