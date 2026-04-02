@@ -24,6 +24,32 @@ export type WalletTransactionsResponse = {
   data: WalletTransaction[];
 };
 
+export type WithdrawalRequest = {
+  id: number;
+  reference: string;
+  amount: number;
+  currency: string;
+  payoutMethod: string;
+  payoutDetails?: Record<string, unknown> | null;
+  status: string;
+  fee?: number | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type WithdrawalListResponse = {
+  data: WithdrawalRequest[];
+  meta?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};
+
 export type NotificationRecord = {
   id: number;
   title: string;

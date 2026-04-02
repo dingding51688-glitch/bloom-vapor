@@ -24,8 +24,10 @@
 | Orders | History + filters | ✅ `/orders` 显示 summary、筛选 tabs、列表卡片、Load more、空状态 | `listMyOrders` + `useSWRInfinite`；离线 fallback `ordersFixture`；文档见 `docs/orders.md`。 | 2026-04-02 |
 | Notifications | Bell + Drawer + Inbox | ✅ 新增 SWR Provider、导航铃铛、/notifications 列表（筛选/分页/批量已读） | `lib/notifications-api.ts` 封装 list/count/mark*，`NotificationProvider` 轮询 60s，Drawer + 页面 CTA 与 Strapi metadata 对齐。 | 2026-04-02 |
 | Account profile edit | Phone/Telegram/Locker 保存 | ✅ /account 提供 RHF 表单 + /api/account/profile (GET/PUT) | proxy 调 Strapi customers/me，Zod 校验 phone/telegram，保存后刷新 SWR + AuthProvider profile。 | 2026-04-02 |
+| Referral dashboard | Code / Stats / History | ✅ /referral 卡片展示邀请链接、统计、历史（Invites / Commission） | `lib/referral-api.ts` 封装 summary/events/transactions，页面含复制/分享 CTA、fallback mock、FAQ CTA。 | 2026-04-02 |
 | Admin | Product upload (`/admin/products/*`) | ✅ 新建/编辑 UI 与需求一致，集成 Strapi create/update + upload | `ProductEditor` + `lib/admin-api.ts`；参见 `docs/admin-product.md` 运行说明（JWT 共用、Save draft=publish 提示）。 | 2026-04-02 |
 | Wallet | Balance + Top-up | ✅ `/wallet` 展示余额/历史，`/wallet/topup` 串联 tier + NowPayments + 指南 | `lib/wallet-api.ts` + `docs/wallet-topup.md` 记录流程，支持 NowPayments / bank / crypto 指南（bank/crypto 暂手动）。 | 2026-04-02 |
+| Wallet | Withdrawal | ✅ `/wallet/withdraw` 表单 + `/wallet/withdraw/history` 列表 | `lib/withdrawal-api.ts` + `docs/wallet-withdrawal.md`；Amount/Payout/Review stepper + 历史筛选/分页 + fixtures fallback。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

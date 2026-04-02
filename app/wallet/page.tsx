@@ -152,9 +152,16 @@ export default function WalletPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
           <h1 className="text-3xl font-semibold text-white">Balance & history</h1>
         </div>
-        <Link href="/wallet/topup">
-          <Button size="md">Top up wallet</Button>
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/wallet/withdraw">
+            <Button variant="secondary" size="md">
+              Withdraw
+            </Button>
+          </Link>
+          <Link href="/wallet/topup">
+            <Button size="md">Top up wallet</Button>
+          </Link>
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
