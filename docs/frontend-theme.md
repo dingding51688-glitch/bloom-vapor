@@ -61,6 +61,8 @@ Screenshots stored under `docs/frontend-shots/2026-04-02/`:
 - `reference-mobile.svg` — stylised capture of legacy greenhub420.co.uk mobile hero/CTA.
 - `new-mobile.svg` — updated UI snapshot for the rebuilt theme.
 
+Automation + capture runbook now lives in `docs/tests/frontend-shots.md`. Follow it to regenerate PNGs (Playwright CLI + `pnpm screenshot:mobile`).
+
 _(Playwright screenshot against the production site failed due to missing system libraries; SVG mockups are included to document visual parity.)_
 
 ## 8. Testing
