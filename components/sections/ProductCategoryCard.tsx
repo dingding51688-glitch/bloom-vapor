@@ -4,19 +4,22 @@ import clsx from "clsx";
 
 const toneMap = {
   green: {
-    top: "#101c11",
-    bottom: "#182818",
-    accent: "#13a86b"
+    top: "#0f1b0f",
+    bottom: "#1b2b1b",
+    accent: "#13a86b",
+    overlay: "rgba(19,168,107,0.18)"
   },
   orange: {
-    top: "#2c1608",
-    bottom: "#3c200b",
-    accent: "#f2a33a"
+    top: "#3b1b06",
+    bottom: "#4c260c",
+    accent: "#f2a33a",
+    overlay: "rgba(242,163,58,0.2)"
   },
   cream: {
-    top: "#332515",
-    bottom: "#251c11",
-    accent: "#f5d6a1"
+    top: "#2f2416",
+    bottom: "#20170f",
+    accent: "#f5d6a1",
+    overlay: "rgba(245,214,161,0.15)"
   }
 };
 
@@ -44,34 +47,34 @@ export function ProductCategoryCard({
   imageEmojiFallback = "🍃"
 }: ProductCategoryCardProps) {
   const palette = toneMap[tone] ?? toneMap.green;
-  const background = `linear-gradient(180deg, ${palette.top} 0%, ${palette.top} 55%, ${palette.bottom} 55%, ${palette.bottom} 100%)`;
+  const background = `linear-gradient(180deg, ${palette.top} 0%, ${palette.top} 58%, ${palette.bottom} 58%, ${palette.bottom} 100%)`;
 
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[240px] overflow-hidden rounded-[36px] border border-white/10 bg-[#090909] shadow-[0_25px_70px_rgba(0,0,0,0.35)]"
+      className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-[40px] border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:flex-row"
       style={{ background }}
     >
-      <div className="relative z-10 flex w-full flex-col justify-between gap-4 p-6 pr-4 sm:w-3/5">
+      <div className="relative z-10 flex w-full flex-col justify-between gap-5 px-6 py-6 sm:w-3/5">
         <div>
           {label && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">{label}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/75">{label}</p>
           )}
-          <h3 className="mt-2 text-2xl font-semibold uppercase tracking-[0.2em] text-white">{title}</h3>
-          {subtitle && <p className="mt-2 text-sm text-white/80">{subtitle}</p>}
+          <h3 className="mt-3 text-2xl font-semibold uppercase tracking-[0.22em]">{title}</h3>
+          {subtitle && <p className="mt-3 text-sm text-white/80">{subtitle}</p>}
         </div>
         <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1">
           <ArrowIcon />
         </span>
       </div>
-      <div className="relative z-10 flex flex-1 items-end justify-center pb-4 pr-4">
+      <div className="relative z-10 flex flex-1 items-end justify-center px-4 pb-4 sm:justify-end sm:px-0 sm:pr-8">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt || title}
-            width={220}
-            height={220}
-            className="h-40 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+            width={280}
+            height={280}
+            className="h-44 w-auto object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)]"
             priority={false}
           />
         ) : (
@@ -84,11 +87,15 @@ export function ProductCategoryCard({
       </div>
       <div
         aria-hidden="true"
-        className={clsx(
-          "pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-20",
-          tone === "orange" ? "bg-white" : "bg-white"
-        )}
-      />
+        className="pointer-events-none absolute inset-0"
+      >
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+        <div
+          className="absolute -bottom-12 -right-16 h-56 w-56 rounded-[50%] blur-[60px]"
+          style={{ background: palette.overlay }}
+        />
+        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-tl-[90%] bg-white/5" />
+      </div>
     </Link>
   );
 }

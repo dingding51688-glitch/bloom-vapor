@@ -68,9 +68,9 @@ Automation + capture runbook now lives in `docs/tests/frontend-shots.md`. Follow
 _(Playwright screenshot against the production site failed due to missing system libraries; SVG mockups are included to document visual parity.)_
 
 ## 8. Product cards
-- `ProductCategoryCard` drives the homepage FLOWERS / PRE-ROLLS / VAPES row. Each card stacks a #1E2D22 badge + copy on the left and product art on the right, with a split background (top vs bottom colors) and arrow badge. Tone presets: `green` (`#101c11 → #182818`), `orange` (`#2c1608 → #3c200b`), `cream` (`#332515 → #251c11`). Replace the placeholder “GH” logo with the official asset once supplied (see TODO in fixtures).
-- `ProductCollectionGrid` adopts the same split-background layout for live menu items. Category label + title/description stay on the left, image or placeholder badge on the right, arrow badge bottom-left. Palette automatically alternates between green/orange entries.
-- Product art currently references CMS URLs; if higher fidelity renders arrive, update `featuredCollectionsContent` or the Strapi product records. Missing imagery defaults to an initial badge.
+- `ProductCategoryCard` mirrors the latest legacy screenshots: split background (58% top color, 42% bottom) with tone presets — `green` `#0f1b0f → #1b2b1b`, `orange` `#3b1b06 → #4c260c`, `cream` `#2f2416 → #20170f`. A soft radial overlay + bottom-right arc replicate the glossy highlight. Left column uses uppercase body copy with tracking (`label` 0.35em, title 0.22em). Arrow badge (48px) sits bottom-left; hover lifts it by 1px.
+- Right column supports transparent PNGs so hero art appears to float; placeholder badges still render if imagery is missing. Current assets live at `https://cdn.greenhub420.co.uk/ui-parity/*.png` (replace with final production art when available; note this TODO in fixtures).
+- `ProductCollectionGrid` shares the split background treatment and arrow badge, auto-alternating between green/orange palettes per index. Images retain drop shadows; fallbacks display the product initial badge.
 
 ## 9. Testing
 - Unit tests for the section kit live in `components/sections/__tests__/` (HeroClassic, HowItWorksLocker, PaymentRecommendation, ProductCollectionGrid).

@@ -1,6 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
-import { HeroClassic, HowItWorksLocker, ProductCollectionGrid, PaymentRecommendation, ProductCategoryCard } from "@/components/sections";
+import { HeroClassic, HowItWorksLocker, PaymentRecommendation, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
 import type { ProductCardData, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
