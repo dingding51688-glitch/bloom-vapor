@@ -69,3 +69,7 @@
 | Product detail | Weight cards parity | ✅ White card weight selector + Qty CTA | 4x weight tiers (3.5g / 7g / 14g / 28g) + MOST CHOSEN + quantity + CTA 1:1 with legacy shop. | 2026-04-02 |
 
 | Locker ETA | Reference page | ✅ Locker ETA sheet page | /locker-eta 提供 Morning/Afternoon/Evening 窗口 + 请求步骤 + PIN FAQ，入口来自产品/guide/support。 | 2026-04-02 |
+| Product detail contrast | Weight cards / CTA | ✅ Color palette updated for weight cards, badges, quantity, CTA per spec | purchase-panel.tsx now uses #0B0F0D text, #23A26D borders/badges, lighter steppers. | 2026-04-02 |
+| Product detail color reset | Dark theme | ✅ Purchase panel back to black base with high-contrast text | purchase-panel.tsx uses #050708 bg, dark stepper, green CTA with border, white shipping copy. | 2026-04-02 |
+
+| Product detail | Dark weight cards | ✅ Dark variant cards with 4 tiers | 3.5g/7g/14g/28g 黑色卡片 + 绿色选中边框，与夜间主题一致。 | 2026-04-02 |

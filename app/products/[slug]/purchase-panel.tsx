@@ -33,10 +33,11 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const router = useRouter();
   const rawOptions = product.weightOptions ?? [];
   const normalizedOptions = rawOptions.length > 0 ? rawOptions : FALLBACK_WEIGHT_OPTIONS;
-  const [selectedId, setSelectedId] = useState<number | null>(normalizedOptions[0]?.id ?? null);
+  const limitedOptions = normalizedOptions.slice(0, 4); // legacy UI only surfaces the first four tiers
+  const [selectedId, setSelectedId] = useState<number | null>(limitedOptions[0]?.id ?? null);
   const [quantity, setQuantity] = useState(1);
 
-  const displayOptions = normalizedOptions.map((option) => {
+  const displayOptions = limitedOptions.map((option) => {
     const highlight = option.featured || option.label.toLowerCase().includes("28");
     return {
       ...option,
@@ -61,10 +62,10 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-[40px] border border-night-100 bg-white p-6 text-night-900 shadow-card">
+    <div className="flex flex-col gap-6 rounded-[40px] border border-white/10 bg-[#050708] p-6 text-white shadow-card">
       <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-night-400">Weight</p>
-        <h2 className="text-2xl font-semibold">Choose your weight</h2>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/50">Weight</p>
+        <h2 className="text-2xl font-semibold text-white">Choose your weight</h2>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -77,18 +78,17 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
               type="button"
               onClick={() => setSelectedId(option.id)}
               className={clsx(
-                "relative rounded-[32px] border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5",
-                showMostChosen ? "border-emerald-300" : "border-night-100",
-                isActive && "border-emerald-500 shadow-lg"
+                "relative rounded-[32px] border border-[#1F242A] bg-[#0F1114] p-5 text-left text-[#F5F5F5] shadow-[0_18px_30px_rgba(0,0,0,0.45)] transition hover:-translate-y-0.5",
+                isActive && "border-emerald-400 bg-[#11171C] shadow-[0_25px_45px_rgba(16,185,129,0.25)]"
               )}
             >
               {showMostChosen && (
-                <span className="absolute left-5 top-5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-600">
-                  Most chosen
+                <span className="absolute left-5 top-5 rounded-full border border-emerald-400 bg-transparent px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
+                  MOST CHOSEN
                 </span>
               )}
               {isActive && (
-                <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-night-900">
+                <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400 text-[#0B0F0D]">
                   <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
                     <path d="M20 6.5L9.5 17l-5.5-5.5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -96,25 +96,25 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
               )}
               <div className="flex flex-col gap-4 pt-6">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-night-500">{option.label}</p>
-                  <p className="text-3xl font-semibold">£{option.price.toFixed(2)}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#C9CFD4]">{option.label}</p>
+                  <p className="text-3xl font-semibold text-[#F5F5F5]">£{option.price.toFixed(2)}</p>
                 </div>
-                <p className="text-sm text-night-500">{option.displayUnitPrice}</p>
+                <p className="text-sm text-[#C9CFD4]">{option.displayUnitPrice}</p>
               </div>
             </button>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-between rounded-[32px] border border-night-100 bg-night-50 px-5 py-4">
+      <div className="flex items-center justify-between rounded-[32px] border border-white/15 bg-[#0F1215] px-5 py-4 text-[#F5F5F5]">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-night-500">Quantity</p>
-          <p className="text-3xl font-semibold">{quantity}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#F5F5F5]/70">Quantity</p>
+          <p className="text-3xl font-semibold text-[#F5F5F5]">{quantity}</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-night-200 text-2xl font-semibold text-night-900 disabled:opacity-40"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-transparent text-2xl font-semibold text-white disabled:opacity-30"
             onClick={() => adjustQuantity(-1)}
             disabled={quantity === MIN_QTY}
             aria-label="Decrease quantity"
@@ -123,7 +123,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
           </button>
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-night-200 text-2xl font-semibold text-night-900 disabled:opacity-40"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-transparent text-2xl font-semibold text-white disabled:opacity-30"
             onClick={() => adjustQuantity(1)}
             disabled={quantity === MAX_QTY}
             aria-label="Increase quantity"
@@ -136,27 +136,27 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       <Button
         onClick={handleCheckout}
         disabled={!selected}
-        className="w-full border border-emerald-500 bg-none bg-emerald-400 text-night-900 hover:bg-emerald-300"
+        className="w-full rounded-[30px] border-2 border-[#0B0F0D] bg-[#23A26D] text-[#0B0F0D] font-semibold tracking-wide hover:bg-[#1F8B5D]"
       >
         ADD TO CART
       </Button>
       <Link
         href="/locker-eta"
-        className="text-center text-xs font-semibold uppercase tracking-[0.35em] text-night-500 hover:text-night-700"
+        className="text-center text-xs font-semibold uppercase tracking-[0.35em] text-white/80 hover:text-white"
       >
         LOCKER ETA SHEET →
       </Link>
 
-      <div className="rounded-[32px] border border-night-100 bg-night-50/80 p-5 text-sm text-night-700">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-night-500">Where we ship</p>
-        <p className="mt-1 text-base font-semibold text-night-900">We ship across the United Kingdom.</p>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-night-800">
+      <div className="rounded-[32px] border border-white/15 bg-[#0A0C0E] p-5 text-sm text-[#EDEDED]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">Where we ship</p>
+        <p className="mt-1 text-base font-semibold text-white">We ship across the United Kingdom.</p>
+        <ul className="mt-3 list-disc space-y-1 pl-5 text-[#EDEDED]">
           <li>England</li>
           <li>Scotland</li>
           <li>Wales</li>
         </ul>
-        <p className="mt-3 text-sm text-night-600">We do NOT ship to Northern Ireland.</p>
-        <p className="text-sm text-night-600">Orders are vacuum-sealed and discreetly packaged. Tracking number will be provided within 24 hours.</p>
+        <p className="mt-3 text-sm text-[#EDEDED]/80">We do NOT ship to Northern Ireland.</p>
+        <p className="text-sm text-[#EDEDED]/80">Orders are vacuum-sealed and discreetly packaged. Tracking number will be provided within 24 hours.</p>
       </div>
     </div>
   );
