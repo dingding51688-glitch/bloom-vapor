@@ -34,6 +34,12 @@ Public-facing explainer at `/invite` (SEO-friendly, no auth required):
 - Controls remind users of the £20 minimum payout and emphasise sampling Transfer ID in references.
 - Referral dashboard CTA now links to the poster page.
 
+## Leaderboard (`/referral/leaderboard`)
+- Public page showcasing the top 10 ambassadors + rising stars (11-20). Uses fixtures for now; replace with `/api/referral/leaderboard?range=` once backend ships.
+- Range selector (month/quarter/year) is UI-only today; once the API supports range, hook it up.
+- Hero card explains rewards/reset cadence, CTA links back to `/referral`. Additional cards show programme rules + FAQ.
+- Works for anonymous visitors (they see the data + “Start earning” prompt). Logged-in users just get the context.
+
 ## Interactions
 - Copy button uses `navigator.clipboard.writeText`. On success/failure, inline toast text updates for 2.5s.
 - Share buttons open Telegram/WhatsApp share URLs with prefilled copy.
@@ -53,3 +59,9 @@ Public-facing explainer at `/invite` (SEO-friendly, no auth required):
 - Provider 在首次检测到 code 时调用 `/api/referral/click`，24 小时内同一 code 去重（localStorage: `referralClick:<code>`）。
 - 成功点击会记录 `referralClick:last`，失败写入 `referralClick:error` 以便 UI 给出刷新提示。
 - /register → `/api/auth/register`、/checkout → `/api/orders/checkout` 均在 payload 中附带 `referralCode`，后端即可发放 £0.30/click + 好友订单金额 10% 的奖励。
+
+## Anti-fraud
+- Turnstile site key (`NEXT_PUBLIC_TURNSTILE_KEY`, fallback Cloudflare test key) renders invisibly via `ReferralTrackingProvider`.
+- Click payload包含：`token`, `fingerprint`（UA + language + timezone + screen）, `landingPath`, `utm`。
+- Provider 检测失败会重试一次，否则写入 warning flag，Referral UI 告知“异常点击会暂缓奖励”。
+- 后端可结合 IP + token 校验做限速，前端已保证 24h 内去重。
