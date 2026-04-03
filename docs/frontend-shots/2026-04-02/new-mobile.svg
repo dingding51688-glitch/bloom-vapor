@@ -1,0 +1,33 @@
+<svg width="400" height="760" viewBox="0 0 400 760" xmlns="http://www.w3.org/2000/svg" style="font-family:'Geist',sans-serif;background:#050505;border-radius:32px">
+  <defs>
+    <linearGradient id="heroNew" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#050505" />
+      <stop offset="100%" stop-color="#0f1412" />
+    </linearGradient>
+    <linearGradient id="ctaNew" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d5b3f" />
+      <stop offset="100%" stop-color="#13a86b" />
+    </linearGradient>
+    <linearGradient id="cardGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d5b3f" />
+      <stop offset="100%" stop-color="#13a86b" />
+    </linearGradient>
+    <linearGradient id="cardOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#af5a13" />
+      <stop offset="100%" stop-color="#f2a33a" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="400" height="760" fill="#050505" />
+  <rect x="20" y="30" width="360" height="90" rx="24" fill="#050505" stroke="#141414" stroke-width="1" />
+  <text x="40" y="80" fill="#ffffff99" font-size="11" letter-spacing="8">GREENHUB</text>
+  <rect x="20" y="140" width="360" height="280" rx="40" fill="url(#heroNew)" stroke="#141414" />
+  <text x="40" y="200" fill="#ffffff" font-size="28" font-weight="600">Updated hero</text>
+  <text x="40" y="230" fill="#ffffffcc" font-size="15">Matches legacy spacing + fonts</text>
+  <rect x="40" y="260" width="150" height="48" rx="24" fill="url(#ctaNew)" />
+  <text x="80" y="290" fill="#fff" font-size="14" font-weight="600">CTA</text>
+  <rect x="210" y="260" width="150" height="48" rx="24" stroke="#ffffff4d" fill="transparent" />
+  <text x="250" y="290" fill="#ffffffcc" font-size="14" font-weight="600">Secondary</text>
+  <rect x="20" y="440" width="170" height="200" rx="32" fill="url(#cardGreen)" />
+  <rect x="210" y="440" width="170" height="200" rx="32" fill="url(#cardOrange)" />
+  <text x="40" y="720" fill="#ffffff66" font-size="12">New parity (feature/fe-home-product)</text>
+</svg>

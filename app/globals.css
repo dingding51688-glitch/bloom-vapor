@@ -1,0 +1,68 @@
+@import url('https://fonts.cdnfonts.com/css/geist');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --gh-font-sans: 'Geist', 'Geist Sans', 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    --gh-color-bg: #050505;
+    --gh-color-bg-soft: #070707;
+    --gh-color-bg-alt: #0f1412;
+    --gh-color-cta-start: #0d5b3f;
+    --gh-color-cta-end: #13a86b;
+    --gh-color-card-orange-start: #af5a13;
+    --gh-color-card-orange-end: #f2a33a;
+
+    --gh-color-text-primary: #ffffff;
+    --gh-color-text-secondary: rgba(255, 255, 255, 0.8);
+    --gh-color-text-muted: rgba(255, 255, 255, 0.6);
+
+    --gh-radius-lg: 2.5rem; /* 40px */
+    --gh-radius-card: 2rem; /* 32px */
+    --gh-radius-pill: 999px;
+
+    --gh-spacing-section-x: 1rem;
+    --gh-spacing-section-y: 2.5rem;
+
+    --gh-shadow-header: 0 10px 40px rgba(0, 0, 0, 0.45);
+    --gh-shadow-card: 0 25px 70px rgba(0, 0, 0, 0.35);
+    --gh-shadow-cta: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--gh-font-sans);
+    background: radial-gradient(circle at top, rgba(15, 20, 18, 0.55), transparent 60%),
+      linear-gradient(135deg, #050505, #0f1412 60%);
+    color: var(--gh-color-text-primary);
+  }
+
+  main {
+    width: 100%;
+    padding: var(--gh-spacing-section-y) var(--gh-spacing-section-x);
+  }
+}
+
+@layer components {
+  .cta-gradient {
+    background-image: linear-gradient(135deg, var(--gh-color-cta-start), var(--gh-color-cta-end));
+    box-shadow: var(--gh-shadow-cta);
+  }
+
+  .surface-panel {
+    border-radius: var(--gh-radius-card);
+    background: linear-gradient(180deg, var(--gh-color-bg-soft), var(--gh-color-bg));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2rem;
+    box-shadow: var(--gh-shadow-card);
+  }
+}
